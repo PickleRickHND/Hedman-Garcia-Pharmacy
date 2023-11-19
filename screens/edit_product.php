@@ -5,11 +5,11 @@ if(empty($_SESSION["id"])){
     exit;
 }
 
-include "../Configuracion/Conexion.php";
-global $conexion;
+include "../settings/db_connection.php";
+global $connection;
 
 $id=$_GET['id_producto'];
-$seleccionar=$conexion->query("SELECT * FROM Inventario WHERE id_producto='$id'");
+$seleccionar=$connection->query("SELECT * FROM Inventario WHERE id_producto='$id'");
 
 ?>
 
@@ -19,8 +19,8 @@ $seleccionar=$conexion->query("SELECT * FROM Inventario WHERE id_producto='$id'"
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../Imagenes/icono.png">
-    <title>Farmacia HG</title>
+    <link rel="icon" type="image/png" href="../images/icono.png">
+    <title>Edit Product</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -51,39 +51,39 @@ $seleccionar=$conexion->query("SELECT * FROM Inventario WHERE id_producto='$id'"
 <div class="container w-75 bg-white mt-5 rounded shadow">
     <div class="row align-items-center align-items-stretch">
         <div class="col bg-white p-5 rounded bg">
-            <h2 class="fw-bold text-center ру-5"><strong>Farmacia Hedman Garcia</strong></h2><br>
-            <h3 class="fw-bold text-center ру-5">Editar Producto</h3>
+            <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+            <h3 class="fw-bold text-center ру-5">Edit Product</h3>
             <br>
             <div>
                 <form method="post" action="">
                     <?php
-                    include "../Controladores/EditarProducto.php";
+                    include "../controllers/validations.php";
                     while ($datos=$seleccionar->fetch_object()){ ?>
 
                         <div class="mb-3">
                             <input type="hidden" name="id_producto" value="<?= $_GET['id_producto']?>">
                             <br>
-                            <label for="recipient-name1" class="col-form-label">N.º de Producto:</label>
-                            <input type="text" class="form-control" maxlength="6" id="recipient-name1" placeholder="N.º de Producto" name="number" value="<?= $datos->id_producto?>">
+                            <label for="recipient-name1" class="col-form-label">Product N.º :</label>
+                            <input type="text" class="form-control" maxlength="6" id="recipient-name1" placeholder="Product N.º:" name="number" value="<?= $datos->id_producto?>">
                             <br>
-                            <label for="recipient-name1" class="col-form-label">Nombre:</label>
-                            <input type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name" value="<?= $datos->nombre_producto?>">
+                            <label for="recipient-name1" class="col-form-label">Name:</label>
+                            <input type="text" class="form-control" id="recipient-name1" placeholder="Name" name="name" value="<?= $datos->nombre_producto?>">
                             <br>
-                            <label for="recipient-name2" class="col-form-label">Descripción:</label>
+                            <label for="recipient-name2" class="col-form-label">Description:</label>
                             <textarea style="height: 120px;" type="text" class="form-control" id="recipient-name2"  name="description"><?= $datos->descripcion?></textarea>
                             <br>
-                            <label for="recipient-name3" class="col-form-label">Existencia:</label>
+                            <label for="recipient-name3" class="col-form-label">Existence:</label>
                             <input type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Cantidad" name="quantity" value="<?= $datos->existencia_producto?>">
                             <br>
-                            <label for="recipient-name5" class="col-form-label">Precio:</label>
+                            <label for="recipient-name5" class="col-form-label">Price:</label>
                             <input type="text" min="0" max="100000" class="form-control" id="recipient-name5" placeholder="Precio" name="price" value="<?= $datos->precio?>">
                             <br>
-                            <label for="recipient-name6" class="col-form-label">Presentación:</label>
+                            <label for="recipient-name6" class="col-form-label">Presentation:</label>
                             <input type="text" class="form-control" id="recipient-name6" placeholder="Presentación" name="presentation" value="<?= $datos->presentacion_producto?>">
                             <br>
 
                             <div>
-                                <label for="recipient-name7" class="col-form-label">Fecha de Vencimiento:</label>
+                                <label for="recipient-name7" class="col-form-label">Expiration Date:</label>
                                 <div class="input-group date" id="datetimepicker" data-target-input="nearest">
                                     <div class="input-group-append " data-target="#datetimepicker" data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="bi bi-calendar-plus-fill"></i></div>
@@ -101,18 +101,18 @@ $seleccionar=$conexion->query("SELECT * FROM Inventario WHERE id_producto='$id'"
                             </div>
 
                             <br>
-                            <label for="recipient-name8" class="col-form-label">Forma de Administración:</label>
+                            <label for="recipient-name8" class="col-form-label">Administration Way:</label>
                             <input type="text" class="form-control" id="recipient-name8" placeholder="Forma de Administración" name="administration_form" value="<?= $datos->forma_administracion?>">
                             <br>
-                            <label for="recipient-name9" class="col-form-label">Almacenamiento:</label>
+                            <label for="recipient-name9" class="col-form-label">Storage:</label>
                             <input type="text" class="form-control" id="recipient-name9" placeholder="Almacenamiento" name="storage" value="<?= $datos->almacenamiento?>">
                         </div>
 
                     <?php }
                     ?>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-danger" href="Control_Inventario.php">Cerrar</a>
-                        <input type="submit" class="btn btn-primary" value="Modificar" name="editarproductobtn">
+                        <a type="button" class="btn btn-danger" href="inventory_control.php">Close</a>
+                        <input type="submit" class="btn btn-primary" value="Edit" name="edit_product_button">
                     </div>
                 </form>
             </div>

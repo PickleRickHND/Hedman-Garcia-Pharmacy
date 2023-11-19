@@ -5,13 +5,13 @@ if(empty($_SESSION["id"])){
     exit;
 }
 
-include "../Configuracion/Conexion.php";
-global $conexion;
+include "../settings/db_connection.php";
+global $connection;
 
 $id_session = $_SESSION["id"];
-$query_seller = $conexion->query("SELECT * FROM Usuarios WHERE id='$id_session'");
-$query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
-
+$query_seller = $connection->query("SELECT * FROM Usuarios WHERE id='$id_session'");
+$query_paymentMethod = $connection->query("SELECT formas_pago FROM Metodos_Pago");
+global $datos;
 ?>
 
 <!DOCTYPE html>
@@ -20,14 +20,14 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../Imagenes/icono.png">
-    <title>Farmacia HG</title>
+    <link rel="icon" type="image/png" href="../images/icono.png">
+    <title>Billing Module</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../CSS/styles.css" type="text/css">
+    <link rel="stylesheet" href="../css/styles.css" type="text/css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -51,25 +51,35 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
 <div class="container w-90 bg-white mt-5 rounded shadow">
     <div class="row align-items-center align-items-stretch">
         <div class="col bg-white p-5 rounded bg">
-            <h2 class="fw-bold text-center ру-5"><strong>Farmacia Hedman Garcia</strong></h2><br>
-            <h3 class="fw-bold text-center ру-5"><strong>Historial de Facturación</strong></h3>
+            <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+            <h3 class="fw-bold text-center ру-5"><strong>Billing History</strong></h3>
             <br>
 
             <div class="mb-3 d-flex justify-content-between align-items-center">
                 <button type="button" class="btn btn-small btn-success" data-toggle="modal" data-target=".bd-example-modal-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 20 20">
                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
-                    </svg> Crear Nueva Factura
+                    </svg> Generate New Receipt
                 </button>
-                    <input type="text" style="width: 300px" class="form-control" id="buscar-factura" placeholder="Buscar Factura">
-
+                    <input type="text" style="width: 300px" class="form-control" id="buscar-factura" placeholder="Search for Receipts">
             </div>
+
+            <script>
+                $(document).ready(function() {
+                    $("#buscar-factura").on("keyup", function() {
+                        var searchText = $(this).val().toLowerCase();
+                        $("#tabla1 tbody tr").filter(function() {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1)
+                        });
+                    });
+                });
+            </script>
 
             <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Nueva Factura: </h5>
+                            <h5 class="modal-title" id="exampleModalLabel">New Receipt: </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -80,7 +90,7 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                     <div class="mb-3 d-flex justify-content-between align-items-center">
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
                                             <label for="recipient-name1" class="col-form-label"></label>
-                                            <input style="width: 250px" type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name">
+                                            <input style="width: 250px" type="text" class="form-control" id="recipient-name1" placeholder="Name" name="name">
                                         </div>
 
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -140,7 +150,7 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
 
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
                                             <select style="width: 250px" class="form-select" name="payment_method">
-                                                <option>Método de Pago</option>
+                                                <option>Payment Method</option>
                                                 <?php
                                                 while($fetch_PaymentMethod = $query_paymentMethod->fetch_object()) {
                                                     echo '<option value="' . $fetch_PaymentMethod->formas_pago . '">' . $fetch_PaymentMethod->formas_pago . '</option>';
@@ -155,7 +165,7 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                                 <div class="input-group-append">
                                                     <div onclick="updateDate()" class="input-group-text"><i class="bi bi-calendar-x"></i></i></div>
                                                 </div>
-                                                <input onclick="updateDate()" value="Vencimeinto" id="selected-date" type="text" style="width: 192px" class="form-control" placeholder="Vencimiento" name="expiration_date_invoice" readonly/>
+                                                <input onclick="updateDate()" value="Vencimeinto" id="selected-date" type="text" style="width: 192px" class="form-control" placeholder="Expiration" name="expiration_date_invoice" readonly/>
                                             </div>
 
                                             <script>
@@ -176,9 +186,9 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                         <button type="button" class="btn btn-small btn-warning" onclick="limpiarCampos()" style="width: 250px">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eraser" viewBox="0 0 20 20">
                                                 <path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
-                                            </svg> Borrar todos los campos
+                                            </svg> Clean the blanks
                                         </button>
-                                        <input style="width: 232px;" type="text" class="form-control" id="buscar-producto" placeholder="Buscar Productos">
+                                        <input style="width: 232px;" type="text" class="form-control" id="buscar-producto" placeholder="Search for Products">
 
                                         <script>
                                             $(document).ready(function() {
@@ -188,7 +198,7 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                                     // Realiza una solicitud AJAX para buscar productos
                                                     $.ajax({
                                                         type: "POST",
-                                                        url: "../Controladores/Busqueda_Productos.php",
+                                                        url: "../controllers/product_search.php",
                                                         data: { searchText: searchText },
                                                         dataType: "json",
                                                         success: function(response) {
@@ -204,7 +214,7 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                                                 newRow.append("<td style='align-items: center' class='align-items-center justify-content-center'><input class='form-control' style='width: 60px;'>" + "</td>");
                                                                 newRow.append("<td style='text-align:center; white-space: nowrap;'>Lps. " + producto.precio + "</td>");
                                                                 newRow.append("<td style='text-align:center'>" + producto.presentacion_producto + "</td>");
-                                                                newRow.append("<td style='text-align:center'><div class='d-flex justify-content-center align-items-center'> <a onclick='#' class='btn btn-primary'> <span class='d-flex align-items-center'> <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-cart-plus' viewBox='0 0 16 16'><path d='M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z'/><path d='M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/></svg></span></a></div></td>");
+                                                                newRow.append("<td style='text-align:center'><div class='d-flex justify-content-center align-items-center'> <a onclick='#' href=" + producto.id_producto + "'billing.php?id_producto=' class='btn btn-primary'> <span class='d-flex align-items-center'> <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-cart-plus' viewBox='0 0 16 16'><path d='M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z'/><path d='M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/></svg></span></a></div></td>");
 
                                                                 $("#tabla2 tbody").append(newRow);
                                                             }
@@ -226,23 +236,23 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                         <table class="table table-hover" id="tabla2">
                                             <thead>
                                             <tr>
-                                                <th style="text-align:center" scope="col">N.º de Producto</th>
-                                                <th style="text-align:center" scope="col">Nombre</th>
-                                                <th style="text-align:center" scope="col">Unidades</th>
-                                                <th style="text-align:center" scope="col">Precio</th>
-                                                <th style="text-align:center" scope="col">Presentación</th>
-                                                <th style="text-align:center" scope="col">Acciones</th>
+                                                <th style="text-align:center" scope="col">Product N.º </th>
+                                                <th style="text-align:center" scope="col">Name</th>
+                                                <th style="text-align:center" scope="col">Quantity</th>
+                                                <th style="text-align:center" scope="col">Price</th>
+                                                <th style="text-align:center" scope="col">Presentation</th>
+                                                <th style="text-align:center" scope="col">Actions</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <?php
-                                            include "../Configuracion/Conexion.php";
-                                            global $conexion;
+                                            include "../settings/db_connection.php";
+                                            global $connection;
 
                                             $productosPorPagina = 3; // Cambiar esto al número deseado de productos por página
 
                                             // Contar el número total de productos
-                                            $totalProductos = $conexion->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
+                                            $totalProductos = $connection->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
                                             $totalPaginas = ceil($totalProductos / $productosPorPagina);
 
                                             $paginaActual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
@@ -256,7 +266,7 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                             $indiceInicio = ($paginaActual - 1) * $productosPorPagina;
 
                                             $sql = "SELECT * FROM Inventario LIMIT $productosPorPagina OFFSET $indiceInicio";
-                                            $resultado = $conexion->query($sql);
+                                            $resultado = $connection->query($sql);
 
                                             while($datos=$resultado->fetch_object()){ ?>
 
@@ -296,8 +306,8 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                                    <input type="submit" class="btn btn-success" value="Generar Factura" name="generarfacturabtn">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                    <input type="submit" class="btn btn-success" value="Generate Receipt" name="new_billing_button">
                                 </div>
                             </form>
                         </div>
@@ -305,33 +315,33 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                 </div>
             </div>
 
-            <?php include "../Configuracion/Conexion.php";?>
-            <?php include "../Controladores/Realizar_Facturacion.php";?>
+            <?php include "../settings/db_connection.php";?>
+            <?php include "../controllers/validations.php";?>
 
             <table class="table table-hover" id="tabla1">
                 <thead>
                 <tr>
-                    <th style="text-align:center" scope="col">N.º de Factura</th>
-                    <th style="text-align:center" scope="col">Fecha / Hora</th>
-                    <th style="text-align:center" scope="col">Cliente </th>
+                    <th style="text-align:center" scope="col">Receipt N.º</th>
+                    <th style="text-align:center" scope="col">Date / Time</th>
+                    <th style="text-align:center" scope="col">Client </th>
                     <th style="text-align:center" scope="col">RTN</th>
-                    <th style="text-align:center" scope="col">Cajero </th>
-                    <th style="text-align:center" scope="col">Estado</th>
-                    <th style="text-align:center" scope="col">Método de pago</th>
+                    <th style="text-align:center" scope="col">Cashier </th>
+                    <th style="text-align:center" scope="col">Status</th>
+                    <th style="text-align:center" scope="col">Payment Method</th>
                     <th style="text-align:center" scope="col">Total</th>
-                    <th style="text-align:center" scope="col">Acciones</th>
+                    <th style="text-align:center" scope="col">Actions</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
-                include "../Configuracion/Conexion.php";
-                global $conexion;
+                include "../settings/db_connection.php";
+                global $connection;
 
                 $facturasPorPagina = 5;
 
                 // Contar el número total de productos
-                $totalFacturas = $conexion->query("SELECT COUNT(*) as total FROM Facturas")->fetch_assoc()['total'];
+                $totalFacturas = $connection->query("SELECT COUNT(*) as total FROM Facturas")->fetch_assoc()['total'];
                 $totalPaginas = ceil($totalFacturas / $facturasPorPagina);
 
                 $paginaActual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
@@ -345,7 +355,7 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
                 $indiceInicio = ($paginaActual - 1) * $facturasPorPagina;
 
                 $sql = "SELECT * FROM Facturas LIMIT $facturasPorPagina OFFSET $indiceInicio";
-                $resultado = $conexion->query($sql);
+                $resultado = $connection->query($sql);
 
                 while($datos=$resultado->fetch_object()){ ?>
 
@@ -396,11 +406,11 @@ $query_paymentMethod = $conexion->query("SELECT formas_pago FROM Metodos_Pago");
             <br>
             <div class="text-center">
                 <?php if ($paginaActual > 1): ?>
-                    <a href="?pagina=<?php echo $paginaActual - 1; ?>" class="btn btn-primary">Anterior</a>
+                    <a href="?pagina=<?php echo $paginaActual - 1; ?>" class="btn btn-primary">Previous</a>
                 <?php endif; ?>
 
                 <?php if ($paginaActual < $totalPaginas): ?>
-                    <a href="?pagina=<?php echo $paginaActual + 1; ?>" class="btn btn-primary">Siguiente</a>
+                    <a href="?pagina=<?php echo $paginaActual + 1; ?>" class="btn btn-primary">Next</a>
                 <?php endif; ?>
             </div>
             <br>

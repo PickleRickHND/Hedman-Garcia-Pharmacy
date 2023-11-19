@@ -1,15 +1,15 @@
 <?php
 
-include "../Configuracion/Conexion.php";
-global $conexion;
+include "../settings/db_connection.php";
+global $connection;
 
 if(!empty($_GET['id_producto'])){
     $id=$_GET['id_producto'];
-    $eliminar=$conexion->query("DELETE FROM Inventario WHERE id_producto=$id");
+    $eliminar=$connection->query("DELETE FROM Inventario WHERE id_producto=$id");
     if ($eliminar == TRUE){
-        echo "<div class= 'alert alert-success'>Producto Eliminado Correctamente!</div>";
+        echo "<div class= 'alert alert-success'>Product Deleted Succesfully!</div>";
     }else{
-        echo "<div class= 'alert alert-danger'>Ah ocurrido un Error al Eliminar este Producto!</div>";
+        echo "<div class= 'alert alert-danger'>An Error occurred while deleting this Product!</div>";
     }?>
 
     <script>
