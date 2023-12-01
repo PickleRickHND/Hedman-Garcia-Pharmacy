@@ -116,7 +116,6 @@ if(empty($_SESSION["id"])){
                                         </div>
                                     </div>
 
-
                                     <div class="mb-3 d-flex justify-content-between align-items-center">
 
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
