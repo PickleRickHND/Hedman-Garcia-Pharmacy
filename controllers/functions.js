@@ -123,7 +123,7 @@ $(document).ready(function() {
                     newRow.append("<td style='text-align:center'>" + producto.nombre_producto + "</td>");
                     newRow.append("<td style='text-align:justify'>" + producto.descripcion + "</td>");
                     newRow.append("<td style='text-align:center'>" + producto.existencia_producto + "</td>");
-                    newRow.append("<td style='text-align:center; white-space: nowrap;'>" + Lps. producto.precio + "</td>");
+                    newRow.append("<td style='text-align:center; white-space: nowrap;'>" + 'Lps. ' + producto.precio + "</td>");
                     newRow.append("<td style='text-align:center'>" + producto.presentacion_producto + "</td>");
                     newRow.append("<td style='text-align:center'>" + producto.fecha_vencimiento + "</td>");
                     newRow.append("<td style='text-align:center'>" + producto.forma_administracion + "</td>");
