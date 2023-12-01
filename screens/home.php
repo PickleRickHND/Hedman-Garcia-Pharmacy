@@ -12,7 +12,7 @@ if(empty($_SESSION["id"])){
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../images/icono.png">
+    <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Home</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -37,20 +37,20 @@ if(empty($_SESSION["id"])){
     global $connection;
 
     $sql=$connection->query("SELECT * FROM Usuarios");
-    $datos=$sql->fetch_object();
+    $data=$sql->fetch_object();
     ?>
 
 </head>
 <body style="margin-top: 7%">
 <div class="container w-75 bg-white mt-5 rounded shadow">
     <div class="row align-items-center">
-        <img src="../images/Mostradora%20con%20Cliente.png" style="width:560px" alt="">
+        <img src="../images/homeImage.png" style="width:560px" alt="">
         <div class="col bg-white p-5 rounded bg">
             <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
             <h4 class="fw-bold text-center ру-5">Hi <?php echo $_SESSION["nombre"];?>, How can I help today?</h4>
             <br>
             <div class="fw-bold text-center d-grid">
-                <a href="account_settings.php?id=<?= $datos->id?>" class="btn btn-small btn-info btn-block"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 20 20">
+                <a href="account_settings.php?id=<?= $data->id?>" class="btn btn-small btn-info btn-block"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 20 20">
                         <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
                     </svg> Account Settings</a>
             </div>

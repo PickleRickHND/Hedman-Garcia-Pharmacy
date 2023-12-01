@@ -12,7 +12,7 @@ if(empty($_SESSION["codigo"])){
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../images/icono.png">
+    <link rel="icon" type="image/png" href="../images/icon.png">
     <title>New Password</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -35,7 +35,7 @@ if(empty($_SESSION["codigo"])){
 <body>
 <div class="container w-75 bg-white mt-5 rounded shadow">
     <div class="row align-items-center align-items-stretch">
-        <img src="../images/Farmaceutico%20en%20el%20mostrador%20con%20cliente.png" style="width:550px" alt="">
+    <img src="../images/loginImage.png" style="width:550px" alt="">
         <div class="col bg-white p-5 rounded bg">
             <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
             <h4 class="fw-bold text-center ру-5">Password Update</h4>
@@ -43,12 +43,12 @@ if(empty($_SESSION["codigo"])){
             <form method="post" action="">
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="password"><i class="bi bi-key-fill"></i></span>
-                    <input name="newpassword1" id="newpassword1" class="form-control" type="password" placeholder="New Password">
+                    <input name="newPassword1" id="newPassword1" class="form-control" type="password" placeholder="New Password">
                 </div>
 
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="password"><i class="bi bi-key-fill"></i></span>
-                    <input name="newpassword2" id="newpassword2" class="form-control" type="password" placeholder="Verify New Password">
+                    <input name="newPassword2" id="newPassword2" class="form-control" type="password" placeholder="Verify New Password">
                 </div>
 
                 <div class="d-grid">

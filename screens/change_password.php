@@ -17,7 +17,7 @@ if ($_SESSION["id"] != $_GET['id']) {
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../images/icono.png">
+    <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Change Password</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
@@ -33,7 +33,7 @@ if ($_SESSION["id"] != $_GET['id']) {
 <body style="margin-top: 8%">
 <div class="container w-75 bg-white mt-5 rounded shadow">
     <div class="row align-items-center align-items-stretch">
-        <img src="../images/Mostradora%20con%20Cliente.png" style="width:560px" alt="">
+        <img src="../images/loginImage.png" style="width:560px" alt="">
         <div class="col bg-white p-5 rounded bg">
             <h2 class="fw-bold text-center ру-5">Hedman Garcia Pharmacy</h2><br>
             <h4 class="fw-bold text-center ру-5">Change Password</h4>
@@ -43,17 +43,17 @@ if ($_SESSION["id"] != $_GET['id']) {
                 <input type="hidden" name="id_user" value="<?= $_GET['id']?>">
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="password"><i class="bi bi-key"></i></span>
-                    <input name="currentpassword" id="currentpassword" class="form-control" type="password" placeholder="Current Password">
+                    <input name="currentPassword" id="currentPassword" class="form-control" type="password" placeholder="Current Password">
                 </div>
 
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="password"><i class="bi bi-key-fill"></i></span>
-                    <input name="newpassword1" id="newpassword1" class="form-control" type="password" placeholder="New Password">
+                    <input name="newPassword1" id="newPassword1" class="form-control" type="password" placeholder="New Password">
                 </div>
 
                 <div class="input-group mb-4">
                     <span class="input-group-text" id="password"><i class="bi bi-key-fill"></i></span>
-                    <input name="newpassword2" id="newpassword2" class="form-control" type="password" placeholder="Verify New Password">
+                    <input name="newPassword2" id="newPassword2" class="form-control" type="password" placeholder="Verify New Password">
                 </div>
 
                 <div class="d-grid">

@@ -7,9 +7,9 @@ if(!empty($_GET['id'])){
     $id=$_GET['id'];
     $eliminar=$connection->query("DELETE FROM Usuarios WHERE id=$id");
     if ($eliminar == TRUE){
-        echo "<div class= 'alert alert-success'>User deleted Succesfully!</div>";
+        echo "<div class= 'alert alert-success'>User deleted Successfully!</div>";
     }else{
-        echo "<div class= 'alert alert-danger'>An Error has occured while deleting this user!</div>";
+        echo "<div class= 'alert alert-danger'>An Error has occurred while deleting this user!</div>";
     }?>
 
     <script>

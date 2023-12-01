@@ -9,7 +9,7 @@ include "../settings/db_connection.php";
 global $connection;
 
 $id=$_GET['id_producto'];
-$seleccionar=$connection->query("SELECT * FROM Inventario WHERE id_producto='$id'");
+$selectProduct=$connection->query("SELECT * FROM Inventario WHERE id_producto='$id'");
 
 ?>
 
@@ -19,7 +19,7 @@ $seleccionar=$connection->query("SELECT * FROM Inventario WHERE id_producto='$id
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../images/icono.png">
+    <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Edit Product</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
@@ -58,28 +58,28 @@ $seleccionar=$connection->query("SELECT * FROM Inventario WHERE id_producto='$id
                 <form method="post" action="">
                     <?php
                     include "../controllers/validations.php";
-                    while ($datos=$seleccionar->fetch_object()){ ?>
+                    while ($data=$selectProduct->fetch_object()){ ?>
 
                         <div class="mb-3">
                             <input type="hidden" name="id_producto" value="<?= $_GET['id_producto']?>">
                             <br>
                             <label for="recipient-name1" class="col-form-label">Product N.º :</label>
-                            <input type="text" class="form-control" maxlength="6" id="recipient-name1" placeholder="Product N.º:" name="number" value="<?= $datos->id_producto?>">
+                            <input type="text" class="form-control" maxlength="6" id="recipient-name1" placeholder="Product N.º:" name="number" value="<?= $data->id_producto?>">
                             <br>
                             <label for="recipient-name1" class="col-form-label">Name:</label>
-                            <input type="text" class="form-control" id="recipient-name1" placeholder="Name" name="name" value="<?= $datos->nombre_producto?>">
+                            <input type="text" class="form-control" id="recipient-name1" placeholder="Name" name="name" value="<?= $data->nombre_producto?>">
                             <br>
                             <label for="recipient-name2" class="col-form-label">Description:</label>
-                            <textarea style="height: 120px;" type="text" class="form-control" id="recipient-name2"  name="description"><?= $datos->descripcion?></textarea>
+                            <textarea style="height: 120px;" type="text" class="form-control" id="recipient-name2"  name="description"><?= $data->descripcion?></textarea>
                             <br>
                             <label for="recipient-name3" class="col-form-label">Existence:</label>
-                            <input type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Cantidad" name="quantity" value="<?= $datos->existencia_producto?>">
+                            <input type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Cantidad" name="quantity" value="<?= $data->existencia_producto?>">
                             <br>
                             <label for="recipient-name5" class="col-form-label">Price:</label>
-                            <input type="text" min="0" max="100000" class="form-control" id="recipient-name5" placeholder="Precio" name="price" value="<?= $datos->precio?>">
+                            <input type="text" min="0" max="100000" class="form-control" id="recipient-name5" placeholder="Precio" name="price" value="<?= $data->precio?>">
                             <br>
                             <label for="recipient-name6" class="col-form-label">Presentation:</label>
-                            <input type="text" class="form-control" id="recipient-name6" placeholder="Presentación" name="presentation" value="<?= $datos->presentacion_producto?>">
+                            <input type="text" class="form-control" id="recipient-name6" placeholder="Presentación" name="presentation" value="<?= $data->presentacion_producto?>">
                             <br>
 
                             <div>
@@ -88,24 +88,16 @@ $seleccionar=$connection->query("SELECT * FROM Inventario WHERE id_producto='$id
                                     <div class="input-group-append " data-target="#datetimepicker" data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="bi bi-calendar-plus-fill"></i></div>
                                     </div>
-                                    <input type="text" style="width: 189px" class="form-control datetimepicker-input" id="recipient-name7" data-target="#datetimepicker" name="expiration_date" value="<?= $datos->fecha_vencimiento?>"/>
+                                    <input type="text" style="width: 189px" class="form-control datetimepicker-input" id="recipient-name7" data-target="#datetimepicker" name="expiration_date" value="<?= $data->fecha_vencimiento?>"/>
                                 </div>
-
-                                <script>
-                                    $(document).ready(function () {
-                                        $('#datetimepicker').datetimepicker({
-                                            format: 'DD-MM-YYYY',
-                                        });
-                                    });
-                                </script>
                             </div>
 
                             <br>
                             <label for="recipient-name8" class="col-form-label">Administration Way:</label>
-                            <input type="text" class="form-control" id="recipient-name8" placeholder="Forma de Administración" name="administration_form" value="<?= $datos->forma_administracion?>">
+                            <input type="text" class="form-control" id="recipient-name8" placeholder="Forma de Administración" name="administration_form" value="<?= $data->forma_administracion?>">
                             <br>
                             <label for="recipient-name9" class="col-form-label">Storage:</label>
-                            <input type="text" class="form-control" id="recipient-name9" placeholder="Almacenamiento" name="storage" value="<?= $datos->almacenamiento?>">
+                            <input type="text" class="form-control" id="recipient-name9" placeholder="Almacenamiento" name="storage" value="<?= $data->almacenamiento?>">
                         </div>
 
                     <?php }
@@ -121,3 +113,4 @@ $seleccionar=$connection->query("SELECT * FROM Inventario WHERE id_producto='$id
 </div>
 </body>
 </html>
+<script src="../controllers/functions.js"></script>

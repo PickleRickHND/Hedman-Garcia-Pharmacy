@@ -25,10 +25,10 @@ if (!empty($_POST["login_button"])){
             $fetch_password = $fetch['contrasena'];
             if(password_verify($contrasena, $fetch_password)){
                 $check_email_for_password = $connection->query("SELECT * FROM Usuarios WHERE correo='$correo'");
-                if ($datos=$check_email_for_password->fetch_object()) {
-                    $_SESSION["id"] = $datos->id;
-                    $_SESSION["nombre"] = $datos->nombre;
-                    $_SESSION["apellido"] = $datos->apellido;
+                if ($data=$check_email_for_password->fetch_object()) {
+                    $_SESSION["id"] = $data->id;
+                    $_SESSION["nombre"] = $data->nombre;
+                    $_SESSION["apellido"] = $data->apellido;
                     header("location: screens/home.php");
                 }
             }else{
@@ -55,7 +55,7 @@ if (!empty($_POST["reset_password_button"])) {
         }else {
             echo "<div class= 'alert alert-danger'>Please enter a valid value for Email!</div>";
         }
-        if ($datos = $email_to_reset_check->fetch_object()) {
+        if ($data = $email_to_reset_check->fetch_object()) {
             echo "<div class= 'alert alert-success'>Recovery code sent to your email! Please check your Inboxes.</div>";
             try {
                 $code = $connection->real_escape_string(bin2hex(random_bytes(5)));
@@ -109,13 +109,13 @@ if (!empty($_POST["save_user_button"])) {
                                 if (mysqli_num_rows($check_correo) > 0){
                                     echo "<div class= 'alert alert-danger'>Email is already in use by another account!</div>";
                                 }else{
-                                    function generarID($conexion) {
+                                    function generarID($connection) {
                                         $numeroID = rand(1000, 999999);
                                         $query = "SELECT * FROM Usuarios WHERE id = $numeroID";
-                                        $result = $conexion->query($query);
+                                        $result = $connection->query($query);
 
                                         if ($result->num_rows > 0) {
-                                            return generarID($conexion);
+                                            return generarID($connection);
                                         } else {
                                             return $numeroID;
                                         }
@@ -157,8 +157,8 @@ if (!empty($_POST["verify_code_button"])) {
     if (!empty($_POST["code"])) {
         $codigo = $connection->real_escape_string($_POST["code"]);
         $sql = $connection->query("SELECT * FROM Usuarios WHERE codigo='$codigo'");
-        if ($datos = $sql->fetch_object()) {
-            $_SESSION["codigo"]=$datos->codigo;
+        if ($data = $sql->fetch_object()) {
+            $_SESSION["codigo"]=$data->codigo;
             echo "<div class= 'alert alert-success'>Code is Correct! Let's change your password!</div>";
             header( "refresh:3;url=../screens/new_password.php" );
 
@@ -189,13 +189,13 @@ if (!empty($_POST["resend_code_button"])) {
 
 //This Validation is used to confirm the password change when user wants to reset password through login
 if (!empty($_POST["user_password_confirmation_button"])) {
-    if (!empty($_POST["newpassword1"]) and (!empty($_POST["newpassword2"]))) {
+    if (!empty($_POST["newPassword1"]) and (!empty($_POST["newPassword2"]))) {
 
         $code = $connection->real_escape_string(0);
         $codigo = $_SESSION['codigo'];
 
-        $password1 = $connection->real_escape_string($_POST['newpassword1']);
-        $password2 = $connection->real_escape_string($_POST['newpassword2']);
+        $password1 = $connection->real_escape_string($_POST['newPassword1']);
+        $password2 = $connection->real_escape_string($_POST['newPassword2']);
         $crypt_password = password_hash($password1, PASSWORD_DEFAULT);
 
         if (strlen($password1) >= 8) {
@@ -226,22 +226,22 @@ if (!empty($_POST["user_password_confirmation_button"])) {
 }
 
 
-//This Validation is used to Change users password throught account settings
+//This Validation is used to Change users password thought account settings
 if (!empty($_POST["user_password_change_button"])) {
-    if ((!empty($_POST["currentpassword"])) and (!empty($_POST["newpassword1"])) and (!empty($_POST["newpassword2"]))) {
+    if ((!empty($_POST["currentPassword"])) and (!empty($_POST["newPassword1"])) and (!empty($_POST["newPassword2"]))) {
         $id_connected = $_POST['id_user'];
-        $currentpassword = $connection->real_escape_string($_POST["currentpassword"]);
-        $password1 = $connection->real_escape_string($_POST['newpassword1']);
-        $password2 = $connection->real_escape_string($_POST['newpassword2']);
+        $currentPassword = $connection->real_escape_string($_POST["currentPassword"]);
+        $password1 = $connection->real_escape_string($_POST['newPassword1']);
+        $password2 = $connection->real_escape_string($_POST['newPassword2']);
         $crypt_password = password_hash($password1, PASSWORD_DEFAULT);
 
         $check_password = $connection->query("SELECT * FROM Usuarios WHERE id='$id_connected'");
         $fetch = mysqli_fetch_assoc($check_password);
         $fetch_password = $fetch['contrasena'];
 
-        if(password_verify($currentpassword, $fetch_password)){
+        if(password_verify($currentPassword, $fetch_password)){
             $check_password2 = $connection->query("SELECT * FROM Usuarios WHERE id='$id_connected'");
-            if ($datos=$check_password2->fetch_object()) {
+            if ($data=$check_password2->fetch_object()) {
                 if (strlen($password1) >= 8) {
                     if (preg_match("/^[a-zA-Z0-9@_.!]+$/", $password1)) {
                         if ($password1 !== $password2) {
@@ -302,9 +302,9 @@ if (!empty($_POST["save_product_button"])) {
                                                 $insert_product = "INSERT INTO Inventario (id_producto,nombre_producto,descripcion,existencia_producto,precio,presentacion_producto,fecha_vencimiento,forma_administracion,almacenamiento) VALUES ('$number','$name','$description','$quantity','$price','$presentation','$expiration_date','$administration_form','$storage')";
                                                 $response = mysqli_query($connection, $insert_product);
                                                 if ($response === TRUE) {
-                                                    echo "<div class= 'alert alert-success'>New Product added Succesfully!</div>";
+                                                    echo "<div class= 'alert alert-success'>New Product added Successfully!</div>";
                                                 } else {
-                                                    echo "<div class= 'alert alert-danger'>An Error has occured while adding the Product! Please try again later.</div>";
+                                                    echo "<div class= 'alert alert-danger'>An Error has occurred while adding the Product! Please try again later.</div>";
                                                 }
                                             }else{
                                                 echo "<div class= 'alert alert-danger'>Storage information is not Valid!</div>";
@@ -373,10 +373,10 @@ if (!empty($_POST["edit_product_button"])){
                                                 $edit_product=("UPDATE Inventario SET id_producto='$number',nombre_producto='$name',descripcion='$description',existencia_producto='$quantity',precio='$price',presentacion_producto='$presentation',fecha_vencimiento='$expiration_date',forma_administracion='$administration_form',almacenamiento='$storage' WHERE id_producto='$id'");
                                                 $response = mysqli_query($connection, $edit_product);
                                                 if ($response === TRUE) {
-                                                    echo "<div class= 'alert alert-success'>Product editted Succesfully!</div>";
+                                                    echo "<div class= 'alert alert-success'>Product edited Successfully!</div>";
                                                     header("refresh:3;url=inventory_control.php");
                                                 } else {
-                                                    echo "<div class= 'alert alert-danger'>An Error has occured while editing the Product! Please try again later.</div>";
+                                                    echo "<div class= 'alert alert-danger'>An Error has occurred while editing the Product! Please try again later.</div>";
                                                 }
                                             }else{
                                                 echo "<div class= 'alert alert-danger'>Storage information is not Valid!</div>";
@@ -427,7 +427,7 @@ if (!empty($_POST["edit_user_button"])){
                     $edit=$connection->query("UPDATE Usuarios SET nombre='$name',apellido='$lastname',correo='$email',roles='$roles' WHERE id='$id'");
 
                     if ($edit == 1){
-                        echo "<div class= 'alert alert-success'>User has been modified succesfully!</div>";
+                        echo "<div class= 'alert alert-success'>User has been modified successfully!</div>";
                         header( "refresh:3;url=user_management.php" );
                     }else{
                         echo "<div class= 'alert alert-danger'>An Error has occurred while trying to modify this user! Please try again later.</div>";
@@ -463,7 +463,7 @@ if (!empty($_POST["edit_user_settings_button"])){
                     $edit=$connection->query("UPDATE Usuarios SET nombre='$name',apellido='$lastname',correo='$email' WHERE id='$id'");
 
                     if ($edit == 1){
-                        echo "<div class= 'alert alert-success'>User has been modified sucessfully!</div>";
+                        echo "<div class= 'alert alert-success'>User has been modified successfully!</div>";
                         header( "refresh:3;url=home.php" );
                     }else{
                         echo "<div class= 'alert alert-danger'>An Error has ocurred while editing this user! Please try again later.</div>";

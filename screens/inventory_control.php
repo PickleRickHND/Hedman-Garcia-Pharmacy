@@ -12,7 +12,7 @@ if(empty($_SESSION["id"])){
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../images/icono.png">
+    <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Inventory Control</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
@@ -51,51 +51,12 @@ if(empty($_SESSION["id"])){
 
             <!-- Button trigger modal -->
             <div class="mb-3 d-flex justify-content-between align-items-center">
-                <button type="button" class="btn btn-small btn-primary" data-toggle="modal" data-target="#NuevoUsuarioModal">
+                <button type="button" class="btn btn-small btn-primary" data-toggle="modal" data-target="#newUserModal">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 20 20">
                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
                     </svg> Add New Product
                 </button>
-                <input type="text" style="width: 300px" class="form-control" id="buscar-producto" placeholder="Search for Products">
-
-                <script>
-                    $(document).ready(function() {
-                        $("#buscar-producto").on("keyup", function() {
-                            var searchText = $(this).val().toLowerCase();
-
-                            // Realiza una solicitud AJAX para buscar productos
-                            $.ajax({
-                                type: "POST",
-                                url: "../controllers/product_search.php",
-                                data: { searchText: searchText },
-                                dataType: "json",
-                                success: function(response) {
-                                    // Borra la tabla de resultados actual
-                                    $("#tabla1 tbody").empty();
-
-                                    // Agrega los nuevos resultados a la tabla
-                                    for (var i = 0; i < response.length; i++) {
-                                        var producto = response[i];
-                                        var newRow = $("<tr>");
-
-                                        newRow.append("<td style='text-align:center'>" + producto.id_producto + "</td>");
-                                        newRow.append("<td style='text-align:center'>" + producto.nombre_producto + "</td>");
-                                        newRow.append("<td style='text-align:justify'>" + producto.descripcion + "</td>");
-                                        newRow.append("<td style='text-align:center'>" + producto.existencia_producto + "</td>");
-                                        newRow.append("<td style='text-align:center; white-space: nowrap;'><?="Lps. "?> " + producto.precio + "</td>");
-                                        newRow.append("<td style='text-align:center'>" + producto.presentacion_producto + "</td>");
-                                        newRow.append("<td style='text-align:center'>" + producto.fecha_vencimiento + "</td>");
-                                        newRow.append("<td style='text-align:center'>" + producto.forma_administracion + "</td>");
-                                        newRow.append("<td style='text-align:center'>" + producto.almacenamiento + "</td>");
-                                        newRow.append("<td class='fw-bold text-center'><a href=" + producto.id_producto + "'edit_product.php?id_producto=' class='btn btn-small btn-warning btn-block'><span class='d-flex align-items-center'> <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' class='bi bi-pencil-fill me-1' viewBox='0 0 20 20'> <path d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z'/> </svg> Editar </span> </a> <br> <a onclick='return eliminar()' href=" + producto.id_producto + "'inventory_control.php?id_producto=' class='btn btn-small btn-danger btn-block'> <span class='d-flex align-items-center'> <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' class='bi bi-trash-fill' viewBox='0 0 20 20'><path d='M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z'/></svg> Eliminar</span></a> </td>");
-
-                                        $("#tabla1 tbody").append(newRow);
-                                    }
-                                }
-                            });
-                        });
-                    });
-                </script>
+                <input type="text" style="width: 300px" class="form-control" id="searchProduct" placeholder="Search for Products">
             </div>
 
             <?php include "../settings/db_connection.php";?>
@@ -103,7 +64,7 @@ if(empty($_SESSION["id"])){
             <?php include "../controllers/delete_product.php";?>
 
 
-            <div class="modal fade bd-example-modal-lg" id="NuevoUsuarioModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade bd-example-modal-lg" id="newUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -135,14 +96,6 @@ if(empty($_SESSION["id"])){
                                                 </div>
                                                 <input type="text" style="width: 200px" class="form-control datetimepicker-input" data-target="#datetimepicker" name="expiration_date" placeholder="Expiration Date"/>
                                             </div>
-
-                                            <script>
-                                                $(document).ready(function () {
-                                                    $('#datetimepicker').datetimepicker({
-                                                        format: 'DD-MM-YYYY',
-                                                    });
-                                                });
-                                            </script>
                                         </div>
                                     </div>
 
@@ -212,86 +165,53 @@ if(empty($_SESSION["id"])){
                 include "../settings/db_connection.php";
                 global $connection;
 
-                $productosPorPagina = 4; // Cambiar esto al número deseado de productos por página
+                $productsPerPage = 4; 
 
-                // Contar el número total de productos
-                $totalProductos = $connection->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
-                $totalPaginas = ceil($totalProductos / $productosPorPagina);
+                $totalProducts = $connection->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
+                $totalPages = ceil($totalProducts / $productsPerPage);
 
                 $paginaActual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
 
                 if ($paginaActual < 1) {
                     $paginaActual = 1;
-                } elseif ($paginaActual > $totalPaginas) {
-                    $paginaActual = $totalPaginas;
+                } elseif ($paginaActual > $totalPages) {
+                    $paginaActual = $totalPages;
                 }
 
-                $indiceInicio = ($paginaActual - 1) * $productosPorPagina;
+                $initialIndex = ($paginaActual - 1) * $productsPerPage;
 
-                $sql = "SELECT * FROM Inventario LIMIT $productosPorPagina OFFSET $indiceInicio";
-                $resultado = $connection->query($sql);
+                $sql = "SELECT * FROM Inventario LIMIT $productsPerPage OFFSET $initialIndex";
+                $result = $connection->query($sql);
 
-                while($datos=$resultado->fetch_object()){ ?>
-
-                    <script>
-                        //Modifica la URL despues de realizar el proceso que en este caso es eliminar!
-                        (function() {
-                            var not = function () {
-                                window.history.replaceState(null, null, window.location.pathname);
-                            }
-                            setTimeout(not, 0)
-                        }())
-                    </script>
+                while($data=$result->fetch_object()){ ?>
 
                     <tr>
-                        <td style="text-align:center"><?= $datos->id_producto?></td>
-                        <td style="text-align:center"><?= $datos->nombre_producto?></td>
+                        <td style="text-align:center"><?= $data->id_producto?></td>
+                        <td style="text-align:center"><?= $data->nombre_producto?></td>
                         <td style="text-align: justify">
                             <?php
-                            $descripcion = $datos->descripcion;
-                            $descripcionRecortada = substr($descripcion, 0, 75);
-                            $descripcionCompleta = $datos->descripcion;
+                            $descripcion = $data->descripcion;
+                            $shortDescription = substr($descripcion, 0, 75);
+                            $longDescription = $data->descripcion;
 
-                            echo '<span id="descripcion-corta-' . $datos->id_producto . '">' . $descripcionRecortada . '</span>';
-                            echo '<span id="descripcion-completa-' . $datos->id_producto . '" style="display:none;">' . $descripcionCompleta . '</span>';
+                            echo '<span id="descripcion-corta-' . $data->id_producto . '">' . $shortDescription . '</span>';
+                            echo '<span id="descripcion-completa-' . $data->id_producto . '" style="display:none;">' . $longDescription . '</span>';
 
                             if (strlen($descripcion) > 75) {
-                                echo '<button style=" font-size: 14px;" class="btn btn-small btn-info" onclick="mostrarMas(' . $datos->id_producto . ')">Show More...</button>';
-                                echo '<button class="btn btn-small btn-info" onclick="mostrarMenos(' . $datos->id_producto . ')" style="display:none; font-size: 14px;">Show Less...</button>';
+                                echo '<button style=" font-size: 14px;" class="btn btn-small btn-info" onclick="showMore(' . $data->id_producto . ')">Show More...</button>';
+                                echo '<button class="btn btn-small btn-info" onclick="showLess(' . $data->id_producto . ')" style="display:none; font-size: 14px;">Show Less...</button>';
                             }
                             ?>
-
-                            <script>
-                                function mostrarMas(id) {
-                                    var descripcionCorta = document.getElementById("descripcion-corta-" + id);
-                                    var descripcionCompleta = document.getElementById("descripcion-completa-" + id);
-
-                                    descripcionCorta.style.display = "none";
-                                    descripcionCompleta.style.display = "inline";
-                                    document.querySelector('button[onclick="mostrarMas(' + id + ')"]').style.display = "none";
-                                    document.querySelector('button[onclick="mostrarMenos(' + id + ')"]').style.display = "inline";
-                                }
-
-                                function mostrarMenos(id) {
-                                    var descripcionCorta = document.getElementById("descripcion-corta-" + id);
-                                    var descripcionCompleta = document.getElementById("descripcion-completa-" + id);
-
-                                    descripcionCorta.style.display = "inline";
-                                    descripcionCompleta.style.display = "none";
-                                    document.querySelector('button[onclick="mostrarMas(' + id + ')"]').style.display = "inline";
-                                    document.querySelector('button[onclick="mostrarMenos(' + id + ')"]').style.display = "none";
-                                }
-                            </script>
                         </td>
-                        <td style="text-align:center"><?= $datos->existencia_producto?></td>
-                        <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . $datos->precio)?></td>
-                        <td style="text-align:center"><?= $datos->presentacion_producto?></td>
-                        <td style="text-align:center"><?= $datos->fecha_vencimiento?></td>
-                        <td style="text-align:center"><?= $datos->forma_administracion?></td>
-                        <td style="text-align:center"><?= $datos->almacenamiento?></td>
+                        <td style="text-align:center"><?= $data->existencia_producto?></td>
+                        <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . $data->precio)?></td>
+                        <td style="text-align:center"><?= $data->presentacion_producto?></td>
+                        <td style="text-align:center"><?= $data->fecha_vencimiento?></td>
+                        <td style="text-align:center"><?= $data->forma_administracion?></td>
+                        <td style="text-align:center"><?= $data->almacenamiento?></td>
                         <td class="fw-bold text-center">
 
-                            <a href="edit_product.php?id_producto=<?= $datos->id_producto?>" class="btn btn-small btn-warning btn-block">
+                            <a href="edit_product.php?id_producto=<?= $data->id_producto?>" class="btn btn-small btn-warning btn-block">
                                 <span class="d-flex align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-fill me-1" viewBox="0 0 20 20">
                                     <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
@@ -300,7 +220,7 @@ if(empty($_SESSION["id"])){
                             </a>
 
                             <br>
-                            <a onclick="return eliminar()" href="inventory_control.php?id_producto=<?= $datos->id_producto?>" class="btn btn-small btn-danger btn-block">
+                            <a onclick="return deleteProduct()" href="inventory_control.php?id_producto=<?= $data->id_producto?>" class="btn btn-small btn-danger btn-block">
                                 <span class="d-flex align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 20 20">
                                     <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
@@ -308,13 +228,6 @@ if(empty($_SESSION["id"])){
                                 </span>
                             </a>
                         </td>
-
-                        <script>
-                            function eliminar(){
-                                var confirmacion=confirm("Esta Seguro que desea Eliminar este Producto?")
-                                return confirmacion;
-                            }
-                        </script>
                     </tr>
                 <?php }
                 ?>
@@ -326,7 +239,7 @@ if(empty($_SESSION["id"])){
                     <a href="?pagina=<?php echo $paginaActual - 1; ?>" class="btn btn-primary">Previous</a>
                 <?php endif; ?>
 
-                <?php if ($paginaActual < $totalPaginas): ?>
+                <?php if ($paginaActual < $totalPages): ?>
                     <a href="?pagina=<?php echo $paginaActual + 1; ?>" class="btn btn-primary">Next</a>
                 <?php endif; ?>
             </div>
@@ -336,3 +249,4 @@ if(empty($_SESSION["id"])){
 </div>
 </body>
 </html>
+<script src="../controllers/functions.js"></script>

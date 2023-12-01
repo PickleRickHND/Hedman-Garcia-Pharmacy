@@ -11,7 +11,7 @@ global $connection;
 $id_session = $_SESSION["id"];
 $query_seller = $connection->query("SELECT * FROM Usuarios WHERE id='$id_session'");
 $query_paymentMethod = $connection->query("SELECT formas_pago FROM Metodos_Pago");
-global $datos;
+global $data;
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +20,7 @@ global $datos;
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../images/icono.png">
+    <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Billing Module</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
@@ -61,19 +61,8 @@ global $datos;
                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
                     </svg> Generate New Receipt
                 </button>
-                    <input type="text" style="width: 300px" class="form-control" id="buscar-factura" placeholder="Search for Receipts">
+                    <input type="text" style="width: 300px" class="form-control" id="searchReceipt" placeholder="Search for Receipts">
             </div>
-
-            <script>
-                $(document).ready(function() {
-                    $("#buscar-factura").on("keyup", function() {
-                        var searchText = $(this).val().toLowerCase();
-                        $("#tabla1 tbody tr").filter(function() {
-                            $(this).toggle($(this).text().toLowerCase().indexOf(searchText) > -1)
-                        });
-                    });
-                });
-            </script>
 
             <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -85,7 +74,7 @@ global $datos;
                             </button>
                         </div>
                         <div class="modal-body" >
-                            <form id="formulario-factura" method="post" action="">
+                            <form id="receiptForm" method="post" action="">
                                 <div class="mb-3">
                                     <div class="mb-3 d-flex justify-content-between align-items-center">
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -103,32 +92,8 @@ global $datos;
                                                 <div class="input-group-append">
                                                     <div onclick="actualDate()" class="input-group-text"><i class="bi bi-calendar-plus"></i></div>
                                                 </div>
-                                                <input onclick="actualDate()" value="Fecha y Hora" id="actual-date" type="text" style="width: 192px" class="form-control" name="date_time_invoice" readonly/>
+                                                <input onclick="actualDate()" value="Date & Time" id="actual-date" type="text" style="width: 192px" class="form-control" name="date_time_invoice" readonly/>
                                             </div>
-
-                                            <script>
-                                                function actualDate() {
-                                                    var today = new Date();
-                                                    today.setDate(today.getDate());
-
-                                                    var day = today.getDate();
-                                                    var month = today.getMonth();
-                                                    var year = today.getFullYear();
-
-                                                    var hours = today.getHours();
-                                                    var minutes = today.getMinutes();
-                                                    var seconds = today.getSeconds();
-
-                                                    // Format the date and time
-                                                    var formattedDate = (day < 10 ? "0" : "") + day + "-" + (month < 10 ? "0" : "") + month + "-" + year;
-                                                    var formattedTime = (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-
-                                                    // Combine date and time
-                                                    var dateTime = formattedDate + " " + formattedTime;
-
-                                                    document.getElementById("actual-date").value = dateTime;
-                                                }
-                                            </script>
                                         </div>
                                     </div>
 
@@ -165,71 +130,18 @@ global $datos;
                                                 <div class="input-group-append">
                                                     <div onclick="updateDate()" class="input-group-text"><i class="bi bi-calendar-x"></i></i></div>
                                                 </div>
-                                                <input onclick="updateDate()" value="Vencimeinto" id="selected-date" type="text" style="width: 192px" class="form-control" placeholder="Expiration" name="expiration_date_invoice" readonly/>
+                                                <input onclick="updateDate()" value="Expiration" id="selected-date" type="text" style="width: 192px" class="form-control" placeholder="Expiration" name="expiration_date_invoice" readonly/>
                                             </div>
-
-                                            <script>
-                                                function updateDate() {
-                                                    var today = new Date();
-                                                    today.setDate(today.getDate() + 1);
-                                                    var day = today.getDate();
-                                                    var month = today.getMonth() + 1;
-                                                    var year = today.getFullYear();
-                                                    var formattedDate = (day < 10 ? "0" : "") + day + "-" + (month < 10 ? "0" : "") + month + "-" + year;
-                                                    document.getElementById("selected-date").value = formattedDate;
-                                                }
-                                            </script>
                                         </div>
                                     </div>
 
                                     <div class="mb-3 d-flex justify-content-between align-items-center">
-                                        <button type="button" class="btn btn-small btn-warning" onclick="limpiarCampos()" style="width: 250px">
+                                        <button type="button" class="btn btn-small btn-warning" onclick="cleanBlanks()" style="width: 250px">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eraser" viewBox="0 0 20 20">
                                                 <path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
                                             </svg> Clean the blanks
                                         </button>
-                                        <input style="width: 232px;" type="text" class="form-control" id="buscar-producto" placeholder="Search for Products">
-
-                                        <script>
-                                            $(document).ready(function() {
-                                                $("#buscar-producto").on("keyup", function() {
-                                                    var searchText = $(this).val().toLowerCase();
-
-                                                    // Realiza una solicitud AJAX para buscar productos
-                                                    $.ajax({
-                                                        type: "POST",
-                                                        url: "../controllers/product_search.php",
-                                                        data: { searchText: searchText },
-                                                        dataType: "json",
-                                                        success: function(response) {
-                                                            // Borra la tabla de resultados actual
-                                                            $("#tabla2 tbody").empty();
-
-                                                            // Agrega los nuevos resultados a la tabla
-                                                            for (var i = 0; i < response.length; i++) {
-                                                                var producto = response[i];
-                                                                var newRow = $("<tr>");
-                                                                newRow.append("<td style='text-align:center'>" + producto.id_producto + "</td>");
-                                                                newRow.append("<td style='text-align:center'>" + producto.nombre_producto + "</td>");
-                                                                newRow.append("<td style='align-items: center' class='align-items-center justify-content-center'><input class='form-control' style='width: 60px;'>" + "</td>");
-                                                                newRow.append("<td style='text-align:center; white-space: nowrap;'>Lps. " + producto.precio + "</td>");
-                                                                newRow.append("<td style='text-align:center'>" + producto.presentacion_producto + "</td>");
-                                                                newRow.append("<td style='text-align:center'><div class='d-flex justify-content-center align-items-center'> <a onclick='#' href=" + producto.id_producto + "'billing.php?id_producto=' class='btn btn-primary'> <span class='d-flex align-items-center'> <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-cart-plus' viewBox='0 0 16 16'><path d='M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z'/><path d='M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/></svg></span></a></div></td>");
-
-                                                                $("#tabla2 tbody").append(newRow);
-                                                            }
-                                                        }
-                                                    });
-                                                });
-                                            });
-                                        </script>
-
-                                        <script>
-                                            function limpiarCampos() {
-                                                document.getElementById("formulario-factura").reset();
-                                            }
-                                        </script>
-
+                                        <input style="width: 232px;" type="text" class="form-control" id="searchProductsReceipt" placeholder="Search for Products">
                                     </div>
 
                                     <div>
@@ -249,43 +161,32 @@ global $datos;
                                             include "../settings/db_connection.php";
                                             global $connection;
 
-                                            $productosPorPagina = 3; // Cambiar esto al número deseado de productos por página
+                                            $productsPerPage = 3; 
 
-                                            // Contar el número total de productos
-                                            $totalProductos = $connection->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
-                                            $totalPaginas = ceil($totalProductos / $productosPorPagina);
+                                            $totalProducts = $connection->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
+                                            $totalPages = ceil($totalProducts / $productsPerPage);
 
-                                            $paginaActual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+                                            $actualPage = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
 
-                                            if ($paginaActual < 1) {
-                                                $paginaActual = 1;
-                                            } elseif ($paginaActual > $totalPaginas) {
-                                                $paginaActual = $totalPaginas;
+                                            if ($actualPage < 1) {
+                                                $actualPage = 1;
+                                            } elseif ($actualPage > $totalPages) {
+                                                $actualPage = $totalPages;
                                             }
 
-                                            $indiceInicio = ($paginaActual - 1) * $productosPorPagina;
+                                            $initialIndex = ($actualPage - 1) * $productsPerPage;
 
-                                            $sql = "SELECT * FROM Inventario LIMIT $productosPorPagina OFFSET $indiceInicio";
-                                            $resultado = $connection->query($sql);
+                                            $sql = "SELECT * FROM Inventario LIMIT $productsPerPage OFFSET $initialIndex";
+                                            $result = $connection->query($sql);
 
-                                            while($datos=$resultado->fetch_object()){ ?>
-
-                                                <script>
-                                                    //Modifica la URL despues de realizar el proceso que en este caso es eliminar!
-                                                    (function() {
-                                                        var not = function () {
-                                                            window.history.replaceState(null, null, window.location.pathname);
-                                                        }
-                                                        setTimeout(not, 0)
-                                                    }())
-                                                </script>
+                                            while($data=$result->fetch_object()){ ?>
 
                                                 <tr>
-                                                    <td style="text-align:center"><?= $datos->id_producto?></td>
-                                                    <td style="text-align:center"><?= $datos->nombre_producto?></td>
+                                                    <td style="text-align:center"><?= $data->id_producto?></td>
+                                                    <td style="text-align:center"><?= $data->nombre_producto?></td>
                                                     <td class="d-flex align-items-center justify-content-center"><input class="form-control" style="width: 60px;"></td>
-                                                    <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . $datos->precio)?></td>
-                                                    <td style="text-align:center"><?= $datos->presentacion_producto?></td>
+                                                    <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . $data->precio)?></td>
+                                                    <td style="text-align:center"><?= $data->presentacion_producto?></td>
                                                     <td class="fw-bold text-center">
                                                         <div class="d-flex justify-content-center align-items-center">
                                                             <a class="btn btn-primary">
@@ -338,49 +239,38 @@ global $datos;
                 include "../settings/db_connection.php";
                 global $connection;
 
-                $facturasPorPagina = 5;
+                $receiptsPerPage = 5;
 
-                // Contar el número total de productos
-                $totalFacturas = $connection->query("SELECT COUNT(*) as total FROM Facturas")->fetch_assoc()['total'];
-                $totalPaginas = ceil($totalFacturas / $facturasPorPagina);
+                $totalReceipts = $connection->query("SELECT COUNT(*) as total FROM Facturas")->fetch_assoc()['total'];
+                $totalPages = ceil($totalReceipts / $receiptsPerPage);
 
-                $paginaActual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+                $actualPage = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
 
-                if ($paginaActual < 1) {
-                    $paginaActual = 1;
-                } elseif ($paginaActual > $totalPaginas) {
-                    $paginaActual = $totalPaginas;
+                if ($actualPage < 1) {
+                    $actualPage = 1;
+                } elseif ($actualPage > $totalPages) {
+                    $actualPage = $totalPages;
                 }
 
-                $indiceInicio = ($paginaActual - 1) * $facturasPorPagina;
+                $initialIndex = ($actualPage - 1) * $receiptsPerPage;
 
-                $sql = "SELECT * FROM Facturas LIMIT $facturasPorPagina OFFSET $indiceInicio";
-                $resultado = $connection->query($sql);
+                $sql = "SELECT * FROM Facturas LIMIT $receiptsPerPage OFFSET $initialIndex";
+                $result = $connection->query($sql);
 
-                while($datos=$resultado->fetch_object()){ ?>
-
-                    <script>
-                        //Modifica la URL despues de realizar el proceso que en este caso es eliminar!
-                        (function() {
-                            var not = function () {
-                                window.history.replaceState(null, null, window.location.pathname);
-                            }
-                            setTimeout(not, 0)
-                        }())
-                    </script>
+                while($data=$result->fetch_object()){ ?>
 
                     <tr>
-                        <td style="text-align:center"><?= $datos->id_factura?></td>
-                        <td style="text-align:center"><?= $datos->fecha_hora?></td>
-                        <td style="text-align:center"><?= $datos->cliente?></td>
-                        <td style="text-align:center"><?= $datos->rtn?></td>
-                        <td style="text-align:center"><?= $datos->cajero?></td>
-                        <td style="text-align:center"><?= $datos->estado?></td>
-                        <td style="text-align:center"><?= $datos->metodo_pago?></td>
-                        <td style="text-align:center"><?= "Lps. " . $datos->total?></td>
+                        <td style="text-align:center"><?= $data->id_factura?></td>
+                        <td style="text-align:center"><?= $data->fecha_hora?></td>
+                        <td style="text-align:center"><?= $data->cliente?></td>
+                        <td style="text-align:center"><?= $data->rtn?></td>
+                        <td style="text-align:center"><?= $data->cajero?></td>
+                        <td style="text-align:center"><?= $data->estado?></td>
+                        <td style="text-align:center"><?= $data->metodo_pago?></td>
+                        <td style="text-align:center"><?= "Lps. " . $data->total?></td>
                         <td class="fw-bold text-center">
                             <div class="d-flex justify-content-between align-items-center">
-                                <a onclick="#" class="btn btn-primary">
+                                <a onclick="" class="btn btn-primary">
                                 <span class="d-flex align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
                                         <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
@@ -389,7 +279,7 @@ global $datos;
                                 </span>
                                 </a>
                                 <div class="mx-1"></div>
-                                <a onclick="#" class="btn btn-danger">
+                                <a onclick="" class="btn btn-danger">
                                 <span class="d-flex align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
@@ -405,12 +295,12 @@ global $datos;
             </table>
             <br>
             <div class="text-center">
-                <?php if ($paginaActual > 1): ?>
-                    <a href="?pagina=<?php echo $paginaActual - 1; ?>" class="btn btn-primary">Previous</a>
+                <?php if ($actualPage > 1): ?>
+                    <a href="?pagina=<?php echo $actualPage - 1; ?>" class="btn btn-primary">Previous</a>
                 <?php endif; ?>
 
-                <?php if ($paginaActual < $totalPaginas): ?>
-                    <a href="?pagina=<?php echo $paginaActual + 1; ?>" class="btn btn-primary">Next</a>
+                <?php if ($actualPage < $totalPages): ?>
+                    <a href="?pagina=<?php echo $actualPage + 1; ?>" class="btn btn-primary">Next</a>
                 <?php endif; ?>
             </div>
             <br>
@@ -419,3 +309,4 @@ global $datos;
 </div>
 </body>
 </html>
+<script src="../controllers/functions.js"></script>

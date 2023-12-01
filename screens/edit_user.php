@@ -9,8 +9,7 @@ include "../settings/db_connection.php";
 global $connection;
 
 $id=$_GET['id'];
-$seleccionar=$connection->query("SELECT * FROM Usuarios WHERE id='$id'");
-
+$selectUser=$connection->query("SELECT * FROM Usuarios WHERE id='$id'");
 
 ?>
 
@@ -20,7 +19,7 @@ $seleccionar=$connection->query("SELECT * FROM Usuarios WHERE id='$id'");
 <head>
     <meta charset= "UTF-8">
     <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../images/icono.png">
+    <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Edit User</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
@@ -47,21 +46,21 @@ $seleccionar=$connection->query("SELECT * FROM Usuarios WHERE id='$id'");
                 <form method="post" action="">
                     <?php
                     include "../controllers/validations.php";
-                    while ($datos=$seleccionar->fetch_object()){ ?>
+                    while ($data=$selectUser->fetch_object()){ ?>
 
                     <div class="mb-3">
                         <input type="hidden" name="id_user" value="<?= $_GET['id']?>">
                         <label for="recipient-name1" class="col-form-label">Name: </label>
-                        <input type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name" value="<?= $datos->nombre?>">
+                        <input type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name" value="<?= $data->nombre?>">
                         <br>
                         <label for="recipient-name2" class="col-form-label">Last Name: </label>
-                        <input type="text" class="form-control" id="recipient-name2" placeholder="Apellido" name="lastname" value="<?= $datos->apellido?>">
+                        <input type="text" class="form-control" id="recipient-name2" placeholder="Apellido" name="lastname" value="<?= $data->apellido?>">
                         <br>
                         <label for="recipient-name3" class="col-form-label">Email: </label>
-                        <input type="text" class="form-control" id="recipient-name3" placeholder="Correo Electrónico" name="email" value="<?= $datos->correo?>">
+                        <input type="text" class="form-control" id="recipient-name3" placeholder="Correo Electrónico" name="email" value="<?= $data->correo?>">
                         <br>
                         <label for="recipient-name3" class="col-form-label">Roles: </label>
-                        <select class="form-select" name="roles" value="<?= $datos->roles?>">
+                        <select class="form-select" name="roles" value="<?= $data->roles?>">
                             <?php
                             $query_roles = $connection->query("SELECT nombre_rol FROM Roles");
                             while($fetch_Roles = $query_roles->fetch_object()) {
@@ -83,3 +82,4 @@ $seleccionar=$connection->query("SELECT * FROM Usuarios WHERE id='$id'");
 </div>
 </body>
 </html>
+<script src="../controllers/functions.js"></script>
