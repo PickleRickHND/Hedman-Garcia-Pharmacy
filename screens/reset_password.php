@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!empty($_SESSION["id"])){
+if (!empty($_SESSION["id"])) {
     header("Location: home.php");
     exit;
 }
@@ -8,10 +8,11 @@ if(!empty($_SESSION["id"])){
 
 <!DOCTYPE html>
 
-<html lang= "en">
+<html lang="en">
+
 <head>
-    <meta charset= "UTF-8">
-    <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Reset Password</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
@@ -27,37 +28,39 @@ if(!empty($_SESSION["id"])){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
     <style>
-        body{
+        body {
             background: linear-gradient(to right, #7dc8dd, #5794c0);
         }
     </style>
 
 </head>
+
 <body>
-<div class="container w-75 bg-white mt-5 rounded shadow">
-    <div class="row align-items-center align-items-stretch">
-        <img src="../images/homeImage.png" style="width:550px" alt="">
-        <div class="col bg-white p-5 rounded bg">
-            <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
-            <h4 class="fw-bold text-center ру-5">Reset your Password</h4>
-            <br>
-            <br>
-            <form method="post" action="">
-                <div class="input-group mb-4">
-                    <span class="input-group-text" id="email"><i class="bi bi-person-fill"></i></span>
-                    <input name="email" id="email" class="form-control" type="email" placeholder="Email" maxlength="30">
-                </div>
-                <div class="d-grid">
-                    <input type="submit" class="btn btn-primary btn-block" value="Reset Password" name="reset_password_button">
-                </div>
-
+    <div class="container w-75 bg-white mt-5 rounded shadow">
+        <div class="row align-items-center align-items-stretch">
+            <img src="../images/homeImage.png" style="width:550px" alt="">
+            <div class="col bg-white p-5 rounded bg">
+                <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+                <h4 class="fw-bold text-center ру-5">Reset your Password</h4>
                 <br>
-                <?php include "../settings/db_connection.php";?>
-                <?php include "../controllers/validations.php";?>
+                <br>
+                <form method="post" action="">
+                    <div class="input-group mb-4">
+                        <span class="input-group-text" id="email"><i class="bi bi-person-fill"></i></span>
+                        <input name="email" id="email" class="form-control" type="email" placeholder="Email" maxlength="30">
+                    </div>
+                    <div class="d-grid">
+                        <input type="submit" class="btn btn-primary btn-block" value="Reset Password" name="reset_password_button">
+                    </div>
 
-            </form>
+                    <br>
+                    <?php include "../settings/db_connection.php"; ?>
+                    <?php include "../controllers/validations.php"; ?>
+
+                </form>
+            </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>

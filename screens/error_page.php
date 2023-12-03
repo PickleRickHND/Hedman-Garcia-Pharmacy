@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,11 +25,13 @@
         }
     </style>
 </head>
+
 <body>
-<div class="container w-75">
-    <h2 class="fw-bold text-center ру-5">Oops!...</h2>
-    <img class="mx-auto d-block" src="../images/Error.png" style="width: 560px;" alt="">
-    <h2 class="fw-bold text-center ру-5">Page not found...</h2><br>
-</div>
+    <div class="container w-75">
+        <h2 class="fw-bold text-center ру-5">Oops!...</h2>
+        <img class="mx-auto d-block" src="../images/Error.png" style="width: 560px;" alt="">
+        <h2 class="fw-bold text-center ру-5">Page not found...</h2><br>
+    </div>
 </body>
+
 </html>

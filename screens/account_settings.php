@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(empty($_SESSION["id"])){
+if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
     exit;
 }
@@ -12,16 +12,17 @@ if ($_SESSION["id"] != $_GET['id']) {
 
 include "../settings/db_connection.php";
 global $connection;
-$id=$_GET['id'];
-$selectUser=$connection->query("SELECT * FROM Usuarios WHERE id='$id'");
+$id = $_GET['id'];
+$selectUser = $connection->query("SELECT * FROM Usuarios WHERE id='$id'");
 ?>
 
 <!DOCTYPE html>
 
-<html lang= "en">
+<html lang="en">
+
 <head>
-    <meta charset= "UTF-8">
-    <meta name= "viewport" content= "width-device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Account Settings</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
@@ -37,55 +38,56 @@ $selectUser=$connection->query("SELECT * FROM Usuarios WHERE id='$id'");
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
     <style>
-        body{
+        body {
             background: linear-gradient(to right, #7dc8dd, #5794c0);
         }
     </style>
 
 </head>
+
 <body style="margin-top: 5%">
-<div class="container w-75 bg-white mt-5 rounded shadow">
-    <div class="row align-items-center">
-        <img src="../images/settingsImage.png" style="width:560px" alt="">
-        <div class="col bg-white p-5 rounded bg">
-            <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
-            <h4 class="fw-bold text-center ру-5">Account Settings</h4>
-            <form method="post" action="">
-                <?php
-                include "../controllers/validations.php";
+    <div class="container w-75 bg-white mt-5 rounded shadow">
+        <div class="row align-items-center">
+            <img src="../images/settingsImage.png" style="width:560px" alt="">
+            <div class="col bg-white p-5 rounded bg">
+                <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+                <h4 class="fw-bold text-center ру-5">Account Settings</h4>
+                <form method="post" action="">
+                    <?php
+                    include "../controllers/validations.php";
 
-                $sql=$connection->query("SELECT * FROM Usuarios");
-                $data2=$sql->fetch_object();
-                while ($data=$selectUser->fetch_object()){ ?>
+                    $sql = $connection->query("SELECT * FROM Usuarios");
+                    $data2 = $sql->fetch_object();
+                    while ($data = $selectUser->fetch_object()) { ?>
 
 
-                    <div class="mb-3">
-                        <input type="hidden" name="id_user" value="<?= $_GET['id']?>">
-                        <label for="recipient-name1" class="col-form-label">Name:</label>
-                        <input type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name" value="<?= $data->nombre?>">
+                        <div class="mb-3">
+                            <input type="hidden" name="id_user" value="<?= $_GET['id'] ?>">
+                            <label for="recipient-name1" class="col-form-label">Name:</label>
+                            <input type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name" value="<?= $data->nombre ?>">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="recipient-name2" class="col-form-label">Last Name:</label>
+                            <input type="text" class="form-control" id="recipient-name2" placeholder="Apellido" name="lastname" value="<?= $data->apellido ?>">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="recipient-name3" class="col-form-label">Email:</label>
+                            <input type="text" class="form-control" id="recipient-name3" placeholder="Correo Electrónico" name="email" value="<?= $data->correo ?>">
+                        </div>
+                    <?php }
+                    ?>
+                    <div class="fw-bold text-center">
+                        <br>
+                        <a type="button" class="btn btn-danger" href="home.php">Close</a>
+                        <input type="submit" class="btn btn-primary" value="Edit" name="edit_user_settings_button">
+                        <a type="button" class="btn btn-warning" href="change_password.php?id=<?= $data2->id ?>">Change Password</a>
                     </div>
+                </form>
 
-                    <div class="mb-3">
-                        <label for="recipient-name2" class="col-form-label">Last Name:</label>
-                        <input type="text" class="form-control" id="recipient-name2" placeholder="Apellido" name="lastname" value="<?= $data->apellido?>">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="recipient-name3" class="col-form-label">Email:</label>
-                        <input type="text" class="form-control" id="recipient-name3" placeholder="Correo Electrónico" name="email" value="<?= $data->correo?>">
-                    </div>
-                <?php }
-                ?>
-                <div class="fw-bold text-center">
-                    <br>
-                    <a type="button" class="btn btn-danger" href="home.php">Close</a>
-                    <input type="submit" class="btn btn-primary" value="Edit" name="edit_user_settings_button">
-                    <a type="button" class="btn btn-warning" href="change_password.php?id=<?= $data2->id?>">Change Password</a>
-                </div>
-            </form>
-
-    </div>
-</div>
+            </div>
+        </div>
 </body>
-</html>
 
+</html>

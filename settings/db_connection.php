@@ -7,4 +7,4 @@ $user_db = $ConfigFile['Database']['user_db'];
 $password_db = $ConfigFile['Database']['password_db'];
 $db = $ConfigFile['Database']['db'];
 
-$connection = mysqli_connect($server,$user_db,$password_db,$db);
+$connection = mysqli_connect($server, $user_db, $password_db, $db);

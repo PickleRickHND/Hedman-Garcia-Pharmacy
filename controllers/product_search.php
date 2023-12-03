@@ -19,7 +19,3 @@ if (isset($_POST['searchText'])) {
     // Convierte el array en formato JSON y envíalo
     echo json_encode($products);
 }
-
-
-?>
-
