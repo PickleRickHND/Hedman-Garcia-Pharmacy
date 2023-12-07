@@ -4,7 +4,7 @@ if (!empty($_SESSION["id"])) {
     header("Location: screens/home.php");
     exit;
 }
-?>f
+?>
 
 <!DOCTYPE html>
 
