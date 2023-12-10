@@ -7,10 +7,12 @@ $(document).ready(function () {
   });
 });
 
+
 function deleteUser() {
   var validation = confirm("Are you sure you want to Delete this user?");
   return validation;
 }
+
 
 function resetPassword() {
   var validation2 = confirm(
@@ -18,6 +20,7 @@ function resetPassword() {
   );
   return validation2;
 }
+
 
 $(document).ready(function () {
   $("#searchReceipt").on("keyup", function () {
@@ -27,6 +30,7 @@ $(document).ready(function () {
     });
   });
 });
+
 
 function actualDate() {
   var today = new Date();
@@ -65,6 +69,7 @@ function actualDate() {
   document.getElementById("actual-date").value = dateTime;
 }
 
+
 function updateDate() {
   var today = new Date();
   today.setDate(today.getDate() + 1);
@@ -81,6 +86,7 @@ function updateDate() {
     year;
   document.getElementById("selected-date").value = formattedDate;
 }
+
 
 $(document).ready(function () {
   $("#searchProductsReceipt").on("keyup", function () {
@@ -135,15 +141,18 @@ $(document).ready(function () {
   });
 });
 
+
 function cleanBlanks() {
   document.getElementById("receiptForm").reset();
 }
+
 
 $(document).ready(function () {
   $("#datetimepicker").datetimepicker({
     format: "DD-MM-YYYY",
   });
 });
+
 
 $(document).ready(function () {
   $("#searchProduct").on("keyup", function () {
@@ -218,6 +227,7 @@ $(document).ready(function () {
   });
 });
 
+
 function showMore(id) {
   var descripcionCorta = document.getElementById("descripcion-corta-" + id);
   var longDescription = document.getElementById("descripcion-completa-" + id);
@@ -232,6 +242,7 @@ function showMore(id) {
   ).style.display = "inline";
 }
 
+
 function showLess(id) {
   var descripcionCorta = document.getElementById("descripcion-corta-" + id);
   var longDescription = document.getElementById("descripcion-completa-" + id);
@@ -245,6 +256,7 @@ function showLess(id) {
     'button[onclick="showLess(' + id + ')"]'
   ).style.display = "none";
 }
+
 
 function deleteProduct() {
   var validation = confirm("Esta Seguro que desea Eliminar este Producto?");
