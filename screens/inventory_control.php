@@ -75,7 +75,7 @@ if (empty($_SESSION["id"])) {
                 <br>
 
                 <!-- Button trigger modal -->
-                <div class="mb-3 d-flex flex-column align-items-center">
+                <div class="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
                     <button type="button" class="btn btn-small btn-primary" data-toggle="modal" data-target="#newUserModal">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 20 20">
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
@@ -93,7 +93,8 @@ if (empty($_SESSION["id"])) {
 
                         #searchProduct {
                             margin-top: 10px;
-                            width: 100%; /* Updated width to 100% */
+                            width: 100%;
+                            /* Updated width to 100% */
                         }
                     }
                 </style>
