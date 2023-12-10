@@ -50,7 +50,7 @@ $selectUser = $connection->query("SELECT * FROM Usuarios WHERE id='$id'");
         <div class="row align-items-center">
 
             <div class="fw-bold text-center d-grid">
-                <button type="button" class="btn btn-small btn-secondary btn-block" style="margin-top: 20px; width: fit-content;" onclick="goBack()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                <button id="goBackButton" type="button" class="btn btn-small btn-secondary btn-block" style="margin-top: 20px; width: fit-content;" onclick="goBack()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
                     </svg> Go Back
                 </button>
@@ -60,6 +60,14 @@ $selectUser = $connection->query("SELECT * FROM Usuarios WHERE id='$id'");
                         window.history.back();
                     }
                 </script>
+
+                <style>
+                    @media (max-width: 768px) {
+                        #goBackButton {
+                            display: none;
+                        }
+                    }
+                </style>
             </div>
 
             <img src="../images/settingsImage.png" style="width:560px" alt="">
@@ -94,9 +102,11 @@ $selectUser = $connection->query("SELECT * FROM Usuarios WHERE id='$id'");
                     ?>
                     <div class="fw-bold text-center">
                         <br>
-                        <a type="button" class="btn btn-danger" href="home.php">Close</a>
-                        <input type="submit" class="btn btn-primary" value="Edit" name="edit_user_settings_button">
-                        <a type="button" class="btn btn-warning" href="change_password.php?id=<?= $data2->id ?>">Change Password</a>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a type="button" class="btn btn-danger me-md-2 mb-2" href="home.php">Close</a>
+                            <input type="submit" class="btn btn-primary me-md-2 mb-2" value="Edit" name="edit_user_settings_button">
+                            <a type="button" class="btn btn-warning mb-2" href="change_password.php?id=<?= $data2->id ?>">Change Password</a>
+                        </div>
                     </div>
                 </form>
 

@@ -1,9 +1,9 @@
-
-
-body{
-    margin-top: 7%;
+body {
+  margin-top: 7%;
 }
 
-
-
-
+@media (max-width: 768px) {
+  #goBackButton {
+    display: none;
+  }
+}

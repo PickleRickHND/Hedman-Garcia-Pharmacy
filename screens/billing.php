@@ -20,7 +20,7 @@ global $data;
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width-device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Billing Module</title>
 
@@ -55,7 +55,7 @@ global $data;
             <div class="col bg-white p-5 rounded bg">
 
                 <div class="fw-bold text-center d-grid">
-                    <button type="button" class="btn btn-small btn-secondary btn-block" style="margin-top: 20px; width: fit-content;" onclick="goBack()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                    <button type="button" id="goBackButton" class="btn btn-small btn-secondary btn-block" style="margin-top: 20px; width: fit-content;" onclick="goBack()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
                         </svg> Go Back
                     </button>
@@ -65,19 +65,44 @@ global $data;
                             window.history.back();
                         }
                     </script>
+
+                    <style>
+                        @media (max-width: 768px) {
+                            #goBackButton {
+                                display: none;
+                            }
+                        }
+                    </style>
                 </div>
-                
+
                 <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
                 <h3 class="fw-bold text-center ру-5"><strong>Billing History</strong></h3>
                 <br>
 
-                <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div class="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
                     <button type="button" class="btn btn-small btn-success" data-toggle="modal" data-target=".bd-example-modal-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 20 20">
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                         </svg> Generate New Receipt
                     </button>
-                    <input type="text" style="width: 300px" class="form-control" id="searchReceipt" placeholder="Search for Receipts">
+
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <input type="text" style="width: 300px" class="form-control" id="searchReceipt" placeholder="Search for Receipts">
+                    </div>
+
+                    <style>
+                        @media (max-width: 768px) {
+                            .btn-success {
+                                width: 100%;
+                                margin-bottom: 10px;
+                            }
+
+                            #searchReceipt {
+                                margin-top: 10px;
+                                width: 10%;
+                            }
+                        }
+                    </style>
                 </div>
 
                 <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -256,80 +281,82 @@ global $data;
                 <?php include "../settings/db_connection.php"; ?>
                 <?php include "../controllers/validations.php"; ?>
 
-                <table class="table table-hover" id="tabla1">
-                    <thead>
-                        <tr>
-                            <th style="text-align:center" scope="col">Receipt N.º</th>
-                            <th style="text-align:center" scope="col">Date / Time</th>
-                            <th style="text-align:center" scope="col">Client </th>
-                            <th style="text-align:center" scope="col">RTN</th>
-                            <th style="text-align:center" scope="col">Cashier </th>
-                            <th style="text-align:center" scope="col">Status</th>
-                            <th style="text-align:center" scope="col">Payment Method</th>
-                            <th style="text-align:center" scope="col">Total</th>
-                            <th style="text-align:center" scope="col">Actions</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        include "../settings/db_connection.php";
-                        global $connection;
-
-                        $receiptsPerPage = 5;
-
-                        $totalReceipts = $connection->query("SELECT COUNT(*) as total FROM Facturas")->fetch_assoc()['total'];
-                        $totalPages = ceil($totalReceipts / $receiptsPerPage);
-
-                        $actualPage = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
-
-                        if ($actualPage < 1) {
-                            $actualPage = 1;
-                        } elseif ($actualPage > $totalPages) {
-                            $actualPage = $totalPages;
-                        }
-
-                        $initialIndex = ($actualPage - 1) * $receiptsPerPage;
-
-                        $sql = "SELECT * FROM Facturas LIMIT $receiptsPerPage OFFSET $initialIndex";
-                        $result = $connection->query($sql);
-
-                        while ($data = $result->fetch_object()) { ?>
-
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabla1">
+                        <thead>
                             <tr>
-                                <td style="text-align:center"><?= $data->id_factura ?></td>
-                                <td style="text-align:center"><?= $data->fecha_hora ?></td>
-                                <td style="text-align:center"><?= $data->cliente ?></td>
-                                <td style="text-align:center"><?= $data->rtn ?></td>
-                                <td style="text-align:center"><?= $data->cajero ?></td>
-                                <td style="text-align:center"><?= $data->estado ?></td>
-                                <td style="text-align:center"><?= $data->metodo_pago ?></td>
-                                <td style="text-align:center"><?= "Lps. " . $data->total ?></td>
-                                <td class="fw-bold text-center">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <a onclick="" class="btn btn-primary">
-                                            <span class="d-flex align-items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
-                                                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
-                                                </svg>
-                                            </span>
-                                        </a>
-                                        <div class="mx-1"></div>
-                                        <a onclick="" class="btn btn-danger">
-                                            <span class="d-flex align-items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
-                                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
-                                                </svg>
-                                            </span>
-                                        </a>
-                                    </div>
-                                </td>
+                                <th style="text-align:center" scope="col">Receipt N.º</th>
+                                <th style="text-align:center" scope="col">Date / Time</th>
+                                <th style="text-align:center" scope="col">Client </th>
+                                <th style="text-align:center" scope="col">RTN</th>
+                                <th style="text-align:center" scope="col">Cashier </th>
+                                <th style="text-align:center" scope="col">Status</th>
+                                <th style="text-align:center" scope="col">Payment Method</th>
+                                <th style="text-align:center" scope="col">Total</th>
+                                <th style="text-align:center" scope="col">Actions</th>
+                                <th scope="col"></th>
                             </tr>
-                        <?php }
-                        ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php
+                            include "../settings/db_connection.php";
+                            global $connection;
+
+                            $receiptsPerPage = 5;
+
+                            $totalReceipts = $connection->query("SELECT COUNT(*) as total FROM Facturas")->fetch_assoc()['total'];
+                            $totalPages = ceil($totalReceipts / $receiptsPerPage);
+
+                            $actualPage = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+
+                            if ($actualPage < 1) {
+                                $actualPage = 1;
+                            } elseif ($actualPage > $totalPages) {
+                                $actualPage = $totalPages;
+                            }
+
+                            $initialIndex = ($actualPage - 1) * $receiptsPerPage;
+
+                            $sql = "SELECT * FROM Facturas LIMIT $receiptsPerPage OFFSET $initialIndex";
+                            $result = $connection->query($sql);
+
+                            while ($data = $result->fetch_object()) { ?>
+
+                                <tr>
+                                    <td style="text-align:center"><?= $data->id_factura ?></td>
+                                    <td style="text-align:center"><?= $data->fecha_hora ?></td>
+                                    <td style="text-align:center"><?= $data->cliente ?></td>
+                                    <td style="text-align:center"><?= $data->rtn ?></td>
+                                    <td style="text-align:center"><?= $data->cajero ?></td>
+                                    <td style="text-align:center"><?= $data->estado ?></td>
+                                    <td style="text-align:center"><?= $data->metodo_pago ?></td>
+                                    <td style="text-align:center"><?= "Lps. " . $data->total ?></td>
+                                    <td class="fw-bold text-center">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a onclick="" class="btn btn-primary">
+                                                <span class="d-flex align-items-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+                                                    </svg>
+                                                </span>
+                                            </a>
+                                            <div class="mx-1"></div>
+                                            <a onclick="" class="btn btn-danger">
+                                                <span class="d-flex align-items-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+                                                    </svg>
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
                 <br>
                 <div class="text-center">
                     <?php if ($actualPage > 1) : ?>
