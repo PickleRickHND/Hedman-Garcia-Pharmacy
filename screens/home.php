@@ -46,6 +46,7 @@ if (empty($_SESSION["id"])) {
 <body style="margin-top: 7%">
     <div class="container w-75 bg-white mt-5 rounded shadow">
         <div class="row align-items-center">
+
             <img src="../images/homeImage.png" style="width:560px" alt="">
             <div class="col bg-white p-5 rounded bg">
                 <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
@@ -84,7 +85,6 @@ if (empty($_SESSION["id"])) {
                         </svg> Log out </a>
                 </div>
             </div>
-
         </div>
     </div>
 </body>
