@@ -12,6 +12,8 @@ $id_session = $_SESSION["id"];
 $query_seller = $connection->query("SELECT * FROM Usuarios WHERE id='$id_session'");
 $query_paymentMethod = $connection->query("SELECT formas_pago FROM Metodos_Pago");
 global $data;
+
+$shoppingCartUserID = $_SESSION["id"];
 ?>
 
 <!DOCTYPE html>
@@ -91,10 +93,11 @@ global $data;
                     </div>
 
                     <style>
-                        @media (max-width: 768px) {
+                        @media (max-width: 1000px) {
                             .btn-success {
                                 width: 100%;
                                 margin-bottom: 10px;
+                                display: none;
                             }
 
                             #searchReceipt {
@@ -230,7 +233,7 @@ global $data;
                                                                 <td style="text-align:center"><?= $data->presentacion_producto ?></td>
                                                                 <td class="fw-bold text-center">
                                                                     <div class="d-flex justify-content-center align-items-center">
-                                                                        <button type="button" class="btn btn-small btn-primary" onclick="checkShoppingCartUser()" style="width: 40px">
+                                                                        <button type="button" class="btn btn-small btn-primary" onclick="checkShoppingCartUser(<?= $shoppingCartUserID ?>)" style="width: 40px">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 20 20">
                                                                                 <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z" />
                                                                                 <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
@@ -239,24 +242,38 @@ global $data;
                                                                     </div>
 
                                                                     <script>
-                                                                        function checkShoppingCartUser() {
-                                                                            <?php
-                                                                            include "../settings/db_connection.php";
-                                                                            global $connection;
+                                                                        function checkShoppingCartUser(userId) {
+                                                                            var quantityToAdd = document.getElementsByName("quantityToAdd")[0].value;
+                                                                            var id_product = <?= $data->id_producto ?>;
+                                                                            var name_product = "<?= $data->nombre_producto ?>";
+                                                                            var price_product = <?= $data->precio ?>;
+                                                                            var presentation_product = "<?= $data->presentacion_producto ?>";
+                                                                            var tableName = "ShoppingCartUser_" + userId;
 
-                                                                            $databaseName = "FarmaciaHG";
-                                                                            $tableName = "ShoppingCartUser";
+                                                                            var data = {
+                                                                                tableName: tableName
+                                                                            };
 
-                                                                            $query = "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = '$databaseName' AND table_name = '$tableName'";
-                                                                            $result = $connection->query($query);
-                                                                            $count = $result->fetch_assoc()['count'];
-
-                                                                            if ($count > 0) {
-                                                                                echo "<div class= 'alert alert-success'>Tabla existe!</div>";
+                                                                            if (quantityToAdd == "") {
+                                                                                alert("Please, enter a quantity to add to the shopping cart.");
                                                                             } else {
-                                                                                echo "<div class= 'alert alert-success'>Tabla no existe!</div>";
+                                                                                // Primero, verificar si existe la tabla ShoppingCartUser_#id_usuario que es la que contiene el carrito de compras del usuario.
+                                                                                $.ajax({
+                                                                                    type: "POST",
+                                                                                    url: "../controllers/check_table_exists.php",
+                                                                                    data: data,
+                                                                                    success: function(response) {
+                                                                                        if (response == "true") {
+                                                                                            alert("Table " + tableName + " already exists.");
+                                                                                        } else {
+
+                                                                                            
+                                                                                            alert("Shopping Cart Created Successfully");
+                                                                                        }
+
+                                                                                    }
+                                                                                });
                                                                             }
-                                                                            ?>
                                                                         }
                                                                     </script>
                                                                 </td>

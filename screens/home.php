@@ -47,7 +47,8 @@ if (empty($_SESSION["id"])) {
     <div class="container w-75 bg-white mt-5 rounded shadow">
         <div class="row align-items-center">
 
-            <img src="../images/homeImage.png" style="width:560px" alt="">
+            <img src="../images/homeImage.png" style="width:560px; display: block; margin-left: auto; margin-right: auto;" alt="">
+            
             <div class="col bg-white p-5 rounded bg">
                 <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
                 <h4 class="fw-bold text-center ру-5">Hi <?php echo $_SESSION["nombre"]; ?>, How can I help today?</h4>

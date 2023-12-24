@@ -70,7 +70,7 @@ $selectUser = $connection->query("SELECT * FROM Usuarios WHERE id='$id'");
                 </style>
             </div>
 
-            <img src="../images/settingsImage.png" style="width:560px" alt="">
+            <img src="../images/settingsImage.png" style="width:560px; display: block; margin-left: auto; margin-right: auto;" alt="">
             <div class="col bg-white p-5 rounded bg">
                 <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
                 <h4 class="fw-bold text-center ру-5">Account Settings</h4>

@@ -85,10 +85,10 @@ if (empty($_SESSION["id"])) {
                 </div>
 
                 <style>
-                    @media (max-width: 768px) {
+                    @media (max-width: 1000px) {
                         .btn-primary {
                             width: 100%;
-                            margin-bottom: 10px;
+                            display: none;
                         }
 
                         #searchProduct {
@@ -142,17 +142,17 @@ if (empty($_SESSION["id"])) {
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
                                             <div class="mb-3 d-flex flex-column align-items-start">
                                                 <label for="recipient-name2" class="col-form-label"></label>
-                                                <textarea style="height: 120px; vertical-align: top; width: 100%" class="form-control" id="recipient-name2" placeholder="Description" name="description"></textarea>
+                                                <textarea style="height: 120px; vertical-align: top; width: 503px" class="form-control" id="recipient-name2" placeholder="Description" name="description"></textarea>
                                             </div>
 
                                             <div class="mb-3 d-flex flex-column align-items-center">
                                                 <div class="mb-3 d-flex justify-content-between align-items-center">
                                                     <label for="recipient-name3" class="col-form-label"></label>
-                                                    <input style="width: 100%" type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Existence" name="quantity">
+                                                    <input style="width: 240px; " type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Existence" name="quantity">
                                                 </div>
 
                                                 <label for="recipient-name5" class="col-form-label"></label>
-                                                <input style="width: 100%" type="text" class="form-control" id="recipient-name5" placeholder="Price" name="price">
+                                                <input style="width: 240px" type="text" class="form-control" id="recipient-name5" placeholder="Price" name="price">
                                             </div>
                                         </div>
 
@@ -160,17 +160,17 @@ if (empty($_SESSION["id"])) {
 
                                             <div class="mb-3 d-flex justify-content-between align-items-center">
                                                 <label for="recipient-name6" class="col-form-label"></label>
-                                                <input style="width: 100%" type="text" class="form-control" id="recipient-name6" placeholder="Presentation" name="presentation">
+                                                <input style="width: 240px" type="text" class="form-control" id="recipient-name6" placeholder="Presentation" name="presentation">
                                             </div>
 
                                             <div class="mb-3 d-flex justify-content-between align-items-center">
                                                 <label for="recipient-name8" class="col-form-label"></label>
-                                                <input style="width: 100%" type="text" class="form-control" id="recipient-name8" placeholder="Way of Administration" name="administration_form">
+                                                <input style="width: 240px" type="text" class="form-control" id="recipient-name8" placeholder="Way of Administration" name="administration_form">
                                             </div>
 
                                             <div class="mb-3 d-flex justify-content-between align-items-center">
                                                 <label for="recipient-name9" class="col-form-label"></label>
-                                                <input style="width: 100%" type="text" class="form-control" id="recipient-name9" placeholder="Storage" name="storage">
+                                                <input style="width: 240px" type="text" class="form-control" id="recipient-name9" placeholder="Storage" name="storage">
                                             </div>
                                         </div>
                                     </div>
