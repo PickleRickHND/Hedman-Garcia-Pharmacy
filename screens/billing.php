@@ -186,6 +186,67 @@ $shoppingCartUserID = $_SESSION["id"];
                                                     </svg> Clean the blanks
                                                 </button>
                                                 <input style="width: 232px;" type="text" class="form-control" id="searchProductsReceipt" placeholder="Search for Products">
+                                                <script>
+                                                    $(document).ready(function() {
+                                                        $("#searchProductsReceipt").on("keyup", function() {
+                                                            var searchText = $(this).val().toLowerCase();
+
+                                                            // Realiza una solicitud AJAX para buscar productos dentro del modulo de billing
+                                                            $.ajax({
+                                                                type: "POST",
+                                                                url: "../controllers/product_search.php",
+                                                                data: {
+                                                                    searchText: searchText
+                                                                },
+                                                                dataType: "json",
+                                                                success: function(response) {
+                                                                    // Borra la tabla de resultados actual
+                                                                    $("#tabla2 tbody").empty();
+
+                                                                    // Agrega los nuevos resultados a la tabla
+                                                                    for (var i = 0; i < response.length; i++) {
+                                                                        var producto = response[i];
+                                                                        var newRow = $("<tr>");
+                                                                        newRow.append(
+                                                                            "<td style='text-align:center'>" + producto.id_producto + "</td>"
+                                                                        );
+                                                                        newRow.append(
+                                                                            "<td style='text-align:center'>" +
+                                                                            producto.nombre_producto +
+                                                                            "</td>"
+                                                                        );
+                                                                        newRow.append(
+                                                                            "<td style='align-items: center' class='align-items-center justify-content-center'><input class='form-control' style='width: 60px;'></td>"
+                                                                        );
+                                                                        newRow.append(
+                                                                            "<td style='text-align:center; white-space: nowrap;'>Lps. " +
+                                                                            producto.precio +
+                                                                            "</td>"
+                                                                        );
+                                                                        newRow.append(
+                                                                            "<td style='text-align:center'>" +
+                                                                            producto.presentacion_producto +
+                                                                            "</td>"
+                                                                        );
+                                                                        newRow.append(
+                                                                            "<td class='fw-bold text-center'>" +
+                                                                            "<div class='d-flex justify-content-center align-items-center'>" +
+                                                                            "<button type='button' class='btn btn-small btn-primary' onclick='checkShoppingCartUser(<?= $shoppingCartUserID ?>)' style='width: 40px'>" +
+                                                                            "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' class='bi bi-cart-plus' viewBox='0 0 20 20'>" +
+                                                                            "<path d='M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z'></path>" +
+                                                                            "<path d='M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0'></path>" +
+                                                                            "</svg>" +
+                                                                            "</button>" +
+                                                                            "</div>" +
+                                                                            "</td>"
+                                                                        );
+                                                                        $("#tabla2 tbody").append(newRow);
+                                                                    }
+                                                                },
+                                                            });
+                                                        });
+                                                    });
+                                                </script>
                                             </div>
 
                                             <div>
@@ -205,7 +266,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                         include "../settings/db_connection.php";
                                                         global $connection;
 
-                                                        $productsPerPage = 3;
+                                                        $productsPerPage = 1;
 
                                                         $totalProducts = $connection->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
                                                         $totalPages = ceil($totalProducts / $productsPerPage);
@@ -245,13 +306,17 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                         function checkShoppingCartUser(userId) {
                                                                             var quantityToAdd = document.getElementsByName("quantityToAdd")[0].value;
                                                                             var id_product = <?= $data->id_producto ?>;
-                                                                            var name_product = "<?= $data->nombre_producto ?>";
+                                                                            var product_name = "<?= $data->nombre_producto ?>";
                                                                             var price_product = <?= $data->precio ?>;
                                                                             var presentation_product = "<?= $data->presentacion_producto ?>";
                                                                             var tableName = "ShoppingCartUser_" + userId;
 
                                                                             var data = {
-                                                                                tableName: tableName
+                                                                                tableName: tableName,
+                                                                                id_product: id_product,
+                                                                                product_name: product_name,
+                                                                                quantityToAdd: quantityToAdd,
+                                                                                price_product: price_product,
                                                                             };
 
                                                                             if (quantityToAdd == "") {
@@ -264,18 +329,16 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                                     data: data,
                                                                                     success: function(response) {
                                                                                         if (response == "true") {
-                                                                                            alert("Table " + tableName + " already exists.");
+                                                                                            alert("Item added to the shopping cart successfully.");
                                                                                         } else {
-
-                                                                                            
-                                                                                            alert("Shopping Cart Created Successfully");
+                                                                                            alert("Shopping Cart Created Successfully + Item added to the cart successfully.");
                                                                                         }
-
                                                                                     }
                                                                                 });
                                                                             }
                                                                         }
                                                                     </script>
+
                                                                 </td>
                                                             </tr>
                                                         <?php }
