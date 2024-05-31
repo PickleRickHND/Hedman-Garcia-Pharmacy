@@ -186,6 +186,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                     </svg> Clean the blanks
                                                 </button>
                                                 <input style="width: 232px;" type="text" class="form-control" id="searchProductsReceipt" placeholder="Search for Products">
+
                                                 <script>
                                                     $(document).ready(function() {
                                                         $("#searchProductsReceipt").on("keyup", function() {
@@ -216,7 +217,9 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                             "</td>"
                                                                         );
                                                                         newRow.append(
-                                                                            "<td style='align-items: center' class='align-items-center justify-content-center'><input class='form-control' style='width: 60px;'></td>"
+                                                                            "<td class='d-flex align-items-center justify-content-center'>" +
+                                                                            "<input class='form-control' name='quantityToAdd2' style='width: 60px;'>" +
+                                                                            "</td>"
                                                                         );
                                                                         newRow.append(
                                                                             "<td style='text-align:center; white-space: nowrap;'>Lps. " +
@@ -231,7 +234,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                         newRow.append(
                                                                             "<td class='fw-bold text-center'>" +
                                                                             "<div class='d-flex justify-content-center align-items-center'>" +
-                                                                            "<button type='button' class='btn btn-small btn-primary' onclick='checkShoppingCartUser(<?= $shoppingCartUserID ?>)' style='width: 40px'>" +
+                                                                            "<button type='button' class='btn btn-small btn-primary add-to-cart' data-userid='<?= $shoppingCartUserID ?>' style='width: 40px'>" +
                                                                             "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' class='bi bi-cart-plus' viewBox='0 0 20 20'>" +
                                                                             "<path d='M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z'></path>" +
                                                                             "<path d='M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0'></path>" +
@@ -247,6 +250,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                         });
                                                     });
                                                 </script>
+
                                             </div>
 
                                             <div>
@@ -266,7 +270,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                         include "../settings/db_connection.php";
                                                         global $connection;
 
-                                                        $productsPerPage = 1;
+                                                        $productsPerPage = 3;
 
                                                         $totalProducts = $connection->query("SELECT COUNT(*) as total FROM Inventario")->fetch_assoc()['total'];
                                                         $totalPages = ceil($totalProducts / $productsPerPage);
@@ -294,7 +298,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                 <td style="text-align:center"><?= $data->presentacion_producto ?></td>
                                                                 <td class="fw-bold text-center">
                                                                     <div class="d-flex justify-content-center align-items-center">
-                                                                        <button type="button" class="btn btn-small btn-primary" onclick="checkShoppingCartUser(<?= $shoppingCartUserID ?>)" style="width: 40px">
+                                                                        <button type="button" class="btn btn-small btn-primary" id="addToCartButton" onclick="checkShoppingCartUser(<?= $shoppingCartUserID ?>, <?= $data->id_producto ?>, '<?= addslashes($data->nombre_producto) ?>', <?= $data->precio ?>, '<?= addslashes($data->presentacion_producto) ?>')" style="width: 40px">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 20 20">
                                                                                 <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z" />
                                                                                 <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
@@ -303,8 +307,50 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                     </div>
 
                                                                     <script>
-                                                                        function checkShoppingCartUser(userId) {
-                                                                            var quantityToAdd = document.getElementsByName("quantityToAdd")[0].value;
+                                                                        function checkShoppingCartUser(userId, id_product, product_name, price_product, presentation_product) {
+                                                                            var quantityToAdd = $(event.target).closest('tr').find('input[name="quantityToAdd"]').val();
+                                                                            var id_product = <?= $data->id_producto ?>;
+                                                                            var product_name = "<?= $data->nombre_producto ?>";
+                                                                            var price_product = <?= $data->precio ?>;
+                                                                            var presentation_product = "<?= $data->presentacion_producto ?>";
+                                                                            var tableName = "ShoppingCartUser_" + userId;
+
+                                                                            var data = {
+                                                                                tableName: tableName,
+                                                                                id_product: id_product,
+                                                                                product_name: product_name,
+                                                                                quantityToAdd: quantityToAdd,
+                                                                                price_product: price_product,
+                                                                            };
+
+                                                                            if (quantityToAdd == "") {
+                                                                                alert("Please, enter a quantity to add to the shopping cart.");
+                                                                            } else {
+                                                                                // Primero, verificar si existe la tabla ShoppingCartUser_#id_usuario que es la que contiene el carrito de compras del usuario.
+                                                                                $.ajax({
+                                                                                    type: "POST",
+                                                                                    url: "../controllers/check_table_exists.php",
+                                                                                    data: data,
+                                                                                    success: function(response) {
+                                                                                        if (response == "true") {
+                                                                                            alert("Item added to the shopping cart successfully.");
+                                                                                        } else {
+                                                                                            alert("Shopping Cart Created Successfully + Item added to the cart successfully.");
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+
+                                                                        $(document).ready(function() {
+                                                                            $(document).on('click', '.add-to-cart', function() {
+                                                                                var userId = $(this).data('userid');
+                                                                                checkShoppingCartUserWhenSearch(userId);
+                                                                            });
+                                                                        });
+
+                                                                        function checkShoppingCartUserWhenSearch(userId) {
+                                                                            var quantityToAdd = document.getElementsByName("quantityToAdd2")[0].value;
                                                                             var id_product = <?= $data->id_producto ?>;
                                                                             var product_name = "<?= $data->nombre_producto ?>";
                                                                             var price_product = <?= $data->precio ?>;
