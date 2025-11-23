@@ -2,20 +2,38 @@
 include "../settings/db_connection.php";
 global $connection;
 
+// Set response header to JSON
+header('Content-Type: application/json');
+
 if (isset($_POST['searchText'])) {
-    $searchText = $_POST['searchText'];
+    try {
+        $searchText = trim($_POST['searchText']);
 
-    // Realiza una consulta para buscar products por nombre o cualquier otro criterio que desees
-    $query = "SELECT * FROM Inventario WHERE nombre_producto LIKE '%$searchText%' OR id_producto LIKE '%$searchText%' OR precio LIKE '%$searchText%' OR presentacion_producto LIKE '%$searchText%' OR descripcion LIKE '%$searchText%'";
-    $result = $connection->query($query);
+        // Use prepared statement with LIKE to prevent SQL injection
+        $searchParam = "%$searchText%";
 
-    // Inicializa un array para almacenar los resultados
-    $products = array();
+        // Use prepared statement for security
+        $stmt = $connection->prepare("SELECT id_producto, nombre_producto, descripcion, cantidad_producto, empaque_producto, precio, presentacion_producto, fecha_vencimiento, forma_administracion, almacenamiento FROM Inventario WHERE (nombre_producto LIKE ? OR id_producto LIKE ? OR precio LIKE ? OR presentacion_producto LIKE ? OR descripcion LIKE ?) AND active = TRUE");
 
-    while ($row = $result->fetch_assoc()) {
-        $products[] = $row;
+        $stmt->bind_param("sssss", $searchParam, $searchParam, $searchParam, $searchParam, $searchParam);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Inicializa un array para almacenar los resultados
+        $products = array();
+
+        while ($row = $result->fetch_assoc()) {
+            $products[] = $row;
+        }
+
+        $stmt->close();
+
+        // Convierte el array en formato JSON y envíalo
+        echo json_encode($products);
+    } catch (Exception $e) {
+        echo json_encode(['error' => $e->getMessage()]);
     }
-
-    // Convierte el array en formato JSON y envíalo
-    echo json_encode($products);
+} else {
+    echo json_encode(['error' => 'Missing searchText parameter']);
 }
+?>

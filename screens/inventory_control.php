@@ -243,7 +243,7 @@ if (empty($_SESSION["id"])) {
                                         }
                                         ?>
                                     </td>
-                                    <td style="text-align:center"><?= $data->existencia_producto ?></td>
+                                    <td style="text-align:center"><?= $data->cantidad_producto ?></td>
                                     <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . $data->precio) ?></td>
                                     <td style="text-align:center"><?= $data->presentacion_producto ?></td>
                                     <td style="text-align:center"><?= $data->fecha_vencimiento ?></td>
