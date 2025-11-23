@@ -422,18 +422,27 @@ function deleteInvoice(facturaId) {
  * Validate receipt form before submission
  */
 function validateReceiptForm() {
-  var customerName = $("#customer-name").val().trim();
-  var dateTime = $("#actual-date").val().trim();
-  var cashier = $("#cashier").val().trim();
-  var paymentMethod = $("#payment-method").val();
+  // Check if cart has items
+  var cartTotal = $("#cart-total").text().trim();
+  var totalValue = parseFloat(cartTotal.replace("Lps.", "").replace(",", "").trim());
 
-  if (!customerName) {
-    alert("Por favor ingrese el nombre del cliente");
-    $("#customer-name").focus();
+  if (isNaN(totalValue) || totalValue <= 0) {
+    alert("El carrito está vacío. Por favor agregue productos antes de generar la factura.");
     return false;
   }
 
-  if (!dateTime) {
+  var customerName = $("[name='name']").val().trim();
+  var dateTime = $("#actual-date").val().trim();
+  var cashier = $("[name='cashier']").val().trim();
+  var paymentMethod = $("[name='payment_method']").val();
+
+  if (!customerName) {
+    alert("Por favor ingrese el nombre del cliente");
+    $("[name='name']").focus();
+    return false;
+  }
+
+  if (!dateTime || dateTime === "Date & Time") {
     alert("Por favor seleccione la fecha y hora");
     $("#actual-date").focus();
     return false;
@@ -441,13 +450,13 @@ function validateReceiptForm() {
 
   if (!cashier) {
     alert("Por favor ingrese el nombre del cajero");
-    $("#cashier").focus();
+    $("[name='cashier']").focus();
     return false;
   }
 
-  if (!paymentMethod || paymentMethod === "Metodos de Pago") {
+  if (!paymentMethod || paymentMethod === "Payment Method") {
     alert("Por favor seleccione un método de pago");
-    $("#payment-method").focus();
+    $("[name='payment_method']").focus();
     return false;
   }
 
