@@ -299,7 +299,7 @@ if (!empty($_POST["save_product_button"])) {
                                     if (preg_match("/^(?:\d{4}[-\/]\d{2}[-\/]\d{2}|\d{2}[-\/]\d{2}[-\/]\d{4})$/", $expiration_date)) {
                                         if (strlen($administration_form) <= 20 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $administration_form)) {
                                             if (strlen($storage) <= 25 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $storage)) {
-                                                $insert_product = "INSERT INTO Inventario (id_producto,nombre_producto,descripcion,existencia_producto,precio,presentacion_producto,fecha_vencimiento,forma_administracion,almacenamiento) VALUES ('$number','$name','$description','$quantity','$price','$presentation','$expiration_date','$administration_form','$storage')";
+                                                $insert_product = "INSERT INTO Inventario (id_producto,nombre_producto,descripcion,cantidad_producto,precio,presentacion_producto,fecha_vencimiento,forma_administracion,almacenamiento) VALUES ('$number','$name','$description','$quantity','$price','$presentation','$expiration_date','$administration_form','$storage')";
                                                 $response = mysqli_query($connection, $insert_product);
                                                 if ($response === TRUE) {
                                                     echo "<div class= 'alert alert-success'>New Product added Successfully!</div>";
@@ -367,7 +367,7 @@ if (!empty($_POST["edit_product_button"])) {
                                     if (preg_match("/^(?:\d{4}[-\/]\d{2}[-\/]\d{2}|\d{2}[-\/]\d{2}[-\/]\d{4})$/", $expiration_date)) {
                                         if (strlen($administration_form) <= 20 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $administration_form)) {
                                             if (strlen($storage) <= 25 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $storage)) {
-                                                $edit_product = ("UPDATE Inventario SET id_producto='$number',nombre_producto='$name',descripcion='$description',existencia_producto='$quantity',precio='$price',presentacion_producto='$presentation',fecha_vencimiento='$expiration_date',forma_administracion='$administration_form',almacenamiento='$storage' WHERE id_producto='$id'");
+                                                $edit_product = ("UPDATE Inventario SET id_producto='$number',nombre_producto='$name',descripcion='$description',cantidad_producto='$quantity',precio='$price',presentacion_producto='$presentation',fecha_vencimiento='$expiration_date',forma_administracion='$administration_form',almacenamiento='$storage' WHERE id_producto='$id'");
                                                 $response = mysqli_query($connection, $edit_product);
                                                 if ($response === TRUE) {
                                                     echo "<div class= 'alert alert-success'>Product edited Successfully!</div>";
@@ -478,73 +478,140 @@ if (!empty($_POST["edit_user_settings_button"])) {
 }
 
 
-//This Validation is used for the Billing Module (Currently in progress)
+//This Validation is used for the Billing Module - Creates new receipts/invoices
 if (!empty($_POST["new_billing_button"])) {
-    if ((!empty($_POST["numero"])) and (!empty($_POST["name"])) and (!empty($_POST["description"])) and (!empty($_POST["quantity"])) and (!empty($_POST["packing"])) and (!empty($_POST["price"])) and (!empty($_POST["presentation"])) and (!empty($_POST["expiration_date"])) and (!empty($_POST["administration_form"])) and (!empty($_POST["storage"]))) {
-        $number = $connection->real_escape_string($_POST["numero"]);
-        $description = $connection->real_escape_string($_POST["description"]);
-        $name = $connection->real_escape_string($_POST["name"]);
-        $quantity = $connection->real_escape_string($_POST["quantity"]);
-        $packing = $connection->real_escape_string($_POST["packing"]);
-        $price = $connection->real_escape_string($_POST["price"]);
-        $presentation = $connection->real_escape_string($_POST["presentation"]);
-        $expiration_date = $connection->real_escape_string($_POST["expiration_date"]);
-        $administration_form = $connection->real_escape_string($_POST["administration_form"]);
-        $storage = $connection->real_escape_string($_POST["storage"]);
+    // Validate required fields for receipt creation
+    if (!empty($_POST["name"]) && !empty($_POST["date_time_invoice"]) && !empty($_POST["cashier"]) && !empty($_POST["payment_method"])) {
 
-        $check_number = $connection->query("SELECT * FROM Inventario WHERE id_producto='$number'");
-        if (mysqli_num_rows($check_number) > 0) {
-            echo "<div class= 'alert alert-danger'>El Número de Producto ingresado se encuentra asignado a otro producto!</div>";
-        } else {
-            if (preg_match("/^[0-9]+$/", $number) && (strlen($number) <= 6)) {
-                if ((strlen($description) <= 500) && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9\/!(),.]+$/u", $description)) {
-                    if (strlen($name) <= 30 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ]+$/u", $name)) {
-                        if (strlen($quantity) <= 6 && preg_match("/^\d+$/", $quantity)) {
-                            if (strlen($packing) <= 20 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $packing)) {
-                                if (strlen($price) <= 9 && preg_match("/^\d+(\.\d+)?$/", $price)) {
-                                    if (strlen($presentation) <= 20 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $presentation)) {
-                                        if (preg_match("/^(?:\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4})$/", $expiration_date)) {
-                                            if (strlen($administration_form) <= 20 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $administration_form)) {
-                                                if (strlen($storage) <= 25 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $storage)) {
-                                                    $insert_product = "INSERT INTO Inventario (id_producto,nombre_producto,descripcion,cantidad_producto,empaque_producto,precio,presentacion_producto,fecha_vencimiento,forma_administracion,almacenamiento) VALUES ('$number','$name','$description','$quantity','$packing','$price','$presentation','$expiration_date','$administration_form','$storage')";
-                                                    $response = mysqli_query($connection, $insert_product);
-                                                    if ($response === TRUE) {
-                                                        echo "<div class= 'alert alert-success'>Se ha Agregado un Nuevo Producto Correctamente!</div>";
-                                                    } else {
-                                                        echo "<div class= 'alert alert-danger'>Se ha generado un Error al Agregar el Producto!</div>";
-                                                    }
-                                                } else {
-                                                    echo "<div class= 'alert alert-danger'>Por favor ingrese una Forma de Almacenamiento Válida!</div>";
-                                                }
-                                            } else {
-                                                echo "<div class= 'alert alert-danger'>Por favor ingrese una Forma de Administración Válida!</div>";
-                                            }
-                                        } else {
-                                            echo "<div class= 'alert alert-danger'>Por favor ingrese una Fecha de Vencimiento Válida!</div>";
-                                        }
-                                    } else {
-                                        echo "<div class= 'alert alert-danger'>Por favor ingrese un tipo de Presentación Válido!</div>";
-                                    }
-                                } else {
-                                    echo "<div class= 'alert alert-danger'>Por favor ingrese un Precio Válido!</div>";
-                                }
-                            } else {
-                                echo "<div class= 'alert alert-danger'>Por favor ingrese un tipo de Empaque Válido!</div>";
-                            }
-                        } else {
-                            echo "<div class= 'alert alert-danger'>Por favor ingrese una Cantidad Válida!</div>";
-                        }
-                    } else {
-                        echo "<div class= 'alert alert-danger'>El nombre es demasiado extenso o contiene caracteres invalidos, Porfavor ingrese un Nombre Válido!</div>";
-                    }
-                } else {
-                    echo "<div class= 'alert alert-danger'>La Descripción es demasiado extensa o Contiene Caracteres Invalidos, Porfavor intente nuevamente!</div>";
-                }
-            } else {
-                echo "<div class= 'alert alert-danger'>El Número de Producto es Inválido o contiene mas de 6 dígitos!</div>";
+        try {
+            // Start transaction for data integrity
+            $connection->begin_transaction();
+
+            // Get and validate form data
+            $customer_name = trim($_POST["name"]);
+            $rtn = !empty($_POST["rtn"]) ? trim($_POST["rtn"]) : NULL;
+            $date_time = trim($_POST["date_time_invoice"]);
+            $cashier_name = trim($_POST["cashier"]);
+            $payment_method = trim($_POST["payment_method"]);
+            $user_id = $_SESSION["id"];
+
+            // Validate customer name
+            if (strlen($customer_name) > 255 || !preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜñÑ]+$/u", $customer_name)) {
+                throw new Exception("Por favor ingrese un nombre de cliente válido!");
             }
+
+            // Validate RTN if provided
+            if ($rtn && !preg_match("/^[0-9-]+$/", $rtn)) {
+                throw new Exception("Por favor ingrese un RTN válido!");
+            }
+
+            // Validate payment method exists
+            $stmt_check_payment = $connection->prepare("SELECT formas_pago FROM Metodos_Pago WHERE formas_pago = ?");
+            $stmt_check_payment->bind_param("s", $payment_method);
+            $stmt_check_payment->execute();
+            $result_payment = $stmt_check_payment->get_result();
+
+            if ($result_payment->num_rows == 0) {
+                throw new Exception("Método de pago no válido!");
+            }
+            $stmt_check_payment->close();
+
+            // Get shopping cart items for this user
+            $stmt_cart = $connection->prepare("SELECT producto_id, nombre_producto, cantidad, precio_unitario, subtotal FROM Shopping_Cart WHERE usuario_id = ?");
+            $stmt_cart->bind_param("i", $user_id);
+            $stmt_cart->execute();
+            $cart_result = $stmt_cart->get_result();
+
+            // Check if cart is empty
+            if ($cart_result->num_rows == 0) {
+                throw new Exception("El carrito está vacío! Por favor agregue productos antes de generar la factura.");
+            }
+
+            // Calculate total and prepare cart items
+            $cart_items = [];
+            $total = 0.00;
+
+            while ($item = $cart_result->fetch_assoc()) {
+                $cart_items[] = $item;
+                $total += floatval($item['subtotal']);
+
+                // Verify product stock availability
+                $stmt_stock = $connection->prepare("SELECT cantidad_producto FROM Inventario WHERE id_producto = ?");
+                $stmt_stock->bind_param("i", $item['producto_id']);
+                $stmt_stock->execute();
+                $stock_result = $stmt_stock->get_result();
+
+                if ($stock_result->num_rows == 0) {
+                    throw new Exception("Producto ID " . $item['producto_id'] . " no encontrado en inventario!");
+                }
+
+                $stock_data = $stock_result->fetch_assoc();
+                if ($stock_data['cantidad_producto'] < $item['cantidad']) {
+                    throw new Exception("Stock insuficiente para " . $item['nombre_producto'] . ". Disponible: " . $stock_data['cantidad_producto']);
+                }
+                $stmt_stock->close();
+            }
+            $stmt_cart->close();
+
+            // Insert receipt header into Facturas table
+            $stmt_factura = $connection->prepare("INSERT INTO Facturas (fecha_hora, cliente, rtn, cajero, usuario_id, estado, metodo_pago, total) VALUES (?, ?, ?, ?, ?, 'Completada', ?, ?)");
+            $stmt_factura->bind_param("ssssisd", $date_time, $customer_name, $rtn, $cashier_name, $user_id, $payment_method, $total);
+
+            if (!$stmt_factura->execute()) {
+                throw new Exception("Error al crear la factura: " . $stmt_factura->error);
+            }
+
+            $factura_id = $connection->insert_id;
+            $stmt_factura->close();
+
+            // Insert receipt details and update inventory
+            $stmt_details = $connection->prepare("INSERT INTO Factura_Detalles (factura_id, producto_id, nombre_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt_update_stock = $connection->prepare("UPDATE Inventario SET cantidad_producto = cantidad_producto - ? WHERE id_producto = ?");
+
+            foreach ($cart_items as $item) {
+                // Insert detail line
+                $stmt_details->bind_param("iisidd",
+                    $factura_id,
+                    $item['producto_id'],
+                    $item['nombre_producto'],
+                    $item['cantidad'],
+                    $item['precio_unitario'],
+                    $item['subtotal']
+                );
+
+                if (!$stmt_details->execute()) {
+                    throw new Exception("Error al insertar detalles de factura: " . $stmt_details->error);
+                }
+
+                // Update inventory stock
+                $stmt_update_stock->bind_param("ii", $item['cantidad'], $item['producto_id']);
+
+                if (!$stmt_update_stock->execute()) {
+                    throw new Exception("Error al actualizar inventario: " . $stmt_update_stock->error);
+                }
+            }
+
+            $stmt_details->close();
+            $stmt_update_stock->close();
+
+            // Clear shopping cart after successful receipt creation
+            $stmt_clear_cart = $connection->prepare("DELETE FROM Shopping_Cart WHERE usuario_id = ?");
+            $stmt_clear_cart->bind_param("i", $user_id);
+            $stmt_clear_cart->execute();
+            $stmt_clear_cart->close();
+
+            // Commit transaction
+            $connection->commit();
+
+            echo "<div class='alert alert-success'>¡Factura #" . $factura_id . " generada exitosamente! Total: Lps. " . number_format($total, 2) . "</div>";
+            echo "<script>setTimeout(function(){ location.reload(); }, 2000);</script>";
+
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            $connection->rollback();
+            echo "<div class='alert alert-danger'>" . $e->getMessage() . "</div>";
         }
     } else {
-        echo "<div class= 'alert alert-danger'>Porfavor Rellene Todos los Campos e Intentelo Nuevamente!</div>";
+        echo "<div class='alert alert-danger'>Por favor complete todos los campos requeridos (Nombre del Cliente, Fecha/Hora, Cajero, Método de Pago)!</div>";
     }
 }

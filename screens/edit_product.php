@@ -75,7 +75,7 @@ $selectProduct = $connection->query("SELECT * FROM Inventario WHERE id_producto=
                                 <textarea style="height: 120px;" type="text" class="form-control" id="recipient-name2" name="description"><?= $data->descripcion ?></textarea>
                                 <br>
                                 <label for="recipient-name3" class="col-form-label">Existence:</label>
-                                <input type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Cantidad" name="quantity" value="<?= $data->existencia_producto ?>">
+                                <input type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Cantidad" name="quantity" value="<?= $data->cantidad_producto ?>">
                                 <br>
                                 <label for="recipient-name5" class="col-form-label">Price:</label>
                                 <input type="text" min="0" max="100000" class="form-control" id="recipient-name5" placeholder="Precio" name="price" value="<?= $data->precio ?>">
