@@ -124,7 +124,7 @@ $(document).ready(function () {
           );
           newRow.append(
             "<td style='text-align:center'>" +
-              producto.existencia_producto +
+              producto.cantidad_producto +
               "</td>"
           );
           newRow.append(

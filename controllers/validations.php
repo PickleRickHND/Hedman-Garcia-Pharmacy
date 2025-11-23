@@ -299,7 +299,7 @@ if (!empty($_POST["save_product_button"])) {
                                     if (preg_match("/^(?:\d{4}[-\/]\d{2}[-\/]\d{2}|\d{2}[-\/]\d{2}[-\/]\d{4})$/", $expiration_date)) {
                                         if (strlen($administration_form) <= 20 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $administration_form)) {
                                             if (strlen($storage) <= 25 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $storage)) {
-                                                $insert_product = "INSERT INTO Inventario (id_producto,nombre_producto,descripcion,existencia_producto,precio,presentacion_producto,fecha_vencimiento,forma_administracion,almacenamiento) VALUES ('$number','$name','$description','$quantity','$price','$presentation','$expiration_date','$administration_form','$storage')";
+                                                $insert_product = "INSERT INTO Inventario (id_producto,nombre_producto,descripcion,cantidad_producto,precio,presentacion_producto,fecha_vencimiento,forma_administracion,almacenamiento) VALUES ('$number','$name','$description','$quantity','$price','$presentation','$expiration_date','$administration_form','$storage')";
                                                 $response = mysqli_query($connection, $insert_product);
                                                 if ($response === TRUE) {
                                                     echo "<div class= 'alert alert-success'>New Product added Successfully!</div>";
@@ -367,7 +367,7 @@ if (!empty($_POST["edit_product_button"])) {
                                     if (preg_match("/^(?:\d{4}[-\/]\d{2}[-\/]\d{2}|\d{2}[-\/]\d{2}[-\/]\d{4})$/", $expiration_date)) {
                                         if (strlen($administration_form) <= 20 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $administration_form)) {
                                             if (strlen($storage) <= 25 && preg_match("/^[A-Za-z\sáéíóúÁÉÍÓÚüÜ0-9]+$/u", $storage)) {
-                                                $edit_product = ("UPDATE Inventario SET id_producto='$number',nombre_producto='$name',descripcion='$description',existencia_producto='$quantity',precio='$price',presentacion_producto='$presentation',fecha_vencimiento='$expiration_date',forma_administracion='$administration_form',almacenamiento='$storage' WHERE id_producto='$id'");
+                                                $edit_product = ("UPDATE Inventario SET id_producto='$number',nombre_producto='$name',descripcion='$description',cantidad_producto='$quantity',precio='$price',presentacion_producto='$presentation',fecha_vencimiento='$expiration_date',forma_administracion='$administration_form',almacenamiento='$storage' WHERE id_producto='$id'");
                                                 $response = mysqli_query($connection, $edit_product);
                                                 if ($response === TRUE) {
                                                     echo "<div class= 'alert alert-success'>Product edited Successfully!</div>";
