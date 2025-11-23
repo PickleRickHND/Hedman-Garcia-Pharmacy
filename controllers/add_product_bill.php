@@ -39,7 +39,7 @@ try {
     $product_id = intval($_POST['id_product']);
     $product_name = trim($_POST['product_name']);
     $quantity_to_add = intval($_POST['quantityToAdd']);
-    $price = floatval($_POST['price_product']);
+    $price = floatval($_POST['price_product']); // NOTE: This will be overridden with DB price for security
 
     // Validate quantity
     if ($quantity_to_add <= 0) {
@@ -69,6 +69,9 @@ try {
 
     $product_data = $result_check->fetch_assoc();
     $stmt_check->close();
+
+    // SECURITY: Always use database price, never trust client-supplied price
+    $price = floatval($product_data['precio']);
 
     // Check available stock
     if ($product_data['cantidad_producto'] < $quantity_to_add) {
