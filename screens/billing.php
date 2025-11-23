@@ -82,7 +82,7 @@ $shoppingCartUserID = $_SESSION["id"];
                 <br>
 
                 <div class="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
-                    <button type="button" class="btn btn-small btn-success" data-toggle="modal" data-target=".bd-example-modal-lg">
+                    <button type="button" class="btn btn-small btn-success" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 20 20">
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                         </svg> Generate New Receipt
@@ -113,9 +113,7 @@ $shoppingCartUserID = $_SESSION["id"];
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">New Receipt: </h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <form id="receiptForm" method="post" action="">
@@ -234,7 +232,11 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                         newRow.append(
                                                                             "<td class='fw-bold text-center'>" +
                                                                             "<div class='d-flex justify-content-center align-items-center'>" +
-                                                                            "<button type='button' class='btn btn-small btn-primary add-to-cart' data-userid='<?= $shoppingCartUserID ?>' style='width: 40px'>" +
+                                                                            "<button type='button' class='btn btn-small btn-primary add-to-cart-search' " +
+                                                                            "data-product-id='" + producto.id_producto + "' " +
+                                                                            "data-product-name='" + producto.nombre_producto.replace(/'/g, "\\'") + "' " +
+                                                                            "data-product-price='" + producto.precio + "' " +
+                                                                            "style='width: 40px'>" +
                                                                             "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' class='bi bi-cart-plus' viewBox='0 0 20 20'>" +
                                                                             "<path d='M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z'></path>" +
                                                                             "<path d='M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0'></path>" +
@@ -252,6 +254,71 @@ $shoppingCartUserID = $_SESSION["id"];
                                                 </script>
 
                                             </div>
+
+                                            <!-- Shopping Cart Section -->
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Current Shopping Cart:</h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-bordered">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Product</th>
+                                                                <th class="text-center">Quantity</th>
+                                                                <th class="text-end">Price</th>
+                                                                <th class="text-end">Subtotal</th>
+                                                                <th class="text-center">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php
+                                                            // Get cart items for current user using prepared statement
+                                                            $user_id = $_SESSION['id'];
+                                                            $stmt_cart = $connection->prepare("SELECT id, producto_id, nombre_producto, cantidad, precio_unitario, subtotal FROM Shopping_Cart WHERE usuario_id = ? ORDER BY added_at DESC");
+                                                            $stmt_cart->bind_param("i", $user_id);
+                                                            $stmt_cart->execute();
+                                                            $result_cart = $stmt_cart->get_result();
+
+                                                            $cart_total = 0;
+                                                            if ($result_cart->num_rows > 0) {
+                                                                while ($cart_item = $result_cart->fetch_object()) {
+                                                                    $cart_total += $cart_item->subtotal;
+                                                            ?>
+                                                                <tr>
+                                                                    <td><?= htmlspecialchars($cart_item->nombre_producto) ?></td>
+                                                                    <td class="text-center"><?= $cart_item->cantidad ?></td>
+                                                                    <td class="text-end">Lps. <?= number_format($cart_item->precio_unitario, 2) ?></td>
+                                                                    <td class="text-end">Lps. <?= number_format($cart_item->subtotal, 2) ?></td>
+                                                                    <td class="text-center">
+                                                                        <button type="button" onclick="removeFromCart(<?= $cart_item->producto_id ?>)" class="btn btn-sm btn-danger">
+                                                                            <i class="bi bi-trash"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php
+                                                                }
+                                                            } else {
+                                                            ?>
+                                                                <tr>
+                                                                    <td colspan="5" class="text-center text-muted">Cart is empty. Add products below.</td>
+                                                                </tr>
+                                                            <?php
+                                                            }
+                                                            $stmt_cart->close();
+                                                            ?>
+                                                        </tbody>
+                                                        <tfoot class="table-light">
+                                                            <tr class="fw-bold">
+                                                                <td colspan="3" class="text-end">TOTAL:</td>
+                                                                <td class="text-end" id="cart-total">Lps. <?= number_format($cart_total, 2) ?></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+                                            <h6 class="fw-bold">Add Products to Cart:</h6>
 
                                             <div>
                                                 <table class="table table-hover" id="tabla2">
@@ -298,93 +365,17 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                 <td style="text-align:center"><?= $data->presentacion_producto ?></td>
                                                                 <td class="fw-bold text-center">
                                                                     <div class="d-flex justify-content-center align-items-center">
-                                                                        <button type="button" class="btn btn-small btn-primary" id="addToCartButton" onclick="checkShoppingCartUser(<?= $shoppingCartUserID ?>, <?= $data->id_producto ?>, '<?= addslashes($data->nombre_producto) ?>', <?= $data->precio ?>, '<?= addslashes($data->presentacion_producto) ?>')" style="width: 40px">
+                                                                        <button type="button" class="btn btn-small btn-primary add-to-cart-btn"
+                                                                                data-product-id="<?= $data->id_producto ?>"
+                                                                                data-product-name="<?= htmlspecialchars($data->nombre_producto) ?>"
+                                                                                data-product-price="<?= $data->precio ?>"
+                                                                                style="width: 40px">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 20 20">
                                                                                 <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z" />
                                                                                 <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
                                                                             </svg>
                                                                         </button>
                                                                     </div>
-
-                                                                    <script>
-                                                                        function checkShoppingCartUser(userId, id_product, product_name, price_product, presentation_product) {
-                                                                            var quantityToAdd = $(event.target).closest('tr').find('input[name="quantityToAdd"]').val();
-                                                                            var id_product = <?= $data->id_producto ?>;
-                                                                            var product_name = "<?= $data->nombre_producto ?>";
-                                                                            var price_product = <?= $data->precio ?>;
-                                                                            var presentation_product = "<?= $data->presentacion_producto ?>";
-                                                                            var tableName = "ShoppingCartUser_" + userId;
-
-                                                                            var data = {
-                                                                                tableName: tableName,
-                                                                                id_product: id_product,
-                                                                                product_name: product_name,
-                                                                                quantityToAdd: quantityToAdd,
-                                                                                price_product: price_product,
-                                                                            };
-
-                                                                            if (quantityToAdd == "") {
-                                                                                alert("Please, enter a quantity to add to the shopping cart.");
-                                                                            } else {
-                                                                                // Primero, verificar si existe la tabla ShoppingCartUser_#id_usuario que es la que contiene el carrito de compras del usuario.
-                                                                                $.ajax({
-                                                                                    type: "POST",
-                                                                                    url: "../controllers/check_table_exists.php",
-                                                                                    data: data,
-                                                                                    success: function(response) {
-                                                                                        if (response == "true") {
-                                                                                            alert("Item added to the shopping cart successfully.");
-                                                                                        } else {
-                                                                                            alert("Shopping Cart Created Successfully + Item added to the cart successfully.");
-                                                                                        }
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        }
-
-                                                                        $(document).ready(function() {
-                                                                            $(document).on('click', '.add-to-cart', function() {
-                                                                                var userId = $(this).data('userid');
-                                                                                checkShoppingCartUserWhenSearch(userId);
-                                                                            });
-                                                                        });
-
-                                                                        function checkShoppingCartUserWhenSearch(userId) {
-                                                                            var quantityToAdd = document.getElementsByName("quantityToAdd2")[0].value;
-                                                                            var id_product = <?= $data->id_producto ?>;
-                                                                            var product_name = "<?= $data->nombre_producto ?>";
-                                                                            var price_product = <?= $data->precio ?>;
-                                                                            var presentation_product = "<?= $data->presentacion_producto ?>";
-                                                                            var tableName = "ShoppingCartUser_" + userId;
-
-                                                                            var data = {
-                                                                                tableName: tableName,
-                                                                                id_product: id_product,
-                                                                                product_name: product_name,
-                                                                                quantityToAdd: quantityToAdd,
-                                                                                price_product: price_product,
-                                                                            };
-
-                                                                            if (quantityToAdd == "") {
-                                                                                alert("Please, enter a quantity to add to the shopping cart.");
-                                                                            } else {
-                                                                                // Primero, verificar si existe la tabla ShoppingCartUser_#id_usuario que es la que contiene el carrito de compras del usuario.
-                                                                                $.ajax({
-                                                                                    type: "POST",
-                                                                                    url: "../controllers/check_table_exists.php",
-                                                                                    data: data,
-                                                                                    success: function(response) {
-                                                                                        if (response == "true") {
-                                                                                            alert("Item added to the shopping cart successfully.");
-                                                                                        } else {
-                                                                                            alert("Shopping Cart Created Successfully + Item added to the cart successfully.");
-                                                                                        }
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        }
-                                                                    </script>
-
                                                                 </td>
                                                             </tr>
                                                         <?php }
@@ -395,14 +386,57 @@ $shoppingCartUserID = $_SESSION["id"];
                                     </div>
 
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <input type="submit" class="btn btn-success" value="Generate Receipt" name="new_billing_button">
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                        <input type="submit" class="btn btn-success" value="Generate Receipt" name="new_billing_button" onclick="return validateReceiptForm()">
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <script>
+                // Handle add to cart button clicks
+                $(document).ready(function() {
+                    // Handler for regular product list buttons
+                    $(document).on('click', '.add-to-cart-btn', function() {
+                        var $button = $(this);
+                        var productId = $button.data('product-id');
+                        var productName = $button.data('product-name');
+                        var price = $button.data('product-price');
+                        var $quantityInput = $button.closest('tr').find('input[name="quantityToAdd"]');
+                        var quantity = parseInt($quantityInput.val());
+
+                        if (!quantity || quantity <= 0) {
+                            alert("Please enter a valid quantity");
+                            $quantityInput.focus();
+                            return;
+                        }
+
+                        // Call the addToCart function from functions.js
+                        addToCart(productId, productName, price, quantity);
+                    });
+
+                    // Handler for search results buttons
+                    $(document).on('click', '.add-to-cart-search', function() {
+                        var $button = $(this);
+                        var productId = $button.data('product-id');
+                        var productName = $button.data('product-name');
+                        var price = $button.data('product-price');
+                        var $quantityInput = $button.closest('tr').find('input[name="quantityToAdd2"]');
+                        var quantity = parseInt($quantityInput.val());
+
+                        if (!quantity || quantity <= 0) {
+                            alert("Please enter a valid quantity");
+                            $quantityInput.focus();
+                            return;
+                        }
+
+                        // Call the addToCart function from functions.js
+                        addToCart(productId, productName, price, quantity);
+                    });
+                });
+                </script>
 
                 <?php include "../settings/db_connection.php"; ?>
                 <?php include "../controllers/validations.php"; ?>
@@ -459,22 +493,22 @@ $shoppingCartUserID = $_SESSION["id"];
                                     <td style="text-align:center"><?= "Lps. " . $data->total ?></td>
                                     <td class="fw-bold text-center">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <a onclick="" class="btn btn-primary">
+                                            <button type="button" onclick="viewInvoice(<?= $data->id_factura ?>)" class="btn btn-primary">
                                                 <span class="d-flex align-items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
                                                         <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
                                                         <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
                                                     </svg>
                                                 </span>
-                                            </a>
+                                            </button>
                                             <div class="mx-1"></div>
-                                            <a onclick="" class="btn btn-danger">
+                                            <button type="button" onclick="deleteInvoice(<?= $data->id_factura ?>)" class="btn btn-danger">
                                                 <span class="d-flex align-items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
                                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
                                                     </svg>
                                                 </span>
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
