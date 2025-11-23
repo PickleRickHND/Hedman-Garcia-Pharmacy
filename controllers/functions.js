@@ -33,7 +33,7 @@ function actualDate() {
   today.setDate(today.getDate());
 
   var day = today.getDate();
-  var month = today.getMonth();
+  var month = today.getMonth() + 1; // FIX: JavaScript months are 0-indexed, so add 1
   var year = today.getFullYear();
 
   var hours = today.getHours();
@@ -200,4 +200,256 @@ function deleteProduct() {
 
 function goBack() {
   window.history.back();
+}
+
+// ==========================================
+// Shopping Cart Functions
+// ==========================================
+
+/**
+ * Add product to shopping cart
+ * @param {number} productId - Product ID
+ * @param {string} productName - Product name
+ * @param {number} price - Product price
+ * @param {number} quantity - Quantity to add
+ */
+function addToCart(productId, productName, price, quantity) {
+  if (!quantity || quantity <= 0) {
+    alert("Por favor ingrese una cantidad válida");
+    return;
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "../controllers/add_product_bill.php",
+    data: {
+      id_product: productId,
+      product_name: productName,
+      price_product: price,
+      quantityToAdd: quantity
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        alert(response.message);
+        updateCartTotal(response.cart_total);
+        // Reload the page to show updated cart
+        location.reload();
+      } else {
+        alert("Error: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      alert("Error al agregar producto al carrito: " + error);
+      console.error(xhr.responseText);
+    }
+  });
+}
+
+/**
+ * Remove product from shopping cart
+ * @param {number} productId - Product ID to remove
+ */
+function removeFromCart(productId) {
+  if (!confirm("¿Está seguro que desea eliminar este producto del carrito?")) {
+    return;
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "../controllers/remove_product_cart.php",
+    data: {
+      producto_id: productId
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        alert(response.message);
+        updateCartTotal(response.cart_total);
+        // Reload the page to show updated cart
+        location.reload();
+      } else {
+        alert("Error: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      alert("Error al eliminar producto del carrito: " + error);
+      console.error(xhr.responseText);
+    }
+  });
+}
+
+/**
+ * Update cart total display
+ * @param {number} total - New cart total
+ */
+function updateCartTotal(total) {
+  var formatted = "Lps. " + parseFloat(total).toFixed(2);
+  $("#cart-total").text(formatted);
+}
+
+/**
+ * View invoice details
+ * @param {number} facturaId - Invoice ID
+ */
+function viewInvoice(facturaId) {
+  $.ajax({
+    type: "GET",
+    url: "../controllers/view_invoice_details.php",
+    data: {
+      factura_id: facturaId
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        // Build modal content
+        var invoice = response.invoice;
+        var items = response.items;
+
+        var modalContent = `
+          <div class="modal fade" id="invoiceModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Factura #${invoice.id_factura}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <p><strong>Cliente:</strong> ${invoice.cliente}</p>
+                      <p><strong>RTN:</strong> ${invoice.rtn || 'N/A'}</p>
+                      <p><strong>Cajero:</strong> ${invoice.cajero}</p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><strong>Fecha:</strong> ${invoice.fecha_hora}</p>
+                      <p><strong>Estado:</strong> ${invoice.estado}</p>
+                      <p><strong>Método de Pago:</strong> ${invoice.metodo_pago}</p>
+                    </div>
+                  </div>
+                  <h6>Productos:</h6>
+                  <table class="table table-sm">
+                    <thead>
+                      <tr>
+                        <th>Producto</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-end">Precio Unit.</th>
+                        <th class="text-end">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        items.forEach(function (item) {
+          modalContent += `
+                      <tr>
+                        <td>${item.nombre_producto}</td>
+                        <td class="text-center">${item.cantidad}</td>
+                        <td class="text-end">Lps. ${parseFloat(item.precio_unitario).toFixed(2)}</td>
+                        <td class="text-end">Lps. ${parseFloat(item.subtotal).toFixed(2)}</td>
+                      </tr>
+          `;
+        });
+
+        modalContent += `
+                    </tbody>
+                    <tfoot>
+                      <tr class="fw-bold">
+                        <td colspan="3" class="text-end">TOTAL:</td>
+                        <td class="text-end">Lps. ${parseFloat(invoice.total).toFixed(2)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Remove existing modal if any
+        $("#invoiceModal").remove();
+        // Append and show new modal
+        $("body").append(modalContent);
+        var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
+        modal.show();
+      } else {
+        alert("Error: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      alert("Error al cargar detalles de factura: " + error);
+      console.error(xhr.responseText);
+    }
+  });
+}
+
+/**
+ * Delete invoice
+ * @param {number} facturaId - Invoice ID to delete
+ */
+function deleteInvoice(facturaId) {
+  if (!confirm("¿Está seguro que desea eliminar la factura #" + facturaId + "? Esta acción no se puede deshacer y restaurará el inventario.")) {
+    return;
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "../controllers/delete_invoice.php",
+    data: {
+      factura_id: facturaId
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success) {
+        alert(response.message);
+        // Reload the page to show updated list
+        location.reload();
+      } else {
+        alert("Error: " + response.message);
+      }
+    },
+    error: function (xhr, status, error) {
+      alert("Error al eliminar factura: " + error);
+      console.error(xhr.responseText);
+    }
+  });
+}
+
+/**
+ * Validate receipt form before submission
+ */
+function validateReceiptForm() {
+  var customerName = $("#customer-name").val().trim();
+  var dateTime = $("#actual-date").val().trim();
+  var cashier = $("#cashier").val().trim();
+  var paymentMethod = $("#payment-method").val();
+
+  if (!customerName) {
+    alert("Por favor ingrese el nombre del cliente");
+    $("#customer-name").focus();
+    return false;
+  }
+
+  if (!dateTime) {
+    alert("Por favor seleccione la fecha y hora");
+    $("#actual-date").focus();
+    return false;
+  }
+
+  if (!cashier) {
+    alert("Por favor ingrese el nombre del cajero");
+    $("#cashier").focus();
+    return false;
+  }
+
+  if (!paymentMethod || paymentMethod === "Metodos de Pago") {
+    alert("Por favor seleccione un método de pago");
+    $("#payment-method").focus();
+    return false;
+  }
+
+  return true;
 }
