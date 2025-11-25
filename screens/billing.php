@@ -8,8 +8,11 @@ if (empty($_SESSION["id"])) {
 include "../settings/db_connection.php";
 global $connection;
 
-$id_session = $_SESSION["id"];
-$query_seller = $connection->query("SELECT * FROM Usuarios WHERE id='$id_session'");
+$id_session = intval($_SESSION["id"]);
+$stmt_seller = $connection->prepare("SELECT * FROM Usuarios WHERE id = ?");
+$stmt_seller->bind_param("i", $id_session);
+$stmt_seller->execute();
+$query_seller = $stmt_seller->get_result();
 $query_paymentMethod = $connection->query("SELECT formas_pago FROM Metodos_Pago");
 global $data;
 

@@ -226,16 +226,16 @@ if (empty($_SESSION["id"])) {
                             while ($data = $result->fetch_object()) { ?>
 
                                 <tr>
-                                    <td style="text-align:center"><?= $data->id_producto ?></td>
-                                    <td style="text-align:center"><?= $data->nombre_producto ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->id_producto) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->nombre_producto) ?></td>
                                     <td style="text-align: justify">
                                         <?php
                                         $descripcion = $data->descripcion;
                                         $shortDescription = substr($descripcion, 0, 75);
                                         $longDescription = $data->descripcion;
 
-                                        echo '<span id="descripcion-corta-' . $data->id_producto . '">' . $shortDescription . '</span>';
-                                        echo '<span id="descripcion-completa-' . $data->id_producto . '" style="display:none;">' . $longDescription . '</span>';
+                                        echo '<span id="descripcion-corta-' . intval($data->id_producto) . '">' . htmlspecialchars($shortDescription) . '</span>';
+                                        echo '<span id="descripcion-completa-' . intval($data->id_producto) . '" style="display:none;">' . htmlspecialchars($longDescription) . '</span>';
 
                                         if (strlen($descripcion) > 75) {
                                             echo '<button style=" font-size: 14px;" class="btn btn-small btn-info" onclick="showMore(' . $data->id_producto . ')">Show More...</button>';
@@ -243,12 +243,12 @@ if (empty($_SESSION["id"])) {
                                         }
                                         ?>
                                     </td>
-                                    <td style="text-align:center"><?= $data->cantidad_producto ?></td>
-                                    <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . $data->precio) ?></td>
-                                    <td style="text-align:center"><?= $data->presentacion_producto ?></td>
-                                    <td style="text-align:center"><?= $data->fecha_vencimiento ?></td>
-                                    <td style="text-align:center"><?= $data->forma_administracion ?></td>
-                                    <td style="text-align:center"><?= $data->almacenamiento ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->cantidad_producto) ?></td>
+                                    <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . htmlspecialchars($data->precio)) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->presentacion_producto) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->fecha_vencimiento) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->forma_administracion) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->almacenamiento) ?></td>
                                     <td class="fw-bold text-center">
 
                                         <a href="edit_product.php?id_producto=<?= $data->id_producto ?>" class="btn btn-small btn-warning btn-block">

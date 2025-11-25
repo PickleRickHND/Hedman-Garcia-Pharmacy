@@ -8,8 +8,11 @@ if (empty($_SESSION["id"])) {
 include "../settings/db_connection.php";
 global $connection;
 
-$id = $_GET['id'];
-$selectUser = $connection->query("SELECT * FROM Usuarios WHERE id='$id'");
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$stmt_user = $connection->prepare("SELECT * FROM Usuarios WHERE id = ?");
+$stmt_user->bind_param("i", $id);
+$stmt_user->execute();
+$selectUser = $stmt_user->get_result();
 
 ?>
 

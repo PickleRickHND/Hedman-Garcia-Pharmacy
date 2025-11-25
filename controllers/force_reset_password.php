@@ -1,7 +1,28 @@
 <?php
+session_start();
+
+// Security: Check if user is logged in
+if (empty($_SESSION["id"])) {
+    header("Location: ../index.php");
+    exit;
+}
 
 include "../settings/db_connection.php";
 global $connection;
+
+// Security: Verify user has admin role before allowing password reset
+$current_user_id = intval($_SESSION["id"]);
+$stmt_role = $connection->prepare("SELECT roles FROM Usuarios WHERE id = ?");
+$stmt_role->bind_param("i", $current_user_id);
+$stmt_role->execute();
+$result_role = $stmt_role->get_result();
+$user_data = $result_role->fetch_assoc();
+$stmt_role->close();
+
+if ($user_data['roles'] !== 'Administrador') {
+    echo "<div class='alert alert-danger'>Access denied. Only administrators can reset passwords.</div>";
+    exit;
+}
 
 //This Validation was done to Reset Users Password using a Full Admin Account
 if (!empty($_GET['id'])) {
