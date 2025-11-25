@@ -1,0 +1,12 @@
+; Hedman-Garcia Pharmacy Configuration File
+; Copy this file to config.ini and update with your settings
+; IMPORTANT: Never commit config.ini to version control
+
+[Database]
+server = localhost
+user_db = your_database_user
+password_db = your_database_password
+db = FarmaciaHG
+
+[SendGrid]
+apikey = your_sendgrid_api_key

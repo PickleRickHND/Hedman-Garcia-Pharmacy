@@ -1,4 +1,11 @@
 <?php
+session_start();
+
+// Security: Check if user is logged in
+if (empty($_SESSION["id"])) {
+    header("Location: ../index.php");
+    exit;
+}
 
 include "../settings/db_connection.php";
 global $connection;
@@ -6,6 +13,12 @@ global $connection;
 if (!empty($_GET['id'])) {
     try {
         $id = intval($_GET['id']);
+
+        // Security: Prevent user from deleting themselves
+        if ($id === intval($_SESSION["id"])) {
+            echo "<div class='alert alert-danger'>You cannot delete your own account.</div>";
+            exit;
+        }
 
         // Check if user exists before deletion
         $stmt_check = $connection->prepare("SELECT id FROM Usuarios WHERE id = ?");
