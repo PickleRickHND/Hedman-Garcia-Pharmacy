@@ -8,8 +8,11 @@ if (empty($_SESSION["id"])) {
 include "../settings/db_connection.php";
 global $connection;
 
-$id = $_GET['id_producto'];
-$selectProduct = $connection->query("SELECT * FROM Inventario WHERE id_producto='$id'");
+$id = isset($_GET['id_producto']) ? intval($_GET['id_producto']) : 0;
+$stmt_product = $connection->prepare("SELECT * FROM Inventario WHERE id_producto = ?");
+$stmt_product->bind_param("i", $id);
+$stmt_product->execute();
+$selectProduct = $stmt_product->get_result();
 
 ?>
 

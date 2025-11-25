@@ -22,25 +22,18 @@ global $connection;
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User Management</title>
-        <link rel="stylesheet" href="../css/styles.css" type="text/css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-        <style>
-            body {
-                background: linear-gradient(to right, #7dc8dd, #5794c0);
-            }
-        </style>
-    </head>
+    <link rel="stylesheet" href="../css/styles.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to right, #7dc8dd, #5794c0);
+        }
+    </style>
+</head>
 
 <body>
     <div class="container w-75 bg-white mt-5 rounded shadow">
@@ -161,10 +154,10 @@ global $connection;
                         $sql = $connection->query("SELECT * FROM Usuarios");
                         while ($data = $sql->fetch_object()) { ?>
                             <tr>
-                                <td style="text-align:center"><?= $data->nombre ?></td>
-                                <td style="text-align:center"><?= $data->apellido ?></td>
-                                <td style="text-align:center"><?= $data->correo ?></td>
-                                <td style="text-align:center"><?= $data->roles ?></td>
+                                <td style="text-align:center"><?= htmlspecialchars($data->nombre) ?></td>
+                                <td style="text-align:center"><?= htmlspecialchars($data->apellido) ?></td>
+                                <td style="text-align:center"><?= htmlspecialchars($data->correo) ?></td>
+                                <td style="text-align:center"><?= htmlspecialchars($data->roles) ?></td>
                                 <td style="text-align:center">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <a href="edit_user.php?id=<?= $data->id ?>" class="btn btn-small btn-warning"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 20 20">
