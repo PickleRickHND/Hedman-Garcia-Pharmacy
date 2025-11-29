@@ -1,9 +1,17 @@
 <?php
-session_start();
+require_once "settings/session_config.php";
 if (!empty($_SESSION["id"])) {
     header("Location: screens/home.php");
     exit;
 }
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+
+include "settings/db_connection.php";
+include "controllers/validations.php";
 ?>
 
 <!DOCTYPE html>
@@ -39,6 +47,7 @@ if (!empty($_SESSION["id"])) {
                 <h2 class="fw-bold text-center ру-5">Welcome</h2>
                 <br>
                 <form method="post" action="">
+                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                     <div class="input-group mb-4">
                         <span class="input-group-text" id="email"><i class="bi bi-person-fill"></i></span>
                         <input name="email" id="email" class="form-control" type="text" placeholder="Email" maxlength="30" />
@@ -57,9 +66,7 @@ if (!empty($_SESSION["id"])) {
                         <span><a href="screens/reset_password.php">Forgot Password?</a> </span><br>
                     </div>
 
-                    <?php include "settings/db_connection.php"; ?>
-                    <?php include "controllers/validations.php"; ?>
-                </form>
+                    </form>
             </div>
         </div>
     </div>

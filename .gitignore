@@ -1,1 +1,5 @@
 settings/config.ini
+
+# Log files - keep .htaccess for security
+logs/*.log
+logs/error.log

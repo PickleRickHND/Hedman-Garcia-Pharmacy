@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 
 // Security headers
 header("X-Content-Type-Options: nosniff");

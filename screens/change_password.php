@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (empty($_SESSION["id"])) {
     header("Location: home.php");
     exit;
@@ -63,7 +63,7 @@ header("X-XSS-Protection: 1; mode=block");
                 <h4 class="fw-bold text-center py-5">Change Password</h4>
                 <br>
                 <form method="post" action="">
-
+                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                     <input type="hidden" name="id_user" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">
                     <div class="input-group mb-4">
                         <span class="input-group-text" id="password"><i class="bi bi-key"></i></span>
@@ -84,9 +84,9 @@ header("X-XSS-Protection: 1; mode=block");
                         <input type="submit" class="btn btn-primary" value="Verify" name="user_password_change_button">
                     </div>
                     <br>
-                    <?php include "../settings/db_connection.php"; ?>
-                    <?php include "../controllers/validations.php"; ?>
                 </form>
+                <?php include "../settings/db_connection.php"; ?>
+                <?php include "../controllers/validations.php"; ?>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
     exit;

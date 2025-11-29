@@ -5,7 +5,7 @@
  * Note: Only admins or authorized users should be able to delete invoices
  */
 
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 include "../settings/db_connection.php";
 global $connection;
 

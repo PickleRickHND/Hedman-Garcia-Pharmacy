@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 global $connection;
 global $email_to_reset;
 global $code;
@@ -64,8 +64,10 @@ function logError($message, $context = []) {
 
 //These Validations are used to validate the inputs on the Index (Login Page)
 if (!empty($_POST["login_button"])) {
-
-    if (!empty($_POST["email"]) and (!empty($_POST["password"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["email"]) and (!empty($_POST["password"]))) {
         $correo = trim($_POST["email"]);
         $contrasena = $_POST["password"];
 
@@ -111,7 +113,10 @@ use \SendGrid\Mail\Mail;
 
 //This Validation is used for the Reset Password Page
 if (!empty($_POST["reset_password_button"])) {
-    if (!empty($_POST["email"])) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["email"])) {
         $email_to_reset = trim($_POST["email"]);
 
         if (!filter_var($email_to_reset, FILTER_VALIDATE_EMAIL)) {
@@ -170,7 +175,10 @@ if (!empty($_POST["reset_password_button"])) {
 
 //This Validation is used for the addition of new users
 if (!empty($_POST["save_user_button"])) {
-    if (!empty($_POST["name"]) and (!empty($_POST["lastname"])) and (!empty($_POST["email"])) and (!empty($_POST["password1"])) and (!empty($_POST["password2"])) and (!empty($_POST["roles"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["name"]) and (!empty($_POST["lastname"])) and (!empty($_POST["email"])) and (!empty($_POST["password1"])) and (!empty($_POST["password2"])) and (!empty($_POST["roles"]))) {
         $name = trim($_POST['name']);
         $lastname = trim($_POST['lastname']);
         $email = trim($_POST['email']);
@@ -251,7 +259,10 @@ if (!empty($_POST["save_user_button"])) {
 
 //This validation is used to verify if the code provided by the user is the same we currently have on database
 if (!empty($_POST["verify_code_button"])) {
-    if (!empty($_POST["code"])) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["code"])) {
         $codigo = trim($_POST["code"]);
         $reset_email = isset($_SESSION['reset_email']) ? $_SESSION['reset_email'] : '';
 
@@ -289,7 +300,10 @@ if (!empty($_POST["verify_code_button"])) {
 
 //This validation is currently used for sending the Code again to the user
 if (!empty($_POST["resend_code_button"])) {
-    if (empty($_POST["code"])) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (empty($_POST["code"])) {
         $reset_email = isset($_SESSION['reset_email']) ? $_SESSION['reset_email'] : '';
 
         if (!empty($reset_email)) {
@@ -326,7 +340,10 @@ if (!empty($_POST["resend_code_button"])) {
 
 //This Validation is used to confirm the password change when user wants to reset password through login
 if (!empty($_POST["user_password_confirmation_button"])) {
-    if (!empty($_POST["newPassword1"]) and (!empty($_POST["newPassword2"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["newPassword1"]) and (!empty($_POST["newPassword2"]))) {
 
         // Verify code was validated
         if (empty($_SESSION['codigo_verified']) || empty($_SESSION['reset_user_id'])) {
@@ -376,7 +393,10 @@ if (!empty($_POST["user_password_confirmation_button"])) {
 
 //This Validation is used to Change users password thought account settings
 if (!empty($_POST["user_password_change_button"])) {
-    if ((!empty($_POST["currentPassword"])) and (!empty($_POST["newPassword1"])) and (!empty($_POST["newPassword2"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif ((!empty($_POST["currentPassword"])) and (!empty($_POST["newPassword1"])) and (!empty($_POST["newPassword2"]))) {
         $id_connected = intval($_POST['id_user']);
 
         // Verify user is changing their own password
@@ -434,7 +454,10 @@ if (!empty($_POST["user_password_change_button"])) {
 
 //This Validation is used to save a new product to the inventory
 if (!empty($_POST["save_product_button"])) {
-    if ((!empty($_POST["numero"])) and (!empty($_POST["name"])) and (!empty($_POST["description"])) and (!empty($_POST["quantity"])) and (!empty($_POST["price"])) and (!empty($_POST["presentation"])) and (!empty($_POST["expiration_date"])) and (!empty($_POST["administration_form"])) and (!empty($_POST["storage"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif ((!empty($_POST["numero"])) and (!empty($_POST["name"])) and (!empty($_POST["description"])) and (!empty($_POST["quantity"])) and (!empty($_POST["price"])) and (!empty($_POST["presentation"])) and (!empty($_POST["expiration_date"])) and (!empty($_POST["administration_form"])) and (!empty($_POST["storage"]))) {
         $number = trim($_POST["numero"]);
         $description = trim($_POST["description"]);
         $name = trim($_POST["name"]);
@@ -511,7 +534,10 @@ if (!empty($_POST["save_product_button"])) {
 
 //This Validation is used for editing products
 if (!empty($_POST["edit_product_button"])) {
-    if ((!empty($_POST["number"])) and (!empty($_POST["name"])) and (!empty($_POST["description"])) and (!empty($_POST["quantity"])) and (!empty($_POST["price"])) and (!empty($_POST["presentation"])) and (!empty($_POST["expiration_date"])) and (!empty($_POST["administration_form"])) and (!empty($_POST["storage"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif ((!empty($_POST["number"])) and (!empty($_POST["name"])) and (!empty($_POST["description"])) and (!empty($_POST["quantity"])) and (!empty($_POST["price"])) and (!empty($_POST["presentation"])) and (!empty($_POST["expiration_date"])) and (!empty($_POST["administration_form"])) and (!empty($_POST["storage"]))) {
         $id = intval($_POST['id_producto']);
         $number = trim($_POST["number"]);
         $description = trim($_POST["description"]);
@@ -591,7 +617,10 @@ if (!empty($_POST["edit_product_button"])) {
 
 //This validation is used to edit a user from the user management
 if (!empty($_POST["edit_user_button"])) {
-    if (!empty($_POST["name"]) and (!empty($_POST["lastname"])) and (!empty($_POST["email"])) and (!empty($_POST["roles"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["name"]) and (!empty($_POST["lastname"])) and (!empty($_POST["email"])) and (!empty($_POST["roles"]))) {
         $id = intval($_POST['id_user']);
         $name = trim($_POST['name']);
         $lastname = trim($_POST['lastname']);
@@ -641,7 +670,10 @@ if (!empty($_POST["edit_user_button"])) {
 
 // This Validation is used to edit the users account from the account settings
 if (!empty($_POST["edit_user_settings_button"])) {
-    if (!empty($_POST["name"]) and (!empty($_POST["lastname"])) and (!empty($_POST["email"]))) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["name"]) and (!empty($_POST["lastname"])) and (!empty($_POST["email"]))) {
         $id = intval($_POST['id_user']);
 
         // Verify user is editing their own account
@@ -688,8 +720,10 @@ if (!empty($_POST["edit_user_settings_button"])) {
 
 //This Validation is used for the Billing Module - Creates new receipts/invoices
 if (!empty($_POST["new_billing_button"])) {
-    // Validate required fields for receipt creation
-    if (!empty($_POST["name"]) && !empty($_POST["date_time_invoice"]) && !empty($_POST["cashier"]) && !empty($_POST["payment_method"])) {
+    // CSRF validation
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        echo "<div class='alert alert-danger'>Invalid request. Please refresh and try again.</div>";
+    } elseif (!empty($_POST["name"]) && !empty($_POST["date_time_invoice"]) && !empty($_POST["cashier"]) && !empty($_POST["payment_method"])) {
 
         try {
             // Start transaction for data integrity

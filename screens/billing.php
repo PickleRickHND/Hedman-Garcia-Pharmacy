@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
     exit;
@@ -18,6 +18,7 @@ header("X-Frame-Options: DENY");
 header("X-XSS-Protection: 1; mode=block");
 
 include "../settings/db_connection.php";
+include "../controllers/validations.php";
 global $connection;
 
 $id_session = intval($_SESSION["id"]);
@@ -131,6 +132,7 @@ $shoppingCartUserID = $_SESSION["id"];
                             </div>
                             <div class="modal-body">
                                 <form id="receiptForm" method="post" action="">
+                                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                                     <div class="mb-3">
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
                                             <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -374,8 +376,10 @@ $shoppingCartUserID = $_SESSION["id"];
 
                                                         $initialIndex = ($actualPage - 1) * $productsPerPage;
 
-                                                        $sql = "SELECT * FROM Inventario LIMIT $productsPerPage OFFSET $initialIndex";
-                                                        $result = $connection->query($sql);
+                                                        $stmt_products = $connection->prepare("SELECT * FROM Inventario LIMIT ? OFFSET ?");
+                                                        $stmt_products->bind_param("ii", $productsPerPage, $initialIndex);
+                                                        $stmt_products->execute();
+                                                        $result = $stmt_products->get_result();
 
                                                         while ($data = $result->fetch_object()) { ?>
 
@@ -460,9 +464,6 @@ $shoppingCartUserID = $_SESSION["id"];
                 });
                 </script>
 
-                <?php include "../settings/db_connection.php"; ?>
-                <?php include "../controllers/validations.php"; ?>
-
                 <div class="table-responsive">
                     <table class="table table-hover" id="tabla1">
                         <thead>
@@ -499,8 +500,10 @@ $shoppingCartUserID = $_SESSION["id"];
 
                             $initialIndex = ($actualPage - 1) * $receiptsPerPage;
 
-                            $sql = "SELECT * FROM Facturas LIMIT $receiptsPerPage OFFSET $initialIndex";
-                            $result = $connection->query($sql);
+                            $stmt_receipts = $connection->prepare("SELECT * FROM Facturas LIMIT ? OFFSET ?");
+                            $stmt_receipts->bind_param("ii", $receiptsPerPage, $initialIndex);
+                            $stmt_receipts->execute();
+                            $result = $stmt_receipts->get_result();
 
                             while ($data = $result->fetch_object()) { ?>
 

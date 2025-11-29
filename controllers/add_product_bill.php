@@ -4,7 +4,7 @@
  * This endpoint handles AJAX requests to add products to the shopping cart
  */
 
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 include "../settings/db_connection.php";
 global $connection;
 

@@ -1,9 +1,17 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (!empty($_SESSION["id"])) {
     header("Location: home.php");
     exit;
 }
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+
+include "../settings/db_connection.php";
+include "../controllers/validations.php";
 ?>
 
 <!DOCTYPE html>
@@ -45,6 +53,7 @@ if (!empty($_SESSION["id"])) {
                 <br>
                 <br>
                 <form method="post" action="">
+                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                     <div class="input-group mb-4">
                         <span class="input-group-text" id="email"><i class="bi bi-person-fill"></i></span>
                         <input name="email" id="email" class="form-control" type="email" placeholder="Email" maxlength="30">
@@ -54,9 +63,6 @@ if (!empty($_SESSION["id"])) {
                     </div>
 
                     <br>
-                    <?php include "../settings/db_connection.php"; ?>
-                    <?php include "../controllers/validations.php"; ?>
-
                 </form>
             </div>
         </div>

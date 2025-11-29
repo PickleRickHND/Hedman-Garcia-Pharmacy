@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
     exit;
@@ -79,6 +79,7 @@ header("X-XSS-Protection: 1; mode=block");
                 <h2 class="fw-bold text-center py-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
                 <h4 class="fw-bold text-center py-5">Account Settings</h4>
                 <form method="post" action="">
+                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                     <?php
                     include "../controllers/validations.php";
 
