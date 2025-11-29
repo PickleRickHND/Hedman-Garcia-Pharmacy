@@ -1,7 +1,14 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
+    exit;
+}
+
+// Check RBAC - only Administrador and Inventario can edit products
+$user_role = isset($_SESSION["roles"]) ? $_SESSION["roles"] : '';
+if ($user_role !== 'Administrador' && $user_role !== 'Inventario') {
+    header("Location: error_page.php");
     exit;
 }
 
@@ -14,6 +21,10 @@ $stmt_product->bind_param("i", $id);
 $stmt_product->execute();
 $selectProduct = $stmt_product->get_result();
 
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
 ?>
 
 <!DOCTYPE html>
@@ -26,15 +37,13 @@ $selectProduct = $stmt_product->get_result();
     <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Edit Product</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
@@ -56,35 +65,36 @@ $selectProduct = $stmt_product->get_result();
     <div class="container w-75 bg-white mt-5 rounded shadow">
         <div class="row align-items-center align-items-stretch">
             <div class="col bg-white p-5 rounded bg">
-                <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
-                <h3 class="fw-bold text-center ру-5">Edit Product</h3>
+                <h2 class="fw-bold text-center py-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+                <h3 class="fw-bold text-center py-5">Edit Product</h3>
                 <br>
                 <div>
                     <form method="post" action="">
+                        <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                         <?php
                         include "../controllers/validations.php";
                         while ($data = $selectProduct->fetch_object()) { ?>
 
                             <div class="mb-3">
-                                <input type="hidden" name="id_producto" value="<?= $_GET['id_producto'] ?>">
+                                <input type="hidden" name="id_producto" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name1" class="col-form-label">Product N.º :</label>
-                                <input type="text" class="form-control" maxlength="6" id="recipient-name1" placeholder="Product N.º:" name="number" value="<?= $data->id_producto ?>">
+                                <input type="text" class="form-control" maxlength="6" id="recipient-name1" placeholder="Product N.º:" name="number" value="<?= htmlspecialchars($data->id_producto, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name1" class="col-form-label">Name:</label>
-                                <input type="text" class="form-control" id="recipient-name1" placeholder="Name" name="name" value="<?= $data->nombre_producto ?>">
+                                <input type="text" class="form-control" id="recipient-name1" placeholder="Name" name="name" value="<?= htmlspecialchars($data->nombre_producto, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name2" class="col-form-label">Description:</label>
-                                <textarea style="height: 120px;" type="text" class="form-control" id="recipient-name2" name="description"><?= $data->descripcion ?></textarea>
+                                <textarea style="height: 120px;" type="text" class="form-control" id="recipient-name2" name="description"><?= htmlspecialchars($data->descripcion, ENT_QUOTES, 'UTF-8') ?></textarea>
                                 <br>
                                 <label for="recipient-name3" class="col-form-label">Existence:</label>
-                                <input type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Cantidad" name="quantity" value="<?= $data->cantidad_producto ?>">
+                                <input type="number" min="0" max="200" class="form-control" id="recipient-name3" placeholder="Cantidad" name="quantity" value="<?= htmlspecialchars($data->cantidad_producto, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name5" class="col-form-label">Price:</label>
-                                <input type="text" min="0" max="100000" class="form-control" id="recipient-name5" placeholder="Precio" name="price" value="<?= $data->precio ?>">
+                                <input type="text" min="0" max="100000" class="form-control" id="recipient-name5" placeholder="Precio" name="price" value="<?= htmlspecialchars($data->precio, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name6" class="col-form-label">Presentation:</label>
-                                <input type="text" class="form-control" id="recipient-name6" placeholder="Presentación" name="presentation" value="<?= $data->presentacion_producto ?>">
+                                <input type="text" class="form-control" id="recipient-name6" placeholder="Presentación" name="presentation" value="<?= htmlspecialchars($data->presentacion_producto, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
 
                                 <div>
@@ -93,19 +103,20 @@ $selectProduct = $stmt_product->get_result();
                                         <div class="input-group-append " data-target="#datetimepicker" data-toggle="datetimepicker">
                                             <div class="input-group-text"><i class="bi bi-calendar-plus-fill"></i></div>
                                         </div>
-                                        <input type="text" style="width: 189px" class="form-control datetimepicker-input" id="recipient-name7" data-target="#datetimepicker" name="expiration_date" value="<?= $data->fecha_vencimiento ?>" />
+                                        <input type="text" style="width: 189px" class="form-control datetimepicker-input" id="recipient-name7" data-target="#datetimepicker" name="expiration_date" value="<?= htmlspecialchars($data->fecha_vencimiento, ENT_QUOTES, 'UTF-8') ?>" />
                                     </div>
                                 </div>
 
                                 <br>
                                 <label for="recipient-name8" class="col-form-label">Administration Way:</label>
-                                <input type="text" class="form-control" id="recipient-name8" placeholder="Forma de Administración" name="administration_form" value="<?= $data->forma_administracion ?>">
+                                <input type="text" class="form-control" id="recipient-name8" placeholder="Forma de Administración" name="administration_form" value="<?= htmlspecialchars($data->forma_administracion, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name9" class="col-form-label">Storage:</label>
-                                <input type="text" class="form-control" id="recipient-name9" placeholder="Almacenamiento" name="storage" value="<?= $data->almacenamiento ?>">
+                                <input type="text" class="form-control" id="recipient-name9" placeholder="Almacenamiento" name="storage" value="<?= htmlspecialchars($data->almacenamiento, ENT_QUOTES, 'UTF-8') ?>">
                             </div>
 
                         <?php }
+                        $stmt_product->close();
                         ?>
                         <div class="modal-footer">
                             <a type="button" class="btn btn-danger" href="inventory_control.php">Close</a>

@@ -1,9 +1,16 @@
 <?php
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 
 // Security: Check if user is logged in
 if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
+    exit;
+}
+
+// RBAC: Only Administrador can delete users
+$user_role = isset($_SESSION["roles"]) ? $_SESSION["roles"] : '';
+if ($user_role !== 'Administrador') {
+    echo "<div class='alert alert-danger'>Access denied. Only administrators can delete users.</div>";
     exit;
 }
 
