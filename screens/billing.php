@@ -5,6 +5,18 @@ if (empty($_SESSION["id"])) {
     exit;
 }
 
+// Check RBAC - only Administrador and Cajero can access billing
+$user_role = isset($_SESSION["roles"]) ? $_SESSION["roles"] : '';
+if ($user_role !== 'Administrador' && $user_role !== 'Cajero') {
+    header("Location: error_page.php");
+    exit;
+}
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+
 include "../settings/db_connection.php";
 global $connection;
 
@@ -29,10 +41,9 @@ $shoppingCartUserID = $_SESSION["id"];
     <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Billing Module</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../css/styles.css" type="text/css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -80,8 +91,8 @@ $shoppingCartUserID = $_SESSION["id"];
                     </style>
                 </div>
 
-                <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
-                <h3 class="fw-bold text-center ру-5"><strong>Billing History</strong></h3>
+                <h2 class="fw-bold text-center py-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+                <h3 class="fw-bold text-center py-5"><strong>Billing History</strong></h3>
                 <br>
 
                 <div class="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center">

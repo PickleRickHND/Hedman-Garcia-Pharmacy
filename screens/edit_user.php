@@ -5,6 +5,13 @@ if (empty($_SESSION["id"])) {
     exit;
 }
 
+// Check RBAC - only Administrador can edit users
+$user_role = isset($_SESSION["roles"]) ? $_SESSION["roles"] : '';
+if ($user_role !== 'Administrador') {
+    header("Location: error_page.php");
+    exit;
+}
+
 include "../settings/db_connection.php";
 global $connection;
 
@@ -14,6 +21,10 @@ $stmt_user->bind_param("i", $id);
 $stmt_user->execute();
 $selectUser = $stmt_user->get_result();
 
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
 ?>
 
 <!DOCTYPE html>
@@ -26,10 +37,9 @@ $selectUser = $stmt_user->get_result();
     <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Edit User</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 
     <style>
@@ -44,8 +54,8 @@ $selectUser = $stmt_user->get_result();
     <div class="container w-75 bg-white mt-5 rounded shadow">
         <div class="row align-items-center align-items-stretch">
             <div class="col bg-white p-5 rounded bg">
-                <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
-                <h3 class="fw-bold text-center ру-5">Edit User </h3>
+                <h2 class="fw-bold text-center py-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+                <h3 class="fw-bold text-center py-5">Edit User </h3>
                 <br>
                 <div>
                     <form method="post" action="">
@@ -54,27 +64,29 @@ $selectUser = $stmt_user->get_result();
                         while ($data = $selectUser->fetch_object()) { ?>
 
                             <div class="mb-3">
-                                <input type="hidden" name="id_user" value="<?= $_GET['id'] ?>">
+                                <input type="hidden" name="id_user" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">
                                 <label for="recipient-name1" class="col-form-label">Name: </label>
-                                <input type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name" value="<?= $data->nombre ?>">
+                                <input type="text" class="form-control" id="recipient-name1" placeholder="Nombre" name="name" value="<?= htmlspecialchars($data->nombre, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name2" class="col-form-label">Last Name: </label>
-                                <input type="text" class="form-control" id="recipient-name2" placeholder="Apellido" name="lastname" value="<?= $data->apellido ?>">
+                                <input type="text" class="form-control" id="recipient-name2" placeholder="Apellido" name="lastname" value="<?= htmlspecialchars($data->apellido, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name3" class="col-form-label">Email: </label>
-                                <input type="text" class="form-control" id="recipient-name3" placeholder="Correo Electrónico" name="email" value="<?= $data->correo ?>">
+                                <input type="text" class="form-control" id="recipient-name3" placeholder="Correo Electrónico" name="email" value="<?= htmlspecialchars($data->correo, ENT_QUOTES, 'UTF-8') ?>">
                                 <br>
                                 <label for="recipient-name3" class="col-form-label">Roles: </label>
-                                <select class="form-select" name="roles" value="<?= $data->roles ?>">
+                                <select class="form-select" name="roles">
                                     <?php
                                     $query_roles = $connection->query("SELECT nombre_rol FROM Roles");
                                     while ($fetch_Roles = $query_roles->fetch_object()) {
-                                        echo '<option value="' . $fetch_Roles->nombre_rol . '">' . $fetch_Roles->nombre_rol . '</option>';
+                                        $selected = ($fetch_Roles->nombre_rol === $data->roles) ? 'selected' : '';
+                                        echo '<option value="' . htmlspecialchars($fetch_Roles->nombre_rol, ENT_QUOTES, 'UTF-8') . '" ' . $selected . '>' . htmlspecialchars($fetch_Roles->nombre_rol, ENT_QUOTES, 'UTF-8') . '</option>';
                                     }
                                     ?>
                                 </select>
                             </div>
                         <?php }
+                        $stmt_user->close();
                         ?>
                         <div class="modal-footer">
                             <a type="button" class="btn btn-danger" href="user_management.php">Close</a>
