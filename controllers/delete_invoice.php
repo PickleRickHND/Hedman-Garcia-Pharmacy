@@ -26,6 +26,14 @@ try {
         exit;
     }
 
+    // RBAC: Only Administrador can delete invoices
+    $user_role = isset($_SESSION['roles']) ? $_SESSION['roles'] : '';
+    if ($user_role !== 'Administrador') {
+        $response['message'] = 'Acceso denegado. Solo los administradores pueden eliminar facturas.';
+        echo json_encode($response);
+        exit;
+    }
+
     $user_id = intval($_SESSION['id']);
 
     // Validate required POST parameter

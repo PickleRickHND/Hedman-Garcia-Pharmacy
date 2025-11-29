@@ -27,6 +27,14 @@ try {
         exit;
     }
 
+    // RBAC: Only Administrador and Cajero can view invoice details
+    $user_role = isset($_SESSION['roles']) ? $_SESSION['roles'] : '';
+    if ($user_role !== 'Administrador' && $user_role !== 'Cajero') {
+        $response['message'] = 'Acceso denegado. No tiene permisos para ver detalles de facturas.';
+        echo json_encode($response);
+        exit;
+    }
+
     // Validate required GET parameter
     if (!isset($_GET['factura_id'])) {
         $response['message'] = 'Parámetro faltante: factura_id';

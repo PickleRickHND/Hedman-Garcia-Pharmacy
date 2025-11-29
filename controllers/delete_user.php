@@ -7,6 +7,13 @@ if (empty($_SESSION["id"])) {
     exit;
 }
 
+// RBAC: Only Administrador can delete users
+$user_role = isset($_SESSION["roles"]) ? $_SESSION["roles"] : '';
+if ($user_role !== 'Administrador') {
+    echo "<div class='alert alert-danger'>Access denied. Only administrators can delete users.</div>";
+    exit;
+}
+
 include "../settings/db_connection.php";
 global $connection;
 

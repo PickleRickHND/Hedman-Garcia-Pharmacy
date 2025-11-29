@@ -1,4 +1,18 @@
 <?php
+session_start();
+
+// Security: Check if user is logged in
+if (empty($_SESSION["id"])) {
+    header("Location: ../index.php");
+    exit;
+}
+
+// RBAC: Only Administrador and Inventario can delete products
+$user_role = isset($_SESSION["roles"]) ? $_SESSION["roles"] : '';
+if ($user_role !== 'Administrador' && $user_role !== 'Inventario') {
+    echo "<div class='alert alert-danger'>Access denied. Only administrators and inventory managers can delete products.</div>";
+    exit;
+}
 
 include "../settings/db_connection.php";
 global $connection;

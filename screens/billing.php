@@ -162,7 +162,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                         <div class="input-group-append">
                                                             <div class="input-group-text"><i class="bi bi-person-badge-fill"></i></div>
                                                         </div>
-                                                        <input style="width: 208px" type="text" class="form-control" value="<?= $fetch_seller->nombre . " " . $fetch_seller->apellido ?>" name="cashier" readonly />
+                                                        <input style="width: 208px" type="text" class="form-control" value="<?= htmlspecialchars($fetch_seller->nombre . " " . $fetch_seller->apellido, ENT_QUOTES, 'UTF-8') ?>" name="cashier" readonly />
                                                     </div>
                                                 </div>
                                             <?php
@@ -174,7 +174,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                     <option>Payment Method</option>
                                                     <?php
                                                     while ($fetch_PaymentMethod = $query_paymentMethod->fetch_object()) {
-                                                        echo '<option value="' . $fetch_PaymentMethod->formas_pago . '">' . $fetch_PaymentMethod->formas_pago . '</option>';
+                                                        echo '<option value="' . htmlspecialchars($fetch_PaymentMethod->formas_pago, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($fetch_PaymentMethod->formas_pago, ENT_QUOTES, 'UTF-8') . '</option>';
                                                     }
                                                     ?>
                                                 </select>
@@ -216,16 +216,24 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                     // Borra la tabla de resultados actual
                                                                     $("#tabla2 tbody").empty();
 
+                                                                    // Helper function to escape HTML
+                                                                    function escapeHtml(text) {
+                                                                        if (text === null || text === undefined) return '';
+                                                                        var map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+                                                                        return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+                                                                    }
+
                                                                     // Agrega los nuevos resultados a la tabla
                                                                     for (var i = 0; i < response.length; i++) {
                                                                         var producto = response[i];
+                                                                        var productId = parseInt(producto.id_producto, 10);
                                                                         var newRow = $("<tr>");
                                                                         newRow.append(
-                                                                            "<td style='text-align:center'>" + producto.id_producto + "</td>"
+                                                                            "<td style='text-align:center'>" + escapeHtml(producto.id_producto) + "</td>"
                                                                         );
                                                                         newRow.append(
                                                                             "<td style='text-align:center'>" +
-                                                                            producto.nombre_producto +
+                                                                            escapeHtml(producto.nombre_producto) +
                                                                             "</td>"
                                                                         );
                                                                         newRow.append(
@@ -235,21 +243,21 @@ $shoppingCartUserID = $_SESSION["id"];
                                                                         );
                                                                         newRow.append(
                                                                             "<td style='text-align:center; white-space: nowrap;'>Lps. " +
-                                                                            producto.precio +
+                                                                            escapeHtml(producto.precio) +
                                                                             "</td>"
                                                                         );
                                                                         newRow.append(
                                                                             "<td style='text-align:center'>" +
-                                                                            producto.presentacion_producto +
+                                                                            escapeHtml(producto.presentacion_producto) +
                                                                             "</td>"
                                                                         );
                                                                         newRow.append(
                                                                             "<td class='fw-bold text-center'>" +
                                                                             "<div class='d-flex justify-content-center align-items-center'>" +
                                                                             "<button type='button' class='btn btn-small btn-primary add-to-cart-search' " +
-                                                                            "data-product-id='" + producto.id_producto + "' " +
-                                                                            "data-product-name='" + producto.nombre_producto.replace(/'/g, "\\'") + "' " +
-                                                                            "data-product-price='" + producto.precio + "' " +
+                                                                            "data-product-id='" + productId + "' " +
+                                                                            "data-product-name='" + escapeHtml(producto.nombre_producto) + "' " +
+                                                                            "data-product-price='" + escapeHtml(producto.precio) + "' " +
                                                                             "style='width: 40px'>" +
                                                                             "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' class='bi bi-cart-plus' viewBox='0 0 20 20'>" +
                                                                             "<path d='M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z'></path>" +
@@ -372,17 +380,17 @@ $shoppingCartUserID = $_SESSION["id"];
                                                         while ($data = $result->fetch_object()) { ?>
 
                                                             <tr>
-                                                                <td style="text-align:center;"><?= $data->id_producto ?></td>
-                                                                <td style="text-align:center"><?= $data->nombre_producto ?></td>
+                                                                <td style="text-align:center;"><?= htmlspecialchars($data->id_producto, ENT_QUOTES, 'UTF-8') ?></td>
+                                                                <td style="text-align:center"><?= htmlspecialchars($data->nombre_producto, ENT_QUOTES, 'UTF-8') ?></td>
                                                                 <td class="d-flex align-items-center justify-content-center"><input class="form-control" name="quantityToAdd" style="width: 60px;"></td>
-                                                                <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . $data->precio) ?></td>
-                                                                <td style="text-align:center"><?= $data->presentacion_producto ?></td>
+                                                                <td style="text-align:center; white-space: nowrap;"><?= "Lps. " . htmlspecialchars($data->precio, ENT_QUOTES, 'UTF-8') ?></td>
+                                                                <td style="text-align:center"><?= htmlspecialchars($data->presentacion_producto, ENT_QUOTES, 'UTF-8') ?></td>
                                                                 <td class="fw-bold text-center">
                                                                     <div class="d-flex justify-content-center align-items-center">
                                                                         <button type="button" class="btn btn-small btn-primary add-to-cart-btn"
-                                                                                data-product-id="<?= $data->id_producto ?>"
-                                                                                data-product-name="<?= htmlspecialchars($data->nombre_producto) ?>"
-                                                                                data-product-price="<?= $data->precio ?>"
+                                                                                data-product-id="<?= intval($data->id_producto) ?>"
+                                                                                data-product-name="<?= htmlspecialchars($data->nombre_producto, ENT_QUOTES, 'UTF-8') ?>"
+                                                                                data-product-price="<?= htmlspecialchars($data->precio, ENT_QUOTES, 'UTF-8') ?>"
                                                                                 style="width: 40px">
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-plus" viewBox="0 0 20 20">
                                                                                 <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z" />
@@ -497,17 +505,17 @@ $shoppingCartUserID = $_SESSION["id"];
                             while ($data = $result->fetch_object()) { ?>
 
                                 <tr>
-                                    <td style="text-align:center"><?= $data->id_factura ?></td>
-                                    <td style="text-align:center"><?= $data->fecha_hora ?></td>
-                                    <td style="text-align:center"><?= $data->cliente ?></td>
-                                    <td style="text-align:center"><?= $data->rtn ?></td>
-                                    <td style="text-align:center"><?= $data->cajero ?></td>
-                                    <td style="text-align:center"><?= $data->estado ?></td>
-                                    <td style="text-align:center"><?= $data->metodo_pago ?></td>
-                                    <td style="text-align:center"><?= "Lps. " . $data->total ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->id_factura, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->fecha_hora, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->cliente, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->rtn, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->cajero, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->estado, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->metodo_pago, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= "Lps. " . htmlspecialchars($data->total, ENT_QUOTES, 'UTF-8') ?></td>
                                     <td class="fw-bold text-center">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <button type="button" onclick="viewInvoice(<?= $data->id_factura ?>)" class="btn btn-primary">
+                                            <button type="button" onclick="viewInvoice(<?= intval($data->id_factura) ?>)" class="btn btn-primary">
                                                 <span class="d-flex align-items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
                                                         <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
@@ -516,7 +524,7 @@ $shoppingCartUserID = $_SESSION["id"];
                                                 </span>
                                             </button>
                                             <div class="mx-1"></div>
-                                            <button type="button" onclick="deleteInvoice(<?= $data->id_factura ?>)" class="btn btn-danger">
+                                            <button type="button" onclick="deleteInvoice(<?= intval($data->id_factura) ?>)" class="btn btn-danger">
                                                 <span class="d-flex align-items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
                                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
