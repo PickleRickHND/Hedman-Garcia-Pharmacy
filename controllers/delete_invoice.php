@@ -5,7 +5,7 @@
  * Note: Only admins or authorized users should be able to delete invoices
  */
 
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 include "../settings/db_connection.php";
 global $connection;
 
@@ -22,6 +22,14 @@ try {
     // Check if user is logged in
     if (!isset($_SESSION['id'])) {
         $response['message'] = 'Usuario no autenticado. Por favor inicie sesión.';
+        echo json_encode($response);
+        exit;
+    }
+
+    // RBAC: Only Administrador can delete invoices
+    $user_role = isset($_SESSION['roles']) ? $_SESSION['roles'] : '';
+    if ($user_role !== 'Administrador') {
+        $response['message'] = 'Acceso denegado. Solo los administradores pueden eliminar facturas.';
         echo json_encode($response);
         exit;
     }

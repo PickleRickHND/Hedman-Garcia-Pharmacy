@@ -4,7 +4,7 @@
  * This endpoint returns invoice header and line items
  */
 
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 include "../settings/db_connection.php";
 global $connection;
 
@@ -23,6 +23,14 @@ try {
     // Check if user is logged in
     if (!isset($_SESSION['id'])) {
         $response['message'] = 'Usuario no autenticado. Por favor inicie sesión.';
+        echo json_encode($response);
+        exit;
+    }
+
+    // RBAC: Only Administrador and Cajero can view invoice details
+    $user_role = isset($_SESSION['roles']) ? $_SESSION['roles'] : '';
+    if ($user_role !== 'Administrador' && $user_role !== 'Cajero') {
+        $response['message'] = 'Acceso denegado. No tiene permisos para ver detalles de facturas.';
         echo json_encode($response);
         exit;
     }

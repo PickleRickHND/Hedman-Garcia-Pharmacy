@@ -1,9 +1,21 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
     exit;
 }
+
+// Check RBAC - only Administrador and Inventario can access inventory control
+$user_role = isset($_SESSION["roles"]) ? $_SESSION["roles"] : '';
+if ($user_role !== 'Administrador' && $user_role !== 'Inventario') {
+    header("Location: error_page.php");
+    exit;
+}
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
 ?>
 
 <!DOCTYPE html>
@@ -16,16 +28,14 @@ if (empty($_SESSION["id"])) {
     <link rel="icon" type="image/png" href="../images/icon.png">
     <title>Inventory Control</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../css/styles.css" type="text/css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
@@ -70,13 +80,13 @@ if (empty($_SESSION["id"])) {
                     </style>
                 </div>
 
-                <h2 class="fw-bold text-center ру-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
-                <h3 class="fw-bold text-center ру-5"><strong>Inventory Control</strong></h3>
+                <h2 class="fw-bold text-center py-5"><strong>Hedman Garcia Pharmacy</strong></h2><br>
+                <h3 class="fw-bold text-center py-5"><strong>Inventory Control</strong></h3>
                 <br>
 
                 <!-- Button trigger modal -->
                 <div class="mb-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
-                    <button type="button" class="btn btn-small btn-primary" data-toggle="modal" data-target="#newUserModal">
+                    <button type="button" class="btn btn-small btn-primary" data-bs-toggle="modal" data-bs-target="#newUserModal">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 20 20">
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                         </svg> Add New Product
@@ -94,7 +104,6 @@ if (empty($_SESSION["id"])) {
                         #searchProduct {
                             margin-top: 10px;
                             width: 100%;
-                            /* Updated width to 100% */
                         }
                     }
                 </style>
@@ -104,17 +113,16 @@ if (empty($_SESSION["id"])) {
                 <?php include "../controllers/delete_product.php"; ?>
 
 
-                <div class="modal fade bd-example-modal-lg" id="newUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
+                <div class="modal fade bd-example-modal-lg" id="newUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">Add New Product:</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <form method="post" action="">
+                                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                                     <div class="mb-3">
 
                                         <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -175,7 +183,7 @@ if (empty($_SESSION["id"])) {
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                                         <input type="submit" class="btn btn-primary" value="Save" name="save_product_button">
                                     </div>
                                 </form>
@@ -220,38 +228,41 @@ if (empty($_SESSION["id"])) {
 
                             $initialIndex = ($paginaActual - 1) * $productsPerPage;
 
-                            $sql = "SELECT * FROM Inventario LIMIT $productsPerPage OFFSET $initialIndex";
-                            $result = $connection->query($sql);
+                            // Use Prepared Statement for pagination
+                            $stmt = $connection->prepare("SELECT * FROM Inventario LIMIT ? OFFSET ?");
+                            $stmt->bind_param("ii", $productsPerPage, $initialIndex);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
 
                             while ($data = $result->fetch_object()) { ?>
 
                                 <tr>
-                                    <td style="text-align:center"><?= htmlspecialchars($data->id_producto) ?></td>
-                                    <td style="text-align:center"><?= htmlspecialchars($data->nombre_producto) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->id_producto, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->nombre_producto, ENT_QUOTES, 'UTF-8') ?></td>
                                     <td style="text-align: justify">
                                         <?php
                                         $descripcion = $data->descripcion;
                                         $shortDescription = substr($descripcion, 0, 75);
                                         $longDescription = $data->descripcion;
 
-                                        echo '<span id="descripcion-corta-' . intval($data->id_producto) . '">' . htmlspecialchars($shortDescription) . '</span>';
-                                        echo '<span id="descripcion-completa-' . intval($data->id_producto) . '" style="display:none;">' . htmlspecialchars($longDescription) . '</span>';
+                                        echo '<span id="descripcion-corta-' . intval($data->id_producto) . '">' . htmlspecialchars($shortDescription, ENT_QUOTES, 'UTF-8') . '</span>';
+                                        echo '<span id="descripcion-completa-' . intval($data->id_producto) . '" style="display:none;">' . htmlspecialchars($longDescription, ENT_QUOTES, 'UTF-8') . '</span>';
 
                                         if (strlen($descripcion) > 75) {
-                                            echo '<button style=" font-size: 14px;" class="btn btn-small btn-info" onclick="showMore(' . $data->id_producto . ')">Show More...</button>';
-                                            echo '<button class="btn btn-small btn-info" onclick="showLess(' . $data->id_producto . ')" style="display:none; font-size: 14px;">Show Less...</button>';
+                                            echo '<button style=" font-size: 14px;" class="btn btn-small btn-info" onclick="showMore(' . intval($data->id_producto) . ')">Show More...</button>';
+                                            echo '<button class="btn btn-small btn-info" onclick="showLess(' . intval($data->id_producto) . ')" style="display:none; font-size: 14px;">Show Less...</button>';
                                         }
                                         ?>
                                     </td>
-                                    <td style="text-align:center"><?= htmlspecialchars($data->cantidad_producto) ?></td>
-                                    <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . htmlspecialchars($data->precio)) ?></td>
-                                    <td style="text-align:center"><?= htmlspecialchars($data->presentacion_producto) ?></td>
-                                    <td style="text-align:center"><?= htmlspecialchars($data->fecha_vencimiento) ?></td>
-                                    <td style="text-align:center"><?= htmlspecialchars($data->forma_administracion) ?></td>
-                                    <td style="text-align:center"><?= htmlspecialchars($data->almacenamiento) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->cantidad_producto, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center; white-space: nowrap;"><?= ("Lps. " . htmlspecialchars($data->precio, ENT_QUOTES, 'UTF-8')) ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->presentacion_producto, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->fecha_vencimiento, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->forma_administracion, ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td style="text-align:center"><?= htmlspecialchars($data->almacenamiento, ENT_QUOTES, 'UTF-8') ?></td>
                                     <td class="fw-bold text-center">
 
-                                        <a href="edit_product.php?id_producto=<?= $data->id_producto ?>" class="btn btn-small btn-warning btn-block">
+                                        <a href="edit_product.php?id_producto=<?= intval($data->id_producto) ?>" class="btn btn-small btn-warning btn-block">
                                             <span class="d-flex align-items-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-fill me-1" viewBox="0 0 20 20">
                                                     <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
@@ -260,7 +271,7 @@ if (empty($_SESSION["id"])) {
                                         </a>
 
                                         <br>
-                                        <a onclick="return deleteProduct()" href="inventory_control.php?id_producto=<?= $data->id_producto ?>" class="btn btn-small btn-danger btn-block">
+                                        <a onclick="return deleteProduct()" href="inventory_control.php?id_producto=<?= intval($data->id_producto) ?>" class="btn btn-small btn-danger btn-block">
                                             <span class="d-flex align-items-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 20 20">
                                                     <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
@@ -270,6 +281,7 @@ if (empty($_SESSION["id"])) {
                                     </td>
                                 </tr>
                             <?php }
+                            $stmt->close();
                             ?>
                         </tbody>
                     </table>

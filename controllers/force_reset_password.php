@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 
 // Security: Check if user is logged in
 if (empty($_SESSION["id"])) {
@@ -28,7 +28,8 @@ if ($user_data['roles'] !== 'Administrador') {
 if (!empty($_GET['id'])) {
     try {
         $id = intval($_GET['id']);
-        $newpassword = 'P@55W0RD';
+        // Generate a secure random temporary password
+        $newpassword = bin2hex(random_bytes(8)); // 16 character random password
         $cryptnewpassword = password_hash($newpassword, PASSWORD_DEFAULT);
 
         // Use prepared statement to prevent SQL injection
@@ -38,7 +39,10 @@ if (!empty($_GET['id'])) {
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
                 $stmt->close();
-                header("Location: ../screens/user_management.php");
+                // Store temporary password in session to display to admin
+                $_SESSION['temp_password'] = $newpassword;
+                $_SESSION['temp_password_user_id'] = $id;
+                header("Location: ../screens/user_management.php?password_reset=success");
                 exit;
             } else {
                 echo "<div class='alert alert-warning'>User not found or password is already set to default.</div>";
