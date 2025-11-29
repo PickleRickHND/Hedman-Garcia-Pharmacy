@@ -1,9 +1,17 @@
 <?php
-session_start();
-if (empty($_SESSION["codigo"])) {
+require_once "../settings/session_config.php";
+if (empty($_SESSION["codigo_verified"])) {
     header("Location: reset_password.php");
     exit;
 }
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+
+include "../settings/db_connection.php";
+include "../controllers/validations.php";
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +51,7 @@ if (empty($_SESSION["codigo"])) {
                 <h4 class="fw-bold text-center ру-5">Password Update</h4>
                 <br>
                 <form method="post" action="">
+                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                     <div class="input-group mb-4">
                         <span class="input-group-text" id="password"><i class="bi bi-key-fill"></i></span>
                         <input name="newPassword1" id="newPassword1" class="form-control" type="password" placeholder="New Password">
@@ -57,8 +66,6 @@ if (empty($_SESSION["codigo"])) {
                         <input type="submit" class="btn btn-primary btn-block" value="Verify" name="user_password_confirmation_button">
                     </div>
                     <br>
-                    <?php include "../settings/db_connection.php"; ?>
-                    <?php include "../controllers/validations.php"; ?>
                 </form>
             </div>
         </div>

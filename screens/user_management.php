@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once "../settings/session_config.php";
 if (empty($_SESSION["id"])) {
     header("Location: ../index.php");
     exit;
@@ -98,6 +98,35 @@ global $connection;
             <?php include "../settings/db_connection.php"; ?>
             <?php include "../controllers/validations.php"; ?>
             <?php include "../controllers/delete_user.php"; ?>
+
+            <?php
+            // Display and immediately clear temporary password (security: one-time display)
+            if (isset($_SESSION['temp_password']) && isset($_SESSION['temp_password_user_id'])) {
+                $temp_user_id = intval($_SESSION['temp_password_user_id']);
+                $temp_password = htmlspecialchars($_SESSION['temp_password'], ENT_QUOTES, 'UTF-8');
+
+                // Get username for display
+                $stmt_temp_user = $connection->prepare("SELECT nombre, apellido FROM Usuarios WHERE id = ?");
+                $stmt_temp_user->bind_param("i", $temp_user_id);
+                $stmt_temp_user->execute();
+                $temp_user_result = $stmt_temp_user->get_result();
+                $temp_user_data = $temp_user_result->fetch_object();
+                $stmt_temp_user->close();
+
+                $user_display = $temp_user_data ? htmlspecialchars($temp_user_data->nombre . ' ' . $temp_user_data->apellido, ENT_QUOTES, 'UTF-8') : 'User #' . $temp_user_id;
+
+                // Immediately clear from session (one-time display only)
+                unset($_SESSION['temp_password']);
+                unset($_SESSION['temp_password_user_id']);
+                ?>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Password Reset Successful!</strong><br>
+                    Temporary password for <strong><?= $user_display ?></strong>:
+                    <code style="font-size: 1.1em; background: #f8f9fa; padding: 2px 8px; border-radius: 4px;"><?= $temp_password ?></code><br>
+                    <small class="text-danger"><i class="bi bi-exclamation-triangle"></i> This password will only be shown once. Please copy it now and share it securely with the user.</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php } ?>
             <?php include "../controllers/force_reset_password.php"; ?>
             <!-- Modal -->
             <div class="modal fade" id="newUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -109,6 +138,7 @@ global $connection;
                         </div>
                         <div class="modal-body">
                             <form method="post" action="">
+                                <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                                 <div class="mb-3">
                                     <label for="recipient-name1" class="col-form-label"></label>
                                     <input type="text" class="form-control" id="recipient-name1" placeholder="Name" name="name">

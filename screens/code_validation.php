@@ -1,3 +1,14 @@
+<?php
+require_once "../settings/session_config.php";
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+
+include "../settings/db_connection.php";
+include "../controllers/validations.php";
+?>
 <!DOCTYPE html>
 
 <html lang="en">
@@ -37,9 +48,10 @@
                 <br>
                 <br>
                 <form method="post" action="">
+                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken() ?>">
                     <div class="input-group mb-4">
                         <span class="input-group-text" id="code"><i class="bi bi-patch-check-fill"></i></span>
-                        <input name="code" id="code" class="form-control" placeholder="Enter the Reset Code" maxlength="10">
+                        <input name="code" id="code" class="form-control" placeholder="Enter the Reset Code" maxlength="40">
                     </div>
                     <div class="d-grid">
                         <input type="submit" class="btn btn-primary btn-block" value="Verify Code" name="verify_code_button">
@@ -49,8 +61,6 @@
                         <input type="submit" class="btn btn-secondary btn-block" value="Resend Code" name="resend_code_button">
                     </div>
                     <br>
-                    <?php include "../settings/db_connection.php"; ?>
-                    <?php include "../controllers/validations.php"; ?>
                 </form>
             </div>
         </div>

@@ -4,7 +4,7 @@
  * This endpoint returns invoice header and line items
  */
 
-session_start();
+require_once __DIR__ . "/../settings/session_config.php";
 include "../settings/db_connection.php";
 global $connection;
 

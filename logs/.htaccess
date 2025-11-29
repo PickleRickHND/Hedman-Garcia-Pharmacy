@@ -1,0 +1,7 @@
+# Deny access to all files in this directory
+Deny from all
+
+# Alternative for Apache 2.4+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
