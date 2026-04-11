@@ -2,10 +2,18 @@
 
 Sistema de gestión integral para farmacias desarrollado en PHP con MySQL. Proporciona herramientas completas para la administración de inventario, facturación, usuarios y reportes.
 
-[![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4?logo=php)](https://www.php.net/)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/Laravel-11%20LTS-FF2D20?logo=laravel)](https://laravel.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1?logo=mysql)](https://www.mysql.com/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0-7952B3?logo=bootstrap)](https://getbootstrap.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+> **⚠️ Reescritura en progreso.** El repositorio contiene dos versiones
+> conviviendo: la aplicación **legacy** (PHP procedural, root del repo) y el
+> **rewrite** en Laravel 11 LTS + Livewire 3 dentro de `pharmacy-app/`. Al
+> final del roadmap, `pharmacy-app/*` reemplazará el código legacy; mientras
+> tanto, el legacy sigue operativo con parches de seguridad incrementales.
+> Ver [Rewrite Laravel](#-rewrite-laravel-pharmacy-app) más abajo.
 
 ---
 
@@ -20,6 +28,7 @@ Sistema de gestión integral para farmacias desarrollado en PHP con MySQL. Propo
 - [Base de Datos](#-base-de-datos)
 - [Seguridad](#-seguridad)
 - [API Endpoints](#-api-endpoints)
+- [Rewrite Laravel](#-rewrite-laravel-pharmacy-app)
 - [Contribuir](#-contribuir)
 - [Licencia](#-licencia)
 
@@ -721,6 +730,96 @@ Las contribuciones son bienvenidas! Si deseas contribuir:
 - Gestión de usuarios
 - Inventario básico
 - Facturación (incompleta)
+
+---
+
+## 🚀 Rewrite Laravel (`pharmacy-app/`)
+
+A partir de 2026, el proyecto inició una **reescritura completa** bajo
+`pharmacy-app/` usando Laravel 11 LTS + Livewire 3, manteniendo el legacy
+funcional en paralelo. El objetivo es eliminar la deuda técnica acumulada,
+cerrar los findings de seguridad auditados, y entregar una interfaz
+moderna sin perder los datos existentes.
+
+### Stack del rewrite
+
+| Capa | Tecnología |
+|------|------------|
+| Lenguaje | PHP 8.2+ |
+| Framework | Laravel 11 LTS |
+| Reactividad | Livewire 3 (+ Volt solo para páginas auth via Breeze) |
+| CSS | Tailwind CSS + Alpine.js + Vite |
+| Auth scaffold | Laravel Breeze (Livewire stack, dark mode) |
+| Roles/ACL | spatie/laravel-permission 6 |
+| PDF | barryvdh/laravel-dompdf 3 |
+| Tests | Pest PHP |
+| DB | MySQL 8 — base separada `pharmacy` (no toca `FarmaciaHG` del legacy) |
+
+### Estructura
+
+```
+pharmacy-app/
+├── app/
+│   ├── Livewire/              ← componentes reactivos (Fase 2+)
+│   ├── Models/                ← Eloquent
+│   └── Providers/
+├── config/
+│   └── pharmacy.php           ← constantes de negocio (ISV, límites, TTLs)
+├── database/migrations/       ← schema versionado
+├── resources/views/
+│   ├── layouts/app.blade.php  ← layout único compartido
+│   ├── livewire/              ← componentes Livewire + Volt (auth)
+│   └── components/            ← Blade components reutilizables
+├── routes/
+├── tests/                     ← Pest
+└── .env.example               ← plantilla versionada
+```
+
+### Setup local del rewrite
+
+```bash
+cd pharmacy-app
+
+# 1. Dependencias
+composer install
+npm install
+
+# 2. Entorno
+cp .env.example .env
+php artisan key:generate
+# editar .env con credenciales MySQL locales (DB_DATABASE=pharmacy)
+
+# 3. Crear base de datos separada del legacy
+mysql -u root -p -e "CREATE DATABASE pharmacy CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+
+# 4. Migraciones y assets
+php artisan migrate
+npm run build
+
+# 5. Servidor local en puerto 8001 (el legacy usa 8000)
+php artisan serve --port=8001
+# abrir http://localhost:8001
+```
+
+### Roadmap por fases
+
+- **Fase 0** — Backup, tag `v1.0-legacy`, scaffold Laravel. ✅
+- **Fase 1** — Foundation: Breeze + Livewire + Tailwind + config/pharmacy.
+  spatie Permission + dompdf + Pest + layout base. 🔄
+- **Fase 2** — Módulo Usuarios y Dashboard con UI premium.
+- **Fase 3** — Módulo Inventario con búsqueda live Livewire.
+- **Fase 4** — Módulo Billing (carrito, factura transaccional, PDF).
+- **Fase 5** — Comando Artisan para migrar `FarmaciaHG → pharmacy` + cutover.
+- **Fase 6** — Polish, accesibilidad WCAG AA, documentación final.
+
+### Tag de rollback
+
+El código legacy en estado inmediatamente previo al rewrite está preservado
+en el tag `v1.0-legacy`. Para inspeccionarlo:
+
+```bash
+git checkout v1.0-legacy
+```
 
 ---
 

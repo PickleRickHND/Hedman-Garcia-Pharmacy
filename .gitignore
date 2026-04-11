@@ -1,5 +1,29 @@
+# Secrets y credenciales — NUNCA commitear
 settings/config.ini
+**/.env
+**/.env.local
+**/.env.*.local
+!**/.env.example
 
 # Log files - keep .htaccess for security
 logs/*.log
 logs/error.log
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependencies
+vendor/
+node_modules/
+
+# Backups
+*.sql.bak
+*.dump
+backups/
