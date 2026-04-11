@@ -17,7 +17,7 @@ new class extends Component
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false }" class="bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -32,8 +32,21 @@ new class extends Component
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        Dashboard
                     </x-nav-link>
+                    @role('Administrador')
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" wire:navigate>
+                            Usuarios
+                        </x-nav-link>
+                    @endrole
+                    @hasanyrole('Administrador|Cajero')
+                        <x-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.*')" wire:navigate>
+                            Inventario
+                        </x-nav-link>
+                        <x-nav-link :href="route('billing.index')" :active="request()->routeIs('billing.*')" wire:navigate>
+                            Facturación
+                        </x-nav-link>
+                    @endhasanyrole
                 </div>
             </div>
 
@@ -83,8 +96,21 @@ new class extends Component
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                {{ __('Dashboard') }}
+                Dashboard
             </x-responsive-nav-link>
+            @role('Administrador')
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" wire:navigate>
+                    Usuarios
+                </x-responsive-nav-link>
+            @endrole
+            @hasanyrole('Administrador|Cajero')
+                <x-responsive-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.*')" wire:navigate>
+                    Inventario
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('billing.index')" :active="request()->routeIs('billing.*')" wire:navigate>
+                    Facturación
+                </x-responsive-nav-link>
+            @endhasanyrole
         </div>
 
         <!-- Responsive Settings Options -->

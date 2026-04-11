@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'must_change_password',
     ];
 
     /**
@@ -44,6 +45,20 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
         ];
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $parts = preg_split('/\s+/', trim($this->name)) ?: [];
+        $initials = array_map(fn ($p) => mb_substr($p, 0, 1), array_slice($parts, 0, 2));
+
+        return mb_strtoupper(implode('', $initials));
+    }
+
+    public function getPrimaryRoleAttribute(): ?string
+    {
+        return $this->roles->first()?->name;
     }
 }
