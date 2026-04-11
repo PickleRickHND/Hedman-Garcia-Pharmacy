@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\Billing\InvoicePdfController;
 use App\Livewire\Auth\ChangePasswordRequired;
+use App\Livewire\Billing\InvoiceList;
+use App\Livewire\Billing\NewInvoice;
+use App\Livewire\Billing\Show as InvoiceShow;
 use App\Livewire\Dashboard;
 use App\Livewire\Products\Create as ProductCreate;
 use App\Livewire\Products\Edit as ProductEdit;
@@ -44,7 +48,11 @@ Route::middleware(['auth', 'role:Administrador|Cajero'])->group(function () {
         Route::get('inventory/products/{product}/edit', ProductEdit::class)->name('products.edit');
     });
 
-    Route::view('billing', 'billing.placeholder')->name('billing.index');
+    // Facturación — ambos roles
+    Route::get('billing', InvoiceList::class)->name('billing.index');
+    Route::get('billing/new', NewInvoice::class)->name('billing.create');
+    Route::get('billing/{invoice}', InvoiceShow::class)->name('billing.show');
+    Route::get('billing/{invoice}/pdf', InvoicePdfController::class)->name('billing.pdf');
 });
 
 require __DIR__.'/auth.php';

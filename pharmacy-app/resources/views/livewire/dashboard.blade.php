@@ -104,20 +104,33 @@
                 </div>
             </section>
 
-            {{-- Grupo: Facturación (placeholder Fase 4) --}}
+            {{-- Grupo: Facturación --}}
             <section>
-                <h2 class="text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400 mb-3 flex items-center gap-2">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400 mb-3">
                     Facturación
-                    <x-ui.badge variant="warning" size="sm">Fase 4</x-ui.badge>
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <x-ui.card>
-                        <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Facturas hoy</p>
-                        <p class="mt-2 text-3xl font-bold text-surface-400 dark:text-surface-600">—</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Facturas hoy</p>
+                                <p class="mt-2 text-3xl font-bold text-surface-900 dark:text-surface-50">{{ $metrics['invoices_today'] }}</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-sky-600 dark:text-sky-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            </div>
+                        </div>
                     </x-ui.card>
                     <x-ui.card>
-                        <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Ingresos del día</p>
-                        <p class="mt-2 text-3xl font-bold text-surface-400 dark:text-surface-600">L. —</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Ingresos del día</p>
+                                <p class="mt-2 text-3xl font-bold text-brand-600 dark:text-brand-400">L. {{ number_format($metrics['revenue_today'], 2) }}</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                        </div>
                     </x-ui.card>
                 </div>
             </section>
