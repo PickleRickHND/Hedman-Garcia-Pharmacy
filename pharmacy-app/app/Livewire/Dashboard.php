@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Models\Product;
 use App\Models\User;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -20,9 +21,9 @@ class Dashboard extends Component
                 'users_total' => User::count(),
                 'users_admins' => User::role('Administrador')->count(),
                 'users_cashiers' => User::role('Cajero')->count(),
-                'products_total' => 0, // placeholder Fase 3
-                'low_stock' => 0,      // placeholder Fase 3
-                'expiring_soon' => 0,  // placeholder Fase 3
+                'products_total' => Product::count(),
+                'low_stock' => Product::lowStock()->count(),
+                'expiring_soon' => Product::expiringSoon()->count(),
                 'invoices_today' => 0, // placeholder Fase 4
                 'revenue_today' => 0,  // placeholder Fase 4
             ],

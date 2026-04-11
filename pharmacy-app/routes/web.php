@@ -2,6 +2,9 @@
 
 use App\Livewire\Auth\ChangePasswordRequired;
 use App\Livewire\Dashboard;
+use App\Livewire\Products\Create as ProductCreate;
+use App\Livewire\Products\Edit as ProductEdit;
+use App\Livewire\Products\Index as ProductIndex;
 use App\Livewire\Users\Create as UserCreate;
 use App\Livewire\Users\Edit as UserEdit;
 use App\Livewire\Users\Index as UserIndex;
@@ -31,10 +34,17 @@ Route::middleware(['auth', 'role:Administrador'])->prefix('admin/users')->name('
     Route::get('{user}/edit', UserEdit::class)->name('edit');
 });
 
-// Rutas compartidas — Administrador o Cajero
+// Inventario — Administrador y Cajero pueden ver; solo Admin puede crear/editar
 Route::middleware(['auth', 'role:Administrador|Cajero'])->group(function () {
+    Route::get('inventory', ProductIndex::class)->name('inventory.index');
+    Route::get('inventory/products', ProductIndex::class)->name('products.index');
+
+    Route::middleware('role:Administrador')->group(function () {
+        Route::get('inventory/products/create', ProductCreate::class)->name('products.create');
+        Route::get('inventory/products/{product}/edit', ProductEdit::class)->name('products.edit');
+    });
+
     Route::view('billing', 'billing.placeholder')->name('billing.index');
-    Route::view('inventory', 'inventory.placeholder')->name('inventory.index');
 });
 
 require __DIR__.'/auth.php';

@@ -62,24 +62,44 @@
                 </div>
             </section>
 
-            {{-- Grupo: Inventario (placeholder Fase 3) --}}
+            {{-- Grupo: Inventario --}}
             <section>
-                <h2 class="text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400 mb-3 flex items-center gap-2">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400 mb-3">
                     Inventario
-                    <x-ui.badge variant="warning" size="sm">Fase 3</x-ui.badge>
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <x-ui.card>
-                        <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Productos totales</p>
-                        <p class="mt-2 text-3xl font-bold text-surface-400 dark:text-surface-600">—</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Productos totales</p>
+                                <p class="mt-2 text-3xl font-bold text-surface-900 dark:text-surface-50">{{ $metrics['products_total'] }}</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            </div>
+                        </div>
                     </x-ui.card>
                     <x-ui.card>
-                        <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Stock bajo</p>
-                        <p class="mt-2 text-3xl font-bold text-surface-400 dark:text-surface-600">—</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Stock bajo</p>
+                                <p class="mt-2 text-3xl font-bold {{ $metrics['low_stock'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-surface-900 dark:text-surface-50' }}">{{ $metrics['low_stock'] }}</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            </div>
+                        </div>
                     </x-ui.card>
                     <x-ui.card>
-                        <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Próximos a vencer</p>
-                        <p class="mt-2 text-3xl font-bold text-surface-400 dark:text-surface-600">—</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-surface-500 dark:text-surface-400">Próximos a vencer</p>
+                                <p class="mt-2 text-3xl font-bold {{ $metrics['expiring_soon'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-surface-900 dark:text-surface-50' }}">{{ $metrics['expiring_soon'] }}</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                        </div>
                     </x-ui.card>
                 </div>
             </section>
