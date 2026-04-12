@@ -735,47 +735,154 @@ Las contribuciones son bienvenidas! Si deseas contribuir:
 
 ## 🚀 Rewrite Laravel (`pharmacy-app/`)
 
-A partir de 2026, el proyecto inició una **reescritura completa** bajo
-`pharmacy-app/` usando Laravel 11 LTS + Livewire 3, manteniendo el legacy
-funcional en paralelo. El objetivo es eliminar la deuda técnica acumulada,
-cerrar los findings de seguridad auditados, y entregar una interfaz
-moderna sin perder los datos existentes.
+Reescritura completa del sistema bajo `pharmacy-app/` usando **Laravel 11
+LTS + Livewire 3 + Tailwind CSS**. El rewrite cierra todas las
+vulnerabilidades de seguridad identificadas en la auditoría del legacy,
+introduce arquitectura moderna con tests automatizados, y presenta una
+interfaz editorial premium diseñada con Fraunces + Inter.
 
-### Stack del rewrite
+**Estado:** Fases 0–6 completadas. El sistema es funcional end-to-end.
 
-| Capa | Tecnología |
-|------|------------|
-| Lenguaje | PHP 8.2+ |
-| Framework | Laravel 11 LTS |
-| Reactividad | Livewire 3 (+ Volt solo para páginas auth via Breeze) |
-| CSS | Tailwind CSS + Alpine.js + Vite |
-| Auth scaffold | Laravel Breeze (Livewire stack, dark mode) |
-| Roles/ACL | spatie/laravel-permission 6 |
-| PDF | barryvdh/laravel-dompdf 3 |
-| Tests | Pest PHP |
-| DB | MySQL 8 — base separada `pharmacy` (no toca `FarmaciaHG` del legacy) |
+### Stack
 
-### Estructura
+| Capa | Tecnología | Versión |
+|------|------------|---------|
+| Lenguaje | PHP | 8.2+ |
+| Framework | Laravel (LTS) | 11.x |
+| Reactividad | Livewire + Volt (auth) | 3.x |
+| CSS | Tailwind CSS + Alpine.js | 4 / 3 |
+| Build | Vite | 8.x |
+| Auth | Laravel Breeze (Livewire stack, dark mode) | 2.x |
+| Roles/ACL | spatie/laravel-permission | 6.x |
+| PDF | barryvdh/laravel-dompdf | 3.x |
+| Tests | Pest PHP | 4.x |
+| DB | MySQL | 8 |
+| Tipografía | Fraunces (display serif) + Inter (body) | — |
+
+### Módulos implementados
+
+#### Usuarios (Fase 2)
+- CRUD completo con Livewire: tabla paginada, búsqueda live con debounce,
+  filtro por rol, ordenamiento por columna
+- Force reset de contraseña: genera password aleatorio con `Str::random(12)`,
+  marca `must_change_password = true`, se muestra al admin una sola vez
+- Middleware `ForceChangePassword` que intercepta en el próximo login y
+  redirige a cambio obligatorio
+- Protección: `role:Administrador` en middleware + doble check en cada acción
+  (no auto-delete, no auto-reset)
+
+#### Inventario (Fase 3)
+- Product model con scopes `lowStock`, `outOfStock`, `expiringSoon`, `expired`,
+  `search` y accessors `isLowStock`, `isExpired`, `isExpiringSoon`
+- Soft deletes para preservar historial
+- Badges semánticos: "Agotado" (rojo), "Bajo" (amber), "Por vencer" (amber),
+  "Vencido" (rojo)
+- `InventoryService` con transacciones y `lockForUpdate`: `adjustStock`,
+  `increment`, `decrement` con validación de stock resultante
+- Factory con estados `lowStock`, `outOfStock`, `expiringSoon`, `expired`
+
+#### Facturación (Fase 4)
+- POS (Punto de Venta) con Livewire: buscador de productos con stock > 0,
+  carrito en memoria con increment/decrement/remove/clear, cálculo reactivo
+  de subtotal + ISV (15%) + total
+- `BillingService::issueInvoice` transaccional: `lockForUpdate` por producto,
+  validación de stock item a item, creación de Invoice + InvoiceItems con
+  snapshot de nombre/SKU/precio, decremento de stock vía `InventoryService`,
+  numeración secuencial `FHG-NNNNNN`
+- Histórico de facturas: tabla paginada con filtros por fecha (hoy/semana/mes),
+  método de pago, búsqueda por número/cliente/RTN
+- Detalle de factura + descarga PDF (dompdf, template editorial con branding)
+
+#### Dashboard
+- Tarjetas de métricas reales: usuarios (total/admins/cajeros), inventario
+  (productos/stock bajo/próximos a vencer), facturación (facturas hoy/ingresos)
+- Secciones numeradas 01–04 en Fraunces italic (estilo revista médica)
+- Estados vacíos diferenciados: counts en 0 muestran "—" en gris con mensaje
+  contextual; alertas con dot pulsante cuando hay items que requieren atención
+- Accesos rápidos con flecha animada en hover y subtítulo descriptivo
+
+#### UI/Design System (Fase 6)
+- Estilo "Editorial Pharmacy": Fraunces para headings, monospace para metadata,
+  Inter para body, retículas sutiles de fondo, ritmo editorial de revista
+- Login con split layout: panel brand-900 con headline serif italic a la
+  izquierda, formulario con inputs border-bottom + toggle password Alpine +
+  botón blackout con spinner wire:loading
+- Componente `<x-auth-shell>` reutilizable aplicado a las 6 pantallas auth
+  (login/register/forgot/reset/verify/confirm) con props `step/eyebrow/title`
+- Welcome page con hero Fraunces 5.5rem, ficha técnica del stack, feature
+  strip con 3 pilares numerados
+- Error pages custom (403/404/419/500/503) con componente `<x-errors.minimal>`
+- 7 componentes UI base: `button`, `card`, `badge`, `alert`, `input`, `table`,
+  `empty-state` con variantes y dark mode completo
+- Favicon SVG custom con la cápsula de marca
+- Skip link accesible + focus-visible + aria-labels
+
+### Tests
+
+```
+93 tests, 226 assertions, 0 failures
+```
+
+| Suite | Tests | Cobertura |
+|-------|-------|-----------|
+| Auth (Breeze) | 10 | Login, register, logout, password reset/update, email verification |
+| Dashboard | 4 | Guards, métricas, accesos rápidos condicionales por rol |
+| Users/Index | 9 | Guards, listar, search, filtro rol, force reset, delete, auto-delete bloqueado |
+| Users/Create | 6 | Guards, create happy path, validación required/unique |
+| ForceChangePassword | 5 | Redirect, acceso normal, cambio exitoso, validación mismatch |
+| Products/Index | 9 | Guards, listar, search, filtros low/expired, soft delete |
+| Products/Create | 7 | Guards, create, validación sku/stock/fecha |
+| BillingService | 5 | Emisión atómica, rechazo vacío/sin cliente, rollback stock, numeración |
+| Billing/NewInvoice | 11 | Guards, carrito, límites stock, happy path, validación |
+| Billing/InvoiceList | 6 | Guards, listar, detalle, PDF download, rechazo por rol |
+| InventoryService | 5 | Increment, decrement, stock insuficiente, delta cero, cantidad negativa |
+| Smoke | 2 | Welcome page, example |
+
+### Estructura del rewrite
 
 ```
 pharmacy-app/
 ├── app/
-│   ├── Livewire/              ← componentes reactivos (Fase 2+)
-│   ├── Models/                ← Eloquent
-│   └── Providers/
-├── config/
-│   └── pharmacy.php           ← constantes de negocio (ISV, límites, TTLs)
-├── database/migrations/       ← schema versionado
+│   ├── Http/
+│   │   ├── Controllers/Billing/InvoicePdfController.php
+│   │   └── Middleware/ForceChangePassword.php
+│   ├── Livewire/
+│   │   ├── Auth/ChangePasswordRequired.php
+│   │   ├── Billing/{InvoiceList,NewInvoice,Show}.php
+│   │   ├── Dashboard.php
+│   │   ├── Products/{Index,Create,Edit}.php
+│   │   └── Users/{Index,Create,Edit}.php
+│   ├── Models/{User,Product,Invoice,InvoiceItem,PaymentMethod}.php
+│   └── Services/{BillingService,InventoryService}.php
+├── config/pharmacy.php                ← constantes de negocio (ISV, TTLs, límites)
+├── database/
+│   ├── factories/{ProductFactory,InvoiceFactory}.php
+│   ├── migrations/                    ← 8 migraciones (users, permissions, products,
+│   │                                    invoices, invoice_items, payment_methods,
+│   │                                    password_reset_codes, must_change_password)
+│   └── seeders/{Role,PaymentMethod,User,Product}Seeder.php
 ├── resources/views/
-│   ├── layouts/app.blade.php  ← layout único compartido
-│   ├── livewire/              ← componentes Livewire + Volt (auth)
-│   └── components/            ← Blade components reutilizables
-├── routes/
-├── tests/                     ← Pest
-└── .env.example               ← plantilla versionada
+│   ├── components/
+│   │   ├── auth-shell.blade.php       ← shell editorial para todas las auth pages
+│   │   ├── errors/minimal.blade.php   ← error page reutilizable
+│   │   └── ui/{button,card,badge,alert,input,table,empty-state}.blade.php
+│   ├── errors/{403,404,419,500,503}.blade.php
+│   ├── layouts/{app,guest}.blade.php
+│   ├── livewire/
+│   │   ├── billing/{invoice-list,new-invoice,show}.blade.php
+│   │   ├── dashboard.blade.php
+│   │   ├── pages/auth/{login,register,forgot-password,...}.blade.php
+│   │   ├── products/{index,create,edit}.blade.php
+│   │   └── users/{index,create,edit}.blade.php
+│   ├── pdf/invoice.blade.php          ← template de factura para dompdf
+│   └── welcome.blade.php             ← landing page editorial
+├── public/favicon.svg
+├── routes/web.php
+├── tests/Feature/                     ← 93 tests Pest
+└── .env.example
 ```
 
-### Setup local del rewrite
+### Setup local
 
 ```bash
 cd pharmacy-app
@@ -787,35 +894,49 @@ npm install
 # 2. Entorno
 cp .env.example .env
 php artisan key:generate
-# editar .env con credenciales MySQL locales (DB_DATABASE=pharmacy)
+# editar .env: DB_DATABASE=pharmacy, DB_USERNAME, DB_PASSWORD
+# Timezone ya configurado: America/Tegucigalpa
 
-# 3. Crear base de datos separada del legacy
+# 3. Crear base de datos
 mysql -u root -p -e "CREATE DATABASE pharmacy CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 
-# 4. Migraciones y assets
-php artisan migrate
+# 4. Migraciones, seeders y assets
+php artisan migrate --seed
 npm run build
 
-# 5. Servidor local en puerto 8001 (el legacy usa 8000)
+# 5. Servidor local (puerto 8001 para no chocar con el legacy en 8000)
 php artisan serve --port=8001
 # abrir http://localhost:8001
 ```
 
-### Roadmap por fases
+### Credenciales demo
 
-- **Fase 0** — Backup, tag `v1.0-legacy`, scaffold Laravel. ✅
-- **Fase 1** — Foundation: Breeze + Livewire + Tailwind + config/pharmacy.
-  spatie Permission + dompdf + Pest + layout base. 🔄
-- **Fase 2** — Módulo Usuarios y Dashboard con UI premium.
-- **Fase 3** — Módulo Inventario con búsqueda live Livewire.
-- **Fase 4** — Módulo Billing (carrito, factura transaccional, PDF).
-- **Fase 5** — Comando Artisan para migrar `FarmaciaHG → pharmacy` + cutover.
-- **Fase 6** — Polish, accesibilidad WCAG AA, documentación final.
+Tras ejecutar `php artisan migrate --seed`:
+
+| Rol | Email | Password |
+|-----|-------|----------|
+| **Administrador** | `admin@pharmacy.hn` | `admin123` |
+| Administrador | `douglas@pharmacy.hn` | `admin123` |
+| Cajero | `maria@pharmacy.hn` | `cajero123` |
+| Cajero | `carlos@pharmacy.hn` | `cajero123` |
+| Invitado | `invitado@pharmacy.hn` | `invitado123` |
+
+### Roadmap completado
+
+| Fase | Descripción | Estado |
+|------|-------------|--------|
+| **0** | Pre-work: backup, tag `v1.0-legacy`, reconstrucción DB legacy | ✅ |
+| **1** | Foundation: Laravel 11, Breeze, Livewire, Tailwind, Spatie Permission, dompdf, Pest, config/pharmacy, design system UI components | ✅ |
+| **2** | Módulo Usuarios + Dashboard + ForceChangePassword middleware | ✅ |
+| **3** | Módulo Inventario con búsqueda live, alertas, soft delete, InventoryService | ✅ |
+| **4** | Módulo Billing: POS, factura transaccional, PDF, histórico | ✅ |
+| **5** | Migración datos legacy | ⏭️ Saltada (proyecto personal sin datos legacy) |
+| **6** | Polish: UI editorial premium con Fraunces, auth redesign, welcome, error pages, favicon, accesibilidad | ✅ |
 
 ### Tag de rollback
 
-El código legacy en estado inmediatamente previo al rewrite está preservado
-en el tag `v1.0-legacy`. Para inspeccionarlo:
+El código legacy en estado previo al rewrite está preservado en el tag
+`v1.0-legacy`:
 
 ```bash
 git checkout v1.0-legacy
@@ -829,10 +950,9 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ---
 
-## 👥 Autores
+## 👥 Autor
 
-- **Desarrollador Original** - Trabajo inicial
-- **Claude AI** - Refactoring, seguridad, y completar módulo de facturación (2025)
+- **Douglas Hedman** — Diseño, desarrollo y arquitectura
 
 ---
 
@@ -840,19 +960,18 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 Si encuentras algún problema o tienes preguntas:
 
-1. Revisa la [documentación](#📋-tabla-de-contenidos)
-2. Busca en [Issues](https://github.com/tu-usuario/Hedman-Garcia-Pharmacy/issues)
+1. Revisa la [documentación](#-tabla-de-contenidos)
+2. Busca en [Issues](https://github.com/PickleRickHND/Hedman-Garcia-Pharmacy/issues)
 3. Crea un nuevo Issue si no encuentras solución
 
 ---
 
 ## 🙏 Agradecimientos
 
-- [Bootstrap](https://getbootstrap.com/) - Framework CSS
-- [jQuery](https://jquery.com/) - Librería JavaScript
-- [SendGrid](https://sendgrid.com/) - Servicio de email
-- [Composer](https://getcomposer.org/) - Dependency manager para PHP
-
----
-
-**Made with ❤️ for Pharmacy Management**
+- [Laravel](https://laravel.com/) — Framework PHP
+- [Livewire](https://livewire.laravel.com/) — Componentes reactivos
+- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS
+- [Spatie Permission](https://spatie.be/docs/laravel-permission) — Roles y permisos
+- [Fraunces](https://fonts.google.com/specimen/Fraunces) — Tipografía display serif
+- [SendGrid](https://sendgrid.com/) — Servicio de email
+- [Pest PHP](https://pestphp.com/) — Framework de testing
