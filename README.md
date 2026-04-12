@@ -6,7 +6,7 @@ Sistema de gestión integral para farmacias desarrollado en PHP con MySQL. Propo
 [![Laravel](https://img.shields.io/badge/Laravel-11%20LTS-FF2D20?logo=laravel)](https://laravel.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1?logo=mysql)](https://www.mysql.com/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0-7952B3?logo=bootstrap)](https://getbootstrap.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
 ---
 
@@ -927,7 +927,10 @@ git checkout v1.0-legacy
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+**Proprietary — All Rights Reserved.** Este código es de solo lectura para
+evaluación de portafolio. Queda prohibido copiar, distribuir, modificar,
+usar comercialmente o presentar como trabajo académico. Ver [`LICENSE`](LICENSE)
+para los términos completos.
 
 ---
 
