@@ -8,13 +8,6 @@ Sistema de gestión integral para farmacias desarrollado en PHP con MySQL. Propo
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0-7952B3?logo=bootstrap)](https://getbootstrap.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> **⚠️ Reescritura en progreso.** El repositorio contiene dos versiones
-> conviviendo: la aplicación **legacy** (PHP procedural, root del repo) y el
-> **rewrite** en Laravel 11 LTS + Livewire 3 dentro de `pharmacy-app/`. Al
-> final del roadmap, `pharmacy-app/*` reemplazará el código legacy; mientras
-> tanto, el legacy sigue operativo con parches de seguridad incrementales.
-> Ver [Rewrite Laravel](#-rewrite-laravel-pharmacy-app) más abajo.
-
 ---
 
 ## 📋 Tabla de Contenidos
@@ -908,18 +901,6 @@ npm run build
 php artisan serve --port=8001
 # abrir http://localhost:8001
 ```
-
-### Credenciales demo
-
-Tras ejecutar `php artisan migrate --seed`:
-
-| Rol | Email | Password |
-|-----|-------|----------|
-| **Administrador** | `admin@pharmacy.hn` | `admin123` |
-| Administrador | `douglas@pharmacy.hn` | `admin123` |
-| Cajero | `maria@pharmacy.hn` | `cajero123` |
-| Cajero | `carlos@pharmacy.hn` | `cajero123` |
-| Invitado | `invitado@pharmacy.hn` | `invitado123` |
 
 ### Roadmap completado
 
