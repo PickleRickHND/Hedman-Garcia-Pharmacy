@@ -15,9 +15,6 @@ new #[Layout('layouts.guest')] class extends Component
     public string $password = '';
     public string $password_confirmation = '';
 
-    /**
-     * Handle an incoming registration request.
-     */
     public function register(): void
     {
         $validated = $this->validate([
@@ -37,53 +34,107 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
-    <form wire:submit="register">
-        <!-- Name -->
+<x-auth-shell
+    step="02"
+    eyebrow="Crear cuenta"
+    title="Únete al sistema."
+    description="Crea tu cuenta para comenzar a operar."
+    headline="Una plataforma"
+    headline-italic="hecha para tu equipo."
+    subline="Gestión colaborativa con roles, trazabilidad y reportes al instante. Diseñada para equipos que valoran la precisión."
+>
+    <form wire:submit="register" class="space-y-6" novalidate>
+
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <label for="name" class="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-surface-600 dark:text-surface-400">
+                Nombre completo
+            </label>
+            <input
+                wire:model="name"
+                id="name"
+                type="text"
+                name="name"
+                required
+                autofocus
+                autocomplete="name"
+                placeholder="Tu nombre y apellido"
+                class="block w-full border-0 border-b border-surface-300 bg-transparent px-0 py-2.5 text-base text-surface-900 placeholder:text-surface-400 focus:border-brand-600 focus:outline-none focus:ring-0 dark:border-surface-700 dark:text-surface-50 dark:placeholder:text-surface-600 dark:focus:border-brand-500"
+            />
+            @error('name')<p class="mt-1.5 text-xs text-danger" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div>
+            <label for="email" class="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-surface-600 dark:text-surface-400">
+                Correo electrónico
+            </label>
+            <input
+                wire:model="email"
+                id="email"
+                type="email"
+                name="email"
+                required
+                autocomplete="username"
+                placeholder="tu@pharmacy.hn"
+                class="block w-full border-0 border-b border-surface-300 bg-transparent px-0 py-2.5 text-base text-surface-900 placeholder:text-surface-400 focus:border-brand-600 focus:outline-none focus:ring-0 dark:border-surface-700 dark:text-surface-50 dark:placeholder:text-surface-600 dark:focus:border-brand-500"
+            />
+            @error('email')<p class="mt-1.5 text-xs text-danger" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div>
+            <label for="password" class="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-surface-600 dark:text-surface-400">
+                Contraseña
+            </label>
+            <input
+                wire:model="password"
+                id="password"
+                type="password"
+                name="password"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••"
+                class="block w-full border-0 border-b border-surface-300 bg-transparent px-0 py-2.5 text-base text-surface-900 placeholder:text-surface-400 focus:border-brand-600 focus:outline-none focus:ring-0 dark:border-surface-700 dark:text-surface-50 dark:placeholder:text-surface-600 dark:focus:border-brand-500"
+            />
+            @error('password')<p class="mt-1.5 text-xs text-danger" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        <div>
+            <label for="password_confirmation" class="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-surface-600 dark:text-surface-400">
+                Confirmar contraseña
+            </label>
+            <input
+                wire:model="password_confirmation"
+                id="password_confirmation"
+                type="password"
+                name="password_confirmation"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••"
+                class="block w-full border-0 border-b border-surface-300 bg-transparent px-0 py-2.5 text-base text-surface-900 placeholder:text-surface-400 focus:border-brand-600 focus:outline-none focus:ring-0 dark:border-surface-700 dark:text-surface-50 dark:placeholder:text-surface-600 dark:focus:border-brand-500"
+            />
+            @error('password_confirmation')<p class="mt-1.5 text-xs text-danger" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
+        <div class="pt-4">
+            <button
+                type="submit"
+                class="group flex w-full items-center justify-center gap-2 bg-surface-900 px-6 py-3.5 text-sm font-medium tracking-wide text-surface-50 transition-all duration-200 hover:bg-brand-700 focus-visible:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-50 disabled:opacity-60 dark:bg-surface-50 dark:text-surface-900 dark:hover:bg-brand-400 dark:focus-visible:ring-offset-surface-950"
+                wire:loading.attr="disabled"
+            >
+                <span wire:loading.remove wire:target="register">Crear cuenta</span>
+                <span wire:loading wire:target="register">Registrando…</span>
+                <svg wire:loading.remove wire:target="register" class="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </button>
         </div>
     </form>
-</div>
+
+    <p class="mt-10 border-t border-surface-200 pt-6 text-center text-xs text-surface-500 dark:border-surface-800 dark:text-surface-500">
+        ¿Ya tienes una cuenta?
+        <a
+            href="{{ route('login') }}"
+            wire:navigate
+            class="font-medium text-surface-900 underline-offset-4 transition-colors hover:text-brand-700 hover:underline focus-visible:text-brand-700 focus-visible:underline focus-visible:outline-none dark:text-surface-100 dark:hover:text-brand-400"
+        >
+            Inicia sesión
+        </a>
+    </p>
+</x-auth-shell>

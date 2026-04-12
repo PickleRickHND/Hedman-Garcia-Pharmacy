@@ -18,19 +18,12 @@ new #[Layout('layouts.guest')] class extends Component
     public string $password = '';
     public string $password_confirmation = '';
 
-    /**
-     * Mount the component.
-     */
     public function mount(string $token): void
     {
         $this->token = $token;
-
         $this->email = request()->string('email');
     }
 
-    /**
-     * Reset the password for the given user.
-     */
     public function resetPassword(): void
     {
         $this->validate([
@@ -39,9 +32,6 @@ new #[Layout('layouts.guest')] class extends Component
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
         $status = Password::reset(
             $this->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) {
@@ -54,52 +44,88 @@ new #[Layout('layouts.guest')] class extends Component
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
         if ($status != Password::PASSWORD_RESET) {
             $this->addError('email', __($status));
-
             return;
         }
 
         Session::flash('status', __($status));
 
-        $this->redirectRoute('login', navigate: true);
+        $this->redirectRoute('login', navigate: true); // nosemgrep: php.symfony.security.audit.symfony-non-literal-redirect.symfony-non-literal-redirect
     }
 }; ?>
 
-<div>
-    <form wire:submit="resetPassword">
-        <!-- Email Address -->
+<x-auth-shell
+    step="04"
+    eyebrow="Nueva contraseña"
+    title="Restablece tu acceso."
+    description="Elige una contraseña nueva y vuelve a la plataforma."
+    headline="Una contraseña"
+    headline-italic="fuerte, memorable."
+    subline="Mínimo 8 caracteres. Combina letras, números y un símbolo. Nosotros guardamos solo el hash."
+>
+    <form wire:submit="resetPassword" class="space-y-6" novalidate>
+
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label for="email" class="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-surface-600 dark:text-surface-400">
+                Correo electrónico
+            </label>
+            <input
+                wire:model="email"
+                id="email"
+                type="email"
+                name="email"
+                required
+                autofocus
+                autocomplete="username"
+                class="block w-full border-0 border-b border-surface-300 bg-transparent px-0 py-2.5 text-base text-surface-900 placeholder:text-surface-400 focus:border-brand-600 focus:outline-none focus:ring-0 dark:border-surface-700 dark:text-surface-50 dark:placeholder:text-surface-600 dark:focus:border-brand-500"
+            />
+            @error('email')<p class="mt-1.5 text-xs text-danger" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div>
+            <label for="password" class="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-surface-600 dark:text-surface-400">
+                Nueva contraseña
+            </label>
+            <input
+                wire:model="password"
+                id="password"
+                type="password"
+                name="password"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••"
+                class="block w-full border-0 border-b border-surface-300 bg-transparent px-0 py-2.5 text-base text-surface-900 placeholder:text-surface-400 focus:border-brand-600 focus:outline-none focus:ring-0 dark:border-surface-700 dark:text-surface-50 dark:placeholder:text-surface-600 dark:focus:border-brand-500"
+            />
+            @error('password')<p class="mt-1.5 text-xs text-danger" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                          type="password"
-                          name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        <div>
+            <label for="password_confirmation" class="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-surface-600 dark:text-surface-400">
+                Confirmar contraseña
+            </label>
+            <input
+                wire:model="password_confirmation"
+                id="password_confirmation"
+                type="password"
+                name="password_confirmation"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••"
+                class="block w-full border-0 border-b border-surface-300 bg-transparent px-0 py-2.5 text-base text-surface-900 placeholder:text-surface-400 focus:border-brand-600 focus:outline-none focus:ring-0 dark:border-surface-700 dark:text-surface-50 dark:placeholder:text-surface-600 dark:focus:border-brand-500"
+            />
+            @error('password_confirmation')<p class="mt-1.5 text-xs text-danger" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
+        <div class="pt-4">
+            <button
+                type="submit"
+                class="group flex w-full items-center justify-center gap-2 bg-surface-900 px-6 py-3.5 text-sm font-medium tracking-wide text-surface-50 transition-all duration-200 hover:bg-brand-700 focus-visible:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-50 disabled:opacity-60 dark:bg-surface-50 dark:text-surface-900 dark:hover:bg-brand-400 dark:focus-visible:ring-offset-surface-950"
+                wire:loading.attr="disabled"
+            >
+                <span wire:loading.remove wire:target="resetPassword">Restablecer contraseña</span>
+                <span wire:loading wire:target="resetPassword">Actualizando…</span>
+            </button>
         </div>
     </form>
-</div>
+</x-auth-shell>
