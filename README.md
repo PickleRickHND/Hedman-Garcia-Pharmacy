@@ -684,6 +684,28 @@ Las contribuciones son bienvenidas! Si deseas contribuir:
 
 ## 📝 Changelog
 
+### [3.0.0] - 2026-04-13
+
+#### Added (Fase 7 — 10 features de gestión farmacéutica)
+- Categorías de productos con CRUD inline, badge color, filtro en inventario
+- Proveedores con CRUD completo, toggle activo/inactivo, vinculación a productos
+- Kardex de inventario: trazabilidad completa de movimientos de stock (venta, compra, devolución, anulación, ajuste, merma)
+- Gestión de clientes: CRUD, historial de compras, autocompletado en POS
+- Descuentos en facturación: % por línea con límite configurable, ISV sobre monto descontado
+- Anulación de facturas: reversión de stock, modal con motivo, marca de agua en PDF
+- Notificaciones/Alertas: campana con badge en navbar, alertas de stock bajo/vencidos/por vencer
+- Devoluciones: parcial/total, reingreso a inventario, cálculo con precio efectivo (respeta descuentos)
+- Corte de caja: apertura/cierre atómico, desglose por método de pago, arqueo de efectivo
+- Reportes: ventas por periodo, productos más vendidos, snapshot de inventario
+- 67 tests nuevos (159 total, 373 assertions, 0 failures)
+- 13 nuevas migraciones, 7 nuevos modelos, 6 nuevos servicios, 20+ componentes Livewire
+
+#### Security
+- `lockForUpdate` en generación de números de factura y devolución (previene duplicados)
+- Apertura de caja atómica con transacción + lock (previene doble apertura)
+- Precisión financiera: `round()` en cada paso de acumulación monetaria
+- Cálculo de refund en devoluciones con precio efectivo (respeta descuentos aplicados)
+
 ### [2.0.0] - 2025-11-23
 
 #### Added
@@ -734,7 +756,7 @@ vulnerabilidades de seguridad identificadas en la auditoría del legacy,
 introduce arquitectura moderna con tests automatizados, y presenta una
 interfaz editorial premium diseñada con Fraunces + Inter.
 
-**Estado:** Fases 0–6 completadas. El sistema es funcional end-to-end.
+**Estado:** Fases 0–7 completadas. Sistema de gestión farmacéutica completo con 10 módulos funcionales, 159 tests y 373 assertions.
 
 ### Stack
 
@@ -810,25 +832,130 @@ interfaz editorial premium diseñada con Fraunces + Inter.
 - Favicon SVG custom con la cápsula de marca
 - Skip link accesible + focus-visible + aria-labels
 
+#### Categorías de Productos (Fase 7)
+- CRUD inline en una sola página: crear, editar y eliminar sin navegación
+- Badge con color personalizable (hex) en la tabla de inventario
+- Filtro dropdown por categoría en el listado de productos
+- Selector de categoría en formularios de crear/editar producto
+- Seeder con 11 categorías farmacéuticas (Analgesicos, Antibioticos, etc.)
+- `nullOnDelete`: eliminar categoría deja productos sin clasificar
+
+#### Proveedores (Fase 7)
+- CRUD completo: Index con búsqueda, Create, Edit
+- Toggle activo/inactivo sin eliminar (soft state)
+- Scope `search()` por nombre, contacto, teléfono, email
+- Scope `active()` para filtrar proveedores vigentes
+- Selector de proveedor en formularios de producto
+- Conteo de productos por proveedor en la tabla
+
+#### Kardex de Inventario (Fase 7)
+- Tabla `stock_movements` con trazabilidad completa: producto, usuario,
+  tipo, cantidad (+/-), stock antes/después, referencia, motivo
+- Tipos de movimiento: `sale`, `purchase`, `return`, `void`, `adjustment`, `loss`
+- Integración automática: cada operación de `InventoryService` registra movimiento
+- `BillingService` pasa referencia de factura en cada decremento de stock
+- Vista con filtros por producto, tipo de movimiento, rango de fechas
+- Badges semánticos por tipo (rojo=venta/merma, verde=compra, azul=devolución)
+
+#### Gestión de Clientes (Fase 7)
+- CRUD completo: Index con búsqueda, Create, Edit, Show (detalle con historial)
+- Soft deletes para preservar integridad con facturas históricas
+- Autocompletado en POS: buscar cliente por nombre/RTN/teléfono al facturar
+- Selección rápida que rellena nombre + RTN automáticamente
+- Detalle de cliente: datos + tabla de facturas vinculadas + total gastado
+- `customer_id` opcional en facturas (backwards compatible)
+
+#### Descuentos en Facturación (Fase 7)
+- Descuento por línea (porcentaje, 0–30% configurable en `config/pharmacy.php`)
+- ISV calculado sobre monto ya descontado (correcto fiscalmente)
+- Solo rol Administrador puede aplicar descuentos (Cajero ve precio fijo)
+- Campos: `discount_percent` y `discount_amount` en invoice_items,
+  `discount_total` en invoices
+- UI: campo numérico % por línea en el carrito, línea "Descuento" en resumen
+- PDF y detalle actualizados con columna de descuento
+- Precisión financiera: `round()` en cada paso de acumulación
+
+#### Anulación de Facturas (Fase 7)
+- `BillingService::voidInvoice()` transaccional: cambia status, revierte stock,
+  registra movimientos tipo `void` en el kardex
+- Campos: `voided_at`, `voided_by`, `void_reason` en invoices
+- Modal de confirmación con motivo obligatorio (min 5 caracteres)
+- Solo Administrador puede anular
+- Badge "Anulada" en listado de facturas + alerta en detalle
+- Marca de agua "ANULADA" diagonal en PDF (CSS opacity)
+- Scopes: `emitted()` excluye anuladas de reportes y dashboard
+
+#### Notificaciones / Alertas (Fase 7)
+- `NotificationService` calcula alertas en tiempo real (sin tabla extra)
+- Alertas: stock bajo, productos vencidos, productos por vencer
+- Componente Livewire `Bell` con `wire:poll.60s` para refresco automático
+- Campana en navbar con badge numérico rojo cuando hay alertas
+- Dropdown con alertas agrupadas por tipo, clickeables (navegan a inventario
+  con filtro preseleccionado)
+- Visible para Administrador y Cajero
+
+#### Devoluciones (Fase 7)
+- `ReturnService::processReturn()` transaccional: valida factura no anulada,
+  valida cantidades máximas devolvibles, reingresa stock si `restock=true`
+- Devolución parcial: seleccionar qué items y cuántas unidades devolver
+- Checkbox "Reingresar al inventario" por item (para productos dañados)
+- Cálculo de refund con precio efectivo (respeta descuentos aplicados)
+- Numeración secuencial `DEV-NNNNNN` con `lockForUpdate`
+- Movimientos tipo `return` en el kardex
+- Botón "Devolución" en detalle de factura (solo Admin)
+- Vistas: Index (historial), Create (desde factura), Show (detalle)
+
+#### Corte de Caja (Fase 7)
+- `CashRegisterService` con apertura/cierre atómico (transacción + lock)
+- Validación: solo una caja abierta a la vez
+- Cierre calcula automáticamente: facturas emitidas, anuladas, total ventas,
+  desglose por método de pago (efectivo, tarjeta, transferencia)
+- Arqueo: monto inicial + ventas efectivo = esperado vs real contado = diferencia
+- Diferencia positiva (sobrante) o negativa (faltante) con indicador visual
+- Historial de cortes con paginación
+- Detalle completo: periodo, facturas, desglose, arqueo, notas
+
+#### Reportes Básicos (Fase 7)
+- Hub de reportes con 3 cards de acceso rápido (solo Administrador)
+- **Ventas por periodo**: rango de fechas, total facturas, ingresos, descuentos,
+  ISV, promedio diario, desglose por método de pago con barras CSS
+- **Productos más vendidos**: top N por cantidad o ingresos, barras de ranking,
+  selector de criterio y periodo
+- **Inventario actual**: snapshot completo con valor total del inventario
+  (precio × stock), alertas de stock bajo/agotado/vencido, tabla detallada
+  con categoría y fecha de vencimiento
+- `ReportService` con queries optimizadas (aggregates, GROUP BY)
+- Facturas anuladas excluidas de todos los reportes
+
 ### Tests
 
 ```
-93 tests, 226 assertions, 0 failures
+159 tests, 373 assertions, 0 failures
 ```
 
 | Suite | Tests | Cobertura |
 |-------|-------|-----------|
 | Auth (Breeze) | 10 | Login, register, logout, password reset/update, email verification |
+| ForceChangePassword | 5 | Redirect, acceso normal, cambio exitoso, validación mismatch |
 | Dashboard | 4 | Guards, métricas, accesos rápidos condicionales por rol |
 | Users/Index | 9 | Guards, listar, search, filtro rol, force reset, delete, auto-delete bloqueado |
 | Users/Create | 6 | Guards, create happy path, validación required/unique |
-| ForceChangePassword | 5 | Redirect, acceso normal, cambio exitoso, validación mismatch |
 | Products/Index | 9 | Guards, listar, search, filtros low/expired, soft delete |
 | Products/Create | 7 | Guards, create, validación sku/stock/fecha |
+| Categories | 7 | Guards, CRUD inline, unique name, delete nullifica productos, product count |
+| Suppliers | 8 | Guards, CRUD, toggle active, delete nullifica productos, product count |
+| InventoryService | 5 | Increment, decrement, stock insuficiente, delta cero, cantidad negativa |
+| StockMovements | 6 | Movimientos en adjustStock, issueInvoice, filtros vista, guards |
+| Customers | 9 | Guards, CRUD, unique RTN, soft delete, historial, autocompletado POS |
 | BillingService | 5 | Emisión atómica, rechazo vacío/sin cliente, rollback stock, numeración |
 | Billing/NewInvoice | 11 | Guards, carrito, límites stock, happy path, validación |
 | Billing/InvoiceList | 6 | Guards, listar, detalle, PDF download, rechazo por rol |
-| InventoryService | 5 | Increment, decrement, stock insuficiente, delta cero, cantidad negativa |
+| Discounts | 4 | Descuento aplicado, cap max %, backwards compatible, customer_id linkeo |
+| VoidInvoice | 6 | Void + restore stock, kardex void, doble anulación, motivo requerido, UI, guards |
+| Notifications | 5 | Zero alerts, low stock, expired, expiring, bell component render |
+| Returns | 6 | Devolución parcial + stock, kardex return, exceso rechazado, voided rechazado, guards |
+| CashRegister | 8 | Apertura, doble apertura bloqueada, cierre, doble cierre bloqueado, guards, UI |
+| Reports | 8 | salesByPeriod, topProducts, inventorySnapshot, hub guards, 3 report pages |
 | Smoke | 2 | Welcome page, example |
 
 ### Estructura del rewrite
@@ -842,36 +969,57 @@ pharmacy-app/
 │   ├── Livewire/
 │   │   ├── Auth/ChangePasswordRequired.php
 │   │   ├── Billing/{InvoiceList,NewInvoice,Show}.php
+│   │   ├── CashRegister/{Index,Close,Show}.php
+│   │   ├── Categories/Index.php
+│   │   ├── Customers/{Index,Create,Edit,Show}.php
 │   │   ├── Dashboard.php
+│   │   ├── Inventory/StockMovements.php
+│   │   ├── Notifications/Bell.php
 │   │   ├── Products/{Index,Create,Edit}.php
+│   │   ├── Reports/{Index,SalesReport,ProductsReport,InventoryReport}.php
+│   │   ├── Returns/{Index,Create,Show}.php
+│   │   ├── Suppliers/{Index,Create,Edit}.php
 │   │   └── Users/{Index,Create,Edit}.php
-│   ├── Models/{User,Product,Invoice,InvoiceItem,PaymentMethod}.php
-│   └── Services/{BillingService,InventoryService}.php
-├── config/pharmacy.php                ← constantes de negocio (ISV, TTLs, límites)
+│   ├── Models/
+│   │   ├── {User,Product,Invoice,InvoiceItem,PaymentMethod}.php
+│   │   ├── {Category,Supplier,Customer}.php
+│   │   ├── {StockMovement,CashRegister}.php
+│   │   └── {ReturnOrder,ReturnItem}.php
+│   └── Services/
+│       ├── {BillingService,InventoryService}.php
+│       ├── {ReturnService,CashRegisterService}.php
+│       ├── {ReportService,NotificationService}.php
+├── config/pharmacy.php                ← constantes de negocio (ISV, descuentos, TTLs)
 ├── database/
 │   ├── factories/{ProductFactory,InvoiceFactory}.php
-│   ├── migrations/                    ← 8 migraciones (users, permissions, products,
-│   │                                    invoices, invoice_items, payment_methods,
-│   │                                    password_reset_codes, must_change_password)
-│   └── seeders/{Role,PaymentMethod,User,Product}Seeder.php
+│   ├── migrations/                    ← 21 migraciones
+│   └── seeders/{Role,PaymentMethod,Category,Supplier,User,Product}Seeder.php
 ├── resources/views/
 │   ├── components/
-│   │   ├── auth-shell.blade.php       ← shell editorial para todas las auth pages
-│   │   ├── errors/minimal.blade.php   ← error page reutilizable
+│   │   ├── auth-shell.blade.php
+│   │   ├── errors/minimal.blade.php
 │   │   └── ui/{button,card,badge,alert,input,table,empty-state}.blade.php
 │   ├── errors/{403,404,419,500,503}.blade.php
 │   ├── layouts/{app,guest}.blade.php
 │   ├── livewire/
 │   │   ├── billing/{invoice-list,new-invoice,show}.blade.php
+│   │   ├── cash-register/{index,close,show}.blade.php
+│   │   ├── categories/index.blade.php
+│   │   ├── customers/{index,create,edit,show}.blade.php
 │   │   ├── dashboard.blade.php
+│   │   ├── inventory/stock-movements.blade.php
+│   │   ├── notifications/bell.blade.php
 │   │   ├── pages/auth/{login,register,forgot-password,...}.blade.php
 │   │   ├── products/{index,create,edit}.blade.php
+│   │   ├── reports/{index,sales,products,inventory}.blade.php
+│   │   ├── returns/{index,create,show}.blade.php
+│   │   ├── suppliers/{index,create,edit}.blade.php
 │   │   └── users/{index,create,edit}.blade.php
-│   ├── pdf/invoice.blade.php          ← template de factura para dompdf
-│   └── welcome.blade.php             ← landing page editorial
+│   ├── pdf/invoice.blade.php
+│   └── welcome.blade.php
 ├── public/favicon.svg
 ├── routes/web.php
-├── tests/Feature/                     ← 93 tests Pest
+├── tests/Feature/                     ← 159 tests Pest
 └── .env.example
 ```
 
@@ -913,6 +1061,7 @@ php artisan serve --port=8001
 | **4** | Módulo Billing: POS, factura transaccional, PDF, histórico | ✅ |
 | **5** | Migración datos legacy | ⏭️ Saltada (proyecto personal sin datos legacy) |
 | **6** | Polish: UI editorial premium con Fraunces, auth redesign, welcome, error pages, favicon, accesibilidad | ✅ |
+| **7** | 10 features de gestión farmacéutica: categorías, proveedores, kardex, clientes, descuentos, anulaciones, notificaciones, devoluciones, corte de caja, reportes | ✅ |
 
 ### Tag de rollback
 
