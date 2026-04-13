@@ -58,12 +58,23 @@
                             class="block w-full rounded-md border-surface-300 bg-white text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:bg-surface-800 dark:border-surface-700 dark:text-surface-100"
                         />
                     </div>
-                    <div class="sm:w-56">
+                    <div class="sm:w-48">
+                        <select
+                            wire:model.live="categoryFilter"
+                            class="block w-full rounded-md border-surface-300 bg-white text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:bg-surface-800 dark:border-surface-700 dark:text-surface-100"
+                        >
+                            <option value="">Todas las categorías</option>
+                            @foreach ($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="sm:w-48">
                         <select
                             wire:model.live="stockFilter"
                             class="block w-full rounded-md border-surface-300 bg-white text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:bg-surface-800 dark:border-surface-700 dark:text-surface-100"
                         >
-                            <option value="">Todos los productos</option>
+                            <option value="">Todos los estados</option>
                             <option value="low">Stock bajo</option>
                             <option value="out">Sin stock</option>
                             <option value="expiring">Próximos a vencer</option>
@@ -103,6 +114,7 @@
                                     @if ($sortField === 'name')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif
                                 </button>
                             </th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-surface-600 dark:text-surface-400">Categoría</th>
                             <th scope="col" class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-surface-600 dark:text-surface-400">
                                 <button wire:click="sortBy('stock')" class="flex items-center gap-1 ml-auto hover:text-surface-900 dark:hover:text-surface-100">
                                     Stock
@@ -139,6 +151,15 @@
                                             @endif
                                         </div>
                                     </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    @if ($product->category)
+                                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium text-white" style="background-color: {{ $product->category->color }}">
+                                            {{ $product->category->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-surface-400">—</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-right">
                                     <div class="flex items-center justify-end gap-2">

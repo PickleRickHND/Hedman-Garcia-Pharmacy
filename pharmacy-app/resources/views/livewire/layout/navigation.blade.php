@@ -38,20 +38,46 @@ new class extends Component
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" wire:navigate>
                             Usuarios
                         </x-nav-link>
+                        <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')" wire:navigate>
+                            Categorías
+                        </x-nav-link>
+                        <x-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')" wire:navigate>
+                            Proveedores
+                        </x-nav-link>
+                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>
+                            Reportes
+                        </x-nav-link>
                     @endrole
                     @hasanyrole('Administrador|Cajero')
-                        <x-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.*')" wire:navigate>
+                        <x-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')" wire:navigate>
+                            Clientes
+                        </x-nav-link>
+                        <x-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.index') || request()->routeIs('products.*')" wire:navigate>
                             Inventario
+                        </x-nav-link>
+                        <x-nav-link :href="route('inventory.movements')" :active="request()->routeIs('inventory.movements')" wire:navigate>
+                            Kardex
                         </x-nav-link>
                         <x-nav-link :href="route('billing.index')" :active="request()->routeIs('billing.*')" wire:navigate>
                             Facturación
+                        </x-nav-link>
+                        <x-nav-link :href="route('returns.index')" :active="request()->routeIs('returns.*')" wire:navigate>
+                            Devoluciones
+                        </x-nav-link>
+                        <x-nav-link :href="route('cash-register.index')" :active="request()->routeIs('cash-register.*')" wire:navigate>
+                            Caja
                         </x-nav-link>
                     @endhasanyrole
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <!-- Notifications + Settings Dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6 sm:gap-2">
+                @hasanyrole('Administrador|Cajero')
+                    <livewire:notifications.bell />
+                @endhasanyrole
+            </div>
+            <div class="hidden sm:flex sm:items-center">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -102,13 +128,34 @@ new class extends Component
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" wire:navigate>
                     Usuarios
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')" wire:navigate>
+                    Categorías
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')" wire:navigate>
+                    Proveedores
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>
+                    Reportes
+                </x-responsive-nav-link>
             @endrole
             @hasanyrole('Administrador|Cajero')
-                <x-responsive-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.*')" wire:navigate>
+                <x-responsive-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')" wire:navigate>
+                    Clientes
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.index') || request()->routeIs('products.*')" wire:navigate>
                     Inventario
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('inventory.movements')" :active="request()->routeIs('inventory.movements')" wire:navigate>
+                    Kardex
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('billing.index')" :active="request()->routeIs('billing.*')" wire:navigate>
                     Facturación
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('returns.index')" :active="request()->routeIs('returns.*')" wire:navigate>
+                    Devoluciones
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('cash-register.index')" :active="request()->routeIs('cash-register.*')" wire:navigate>
+                    Caja
                 </x-responsive-nav-link>
             @endhasanyrole
         </div>

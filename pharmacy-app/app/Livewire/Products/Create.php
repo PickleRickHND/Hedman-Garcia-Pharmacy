@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Products;
 
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -25,6 +27,8 @@ class Create extends Component
     public string $administration_form = '';
     public string $storage = '';
     public string $packaging = '';
+    public ?int $category_id = null;
+    public ?int $supplier_id = null;
 
     public function mount(): void
     {
@@ -44,6 +48,8 @@ class Create extends Component
             'administration_form' => ['nullable', 'string', 'max:'.config('pharmacy.limits.product_administration_max')],
             'storage' => ['nullable', 'string', 'max:'.config('pharmacy.limits.product_storage_max')],
             'packaging' => ['nullable', 'string', 'max:'.config('pharmacy.limits.product_packaging_max')],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
         ];
     }
 
@@ -60,6 +66,9 @@ class Create extends Component
 
     public function render(): View
     {
-        return view('livewire.products.create');
+        return view('livewire.products.create', [
+            'categories' => Category::orderBy('name')->get(),
+            'suppliers' => Supplier::active()->orderBy('name')->get(),
+        ]);
     }
 }

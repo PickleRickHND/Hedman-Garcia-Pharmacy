@@ -98,8 +98,29 @@
                                             <button type="button" wire:click="incrementItem({{ $index }})" class="w-7 h-7 rounded-md border border-surface-300 dark:border-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800">+</button>
                                         </div>
 
+                                        @if ($this->canApplyDiscount())
+                                            <div class="w-20 shrink-0">
+                                                <div class="flex items-center gap-0.5">
+                                                    <input
+                                                        type="number"
+                                                        wire:model.live.debounce.500ms="items.{{ $index }}.discount_percent"
+                                                        min="0"
+                                                        max="{{ config('pharmacy.billing.max_discount_percent', 30) }}"
+                                                        step="1"
+                                                        class="block w-14 rounded-md border-surface-300 bg-white text-xs text-right shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:bg-surface-800 dark:border-surface-700 dark:text-surface-100 px-1 py-1"
+                                                    />
+                                                    <span class="text-xs text-surface-400">%</span>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @php
+                                            $lineGross = $item['quantity'] * $item['unit_price'];
+                                            $dp = min(max((float) ($item['discount_percent'] ?? 0), 0), config('pharmacy.billing.max_discount_percent', 30));
+                                            $lineNet = $lineGross - round($lineGross * ($dp / 100), 2);
+                                        @endphp
                                         <div class="w-24 text-right text-sm font-semibold text-surface-900 dark:text-surface-100">
-                                            L. {{ number_format($item['quantity'] * $item['unit_price'], 2) }}
+                                            L. {{ number_format($lineNet, 2) }}
                                         </div>
 
                                         <button type="button" wire:click="removeItem({{ $index }})" class="text-surface-400 hover:text-danger">
@@ -120,6 +141,44 @@
                         </x-slot>
 
                         <div class="space-y-4">
+                            {{-- Buscador de clientes existentes --}}
+                            @if (!$customer_id)
+                                <div class="relative">
+                                    <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">Buscar cliente</label>
+                                    <input
+                                        type="search"
+                                        wire:model.live.debounce.250ms="customerSearch"
+                                        placeholder="Nombre, RTN o teléfono..."
+                                        class="block w-full rounded-md border-surface-300 bg-white text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:bg-surface-800 dark:border-surface-700 dark:text-surface-100"
+                                    />
+                                    @if ($showCustomerDropdown && $this->customerResults->isNotEmpty())
+                                        <div class="absolute z-10 mt-1 w-full border border-surface-200 dark:border-surface-700 rounded-lg bg-white dark:bg-surface-800 shadow-lg max-h-48 overflow-y-auto">
+                                            @foreach ($this->customerResults as $cust)
+                                                <button type="button" wire:click="selectCustomer({{ $cust->id }})" class="w-full text-left px-3 py-2 hover:bg-surface-50 dark:hover:bg-surface-700 text-sm">
+                                                    <span class="font-medium text-surface-900 dark:text-surface-100">{{ $cust->name }}</span>
+                                                    @if ($cust->rtn)
+                                                        <span class="text-surface-500 dark:text-surface-400 ml-1">· {{ $cust->rtn }}</span>
+                                                    @endif
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    <p class="mt-1 text-xs text-surface-400">O deja vacío para ingresar manualmente</p>
+                                </div>
+                            @else
+                                <div class="flex items-center justify-between rounded-md border border-brand-200 bg-brand-50 px-3 py-2 dark:border-brand-800 dark:bg-brand-950/30">
+                                    <div>
+                                        <p class="text-sm font-medium text-brand-800 dark:text-brand-200">{{ $customer_name }}</p>
+                                        @if ($customer_rtn)
+                                            <p class="text-xs text-brand-600 dark:text-brand-400">RTN: {{ $customer_rtn }}</p>
+                                        @endif
+                                    </div>
+                                    <button type="button" wire:click="clearCustomer" class="text-brand-500 hover:text-brand-700">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                            @endif
+
                             <x-ui.input
                                 label="Nombre"
                                 name="customer_name"
@@ -164,6 +223,12 @@
                                 <dt class="text-surface-600 dark:text-surface-400">Subtotal</dt>
                                 <dd class="text-surface-900 dark:text-surface-100 font-medium">L. {{ number_format($this->totals['subtotal'], 2) }}</dd>
                             </div>
+                            @if ($this->totals['discount'] > 0)
+                                <div class="flex justify-between">
+                                    <dt class="text-green-600 dark:text-green-400">Descuento</dt>
+                                    <dd class="text-green-600 dark:text-green-400 font-medium">- L. {{ number_format($this->totals['discount'], 2) }}</dd>
+                                </div>
+                            @endif
                             <div class="flex justify-between">
                                 <dt class="text-surface-600 dark:text-surface-400">ISV (15%)</dt>
                                 <dd class="text-surface-900 dark:text-surface-100 font-medium">L. {{ number_format($this->totals['tax'], 2) }}</dd>

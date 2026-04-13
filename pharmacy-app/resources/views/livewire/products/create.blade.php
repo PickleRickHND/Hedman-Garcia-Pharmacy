@@ -23,6 +23,20 @@
                     </div>
 
                     <div class="mt-5">
+                        <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">Categoría</label>
+                        <select
+                            wire:model="category_id"
+                            class="block w-full rounded-md border-surface-300 bg-white shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:bg-surface-800 dark:border-surface-700 dark:text-surface-100"
+                        >
+                            <option value="">Sin categoría</option>
+                            @foreach ($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('category_id')<p class="mt-1 text-xs text-danger">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div class="mt-5">
                         <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">Descripción</label>
                         <textarea
                             wire:model="description"
@@ -53,6 +67,16 @@
                             <h2 class="font-semibold text-surface-900 dark:text-surface-100">Detalles farmacéuticos</h2>
                             <p class="text-xs text-surface-500 dark:text-surface-400 mt-1">Opcionales</p>
                         </x-slot>
+
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">Proveedor</label>
+                            <select wire:model="supplier_id" class="block w-full rounded-md border-surface-300 bg-white shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:bg-surface-800 dark:border-surface-700 dark:text-surface-100">
+                                <option value="">Sin proveedor</option>
+                                @foreach ($suppliers as $sup)
+                                    <option value="{{ $sup->id }}">{{ $sup->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <x-ui.input label="Presentación" name="presentation" wire:model="presentation" hint="Ej: Tableta 500mg" />

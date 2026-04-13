@@ -104,7 +104,12 @@
                         @foreach ($invoices as $invoice)
                             <tr class="hover:bg-surface-50 dark:hover:bg-surface-900/40">
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    <span class="font-mono text-sm font-semibold text-surface-900 dark:text-surface-100">{{ $invoice->invoice_number }}</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono text-sm font-semibold text-surface-900 dark:text-surface-100">{{ $invoice->invoice_number }}</span>
+                                        @if ($invoice->is_voided)
+                                            <x-ui.badge variant="danger" size="sm">Anulada</x-ui.badge>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-surface-600 dark:text-surface-400">{{ $invoice->issued_at->format('d M Y H:i') }}</td>
                                 <td class="px-4 py-3">

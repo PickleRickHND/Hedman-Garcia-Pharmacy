@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Products;
 
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -26,6 +28,8 @@ class Edit extends Component
     public string $administration_form = '';
     public string $storage = '';
     public string $packaging = '';
+    public ?int $category_id = null;
+    public ?int $supplier_id = null;
 
     public function mount(Product $product): void
     {
@@ -42,6 +46,8 @@ class Edit extends Component
         $this->administration_form = $product->administration_form ?? '';
         $this->storage = $product->storage ?? '';
         $this->packaging = $product->packaging ?? '';
+        $this->category_id = $product->category_id;
+        $this->supplier_id = $product->supplier_id;
     }
 
     protected function rules(): array
@@ -57,6 +63,8 @@ class Edit extends Component
             'administration_form' => ['nullable', 'string', 'max:'.config('pharmacy.limits.product_administration_max')],
             'storage' => ['nullable', 'string', 'max:'.config('pharmacy.limits.product_storage_max')],
             'packaging' => ['nullable', 'string', 'max:'.config('pharmacy.limits.product_packaging_max')],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
         ];
     }
 
@@ -73,6 +81,9 @@ class Edit extends Component
 
     public function render(): View
     {
-        return view('livewire.products.edit');
+        return view('livewire.products.edit', [
+            'categories' => Category::orderBy('name')->get(),
+            'suppliers' => Supplier::active()->orderBy('name')->get(),
+        ]);
     }
 }

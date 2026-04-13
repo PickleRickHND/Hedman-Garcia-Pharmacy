@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -25,6 +26,8 @@ class Product extends Model
         'administration_form',
         'storage',
         'packaging',
+        'category_id',
+        'supplier_id',
     ];
 
     protected function casts(): array
@@ -37,8 +40,31 @@ class Product extends Model
     }
 
     // -----------------------------------------------------------------------
+    // Relationships
+    // -----------------------------------------------------------------------
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    // -----------------------------------------------------------------------
     // Scopes
     // -----------------------------------------------------------------------
+
+    public function scopeByCategory(Builder $query, ?int $categoryId): Builder
+    {
+        if ($categoryId === null) {
+            return $query;
+        }
+
+        return $query->where('category_id', $categoryId);
+    }
 
     public function scopeLowStock(Builder $query, ?int $threshold = null): Builder
     {

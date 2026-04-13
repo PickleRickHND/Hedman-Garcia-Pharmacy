@@ -16,6 +16,8 @@ class InvoiceItem extends Model
         'product_name',
         'quantity',
         'unit_price',
+        'discount_percent',
+        'discount_amount',
         'subtotal',
     ];
 
@@ -24,6 +26,8 @@ class InvoiceItem extends Model
         return [
             'quantity' => 'integer',
             'unit_price' => 'decimal:2',
+            'discount_percent' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
             'subtotal' => 'decimal:2',
         ];
     }

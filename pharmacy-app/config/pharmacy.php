@@ -24,6 +24,7 @@ return [
     'billing' => [
         'invoice_number_prefix' => env('PHARMACY_INVOICE_PREFIX', 'FHG-'),
         'invoice_number_padding' => 6,
+        'max_discount_percent' => (float) env('PHARMACY_MAX_DISCOUNT', 30),
         'default_payment_methods' => [
             'Efectivo',
             'Tarjeta de Credito',

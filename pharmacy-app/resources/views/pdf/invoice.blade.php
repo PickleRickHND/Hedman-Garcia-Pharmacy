@@ -45,9 +45,14 @@
         .totals-total .totals-value { color: #16a34a; }
 
         .footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid #e7e5e4; font-size: 8pt; color: #78716c; text-align: center; }
+        .watermark { position: fixed; top: 35%; left: 10%; font-size: 72pt; color: rgba(220, 38, 38, 0.15); transform: rotate(-35deg); font-weight: bold; letter-spacing: 8px; z-index: 0; pointer-events: none; }
     </style>
 </head>
 <body>
+    @if ($invoice->status === 'voided')
+        <div class="watermark">ANULADA</div>
+    @endif
+
     <div class="header">
         <div class="header-left">
             <div class="brand">Hedman Garcia Pharmacy</div>
@@ -81,6 +86,7 @@
                 <th>Producto</th>
                 <th class="num">Precio</th>
                 <th class="num">Cant.</th>
+                <th class="num">Desc.</th>
                 <th class="num">Subtotal</th>
             </tr>
         </thead>
@@ -93,6 +99,7 @@
                     </td>
                     <td class="num">L. {{ number_format((float) $item->unit_price, 2) }}</td>
                     <td class="num">{{ $item->quantity }}</td>
+                    <td class="num">{{ (float) $item->discount_percent > 0 ? number_format((float) $item->discount_percent, 0).'%' : '—' }}</td>
                     <td class="num">L. {{ number_format((float) $item->subtotal, 2) }}</td>
                 </tr>
             @endforeach
@@ -104,6 +111,12 @@
             <div class="totals-label">Subtotal</div>
             <div class="totals-value">L. {{ number_format((float) $invoice->subtotal, 2) }}</div>
         </div>
+        @if ((float) $invoice->discount_total > 0)
+        <div class="totals-row">
+            <div class="totals-label">Descuento</div>
+            <div class="totals-value" style="color:#16a34a;">- L. {{ number_format((float) $invoice->discount_total, 2) }}</div>
+        </div>
+        @endif
         <div class="totals-row">
             <div class="totals-label">ISV (15%)</div>
             <div class="totals-value">L. {{ number_format((float) $invoice->tax, 2) }}</div>

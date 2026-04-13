@@ -10,9 +10,9 @@ test('authenticated admin sees dashboard with metrics', function () {
     $response = $this->get('/dashboard');
 
     $response->assertOk();
-    $response->assertSeeText('Bienvenido');
-    $response->assertSeeText('Total usuarios');
-    $response->assertSeeText('Administradores');
+    $response->assertSeeText('Hola,');
+    $response->assertSeeText('Personal');
+    $response->assertSeeText('Inventario');
 });
 
 test('dashboard shows quick access to users for admin', function () {

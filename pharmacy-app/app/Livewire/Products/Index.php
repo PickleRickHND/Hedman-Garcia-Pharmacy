@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Products;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -23,6 +24,9 @@ class Index extends Component
 
     #[Url(as: 'filter', history: true)]
     public string $stockFilter = '';
+
+    #[Url(as: 'cat', history: true)]
+    public string $categoryFilter = '';
 
     #[Url(as: 'sort', history: true)]
     public string $sortField = 'name';
@@ -44,6 +48,11 @@ class Index extends Component
     }
 
     public function updatingStockFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCategoryFilter(): void
     {
         $this->resetPage();
     }
@@ -73,7 +82,9 @@ class Index extends Component
     public function render(): View
     {
         $query = Product::query()
+            ->with('category')
             ->search($this->search)
+            ->when($this->categoryFilter, fn ($q) => $q->byCategory((int) $this->categoryFilter))
             ->when($this->stockFilter === 'low', fn ($q) => $q->lowStock())
             ->when($this->stockFilter === 'out', fn ($q) => $q->outOfStock())
             ->when($this->stockFilter === 'expiring', fn ($q) => $q->expiringSoon())
@@ -88,6 +99,7 @@ class Index extends Component
 
         return view('livewire.products.index', [
             'products' => $products,
+            'categories' => Category::orderBy('name')->get(),
             'summary' => [
                 'total' => Product::count(),
                 'low_stock' => Product::lowStock()->count(),

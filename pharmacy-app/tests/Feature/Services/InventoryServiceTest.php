@@ -1,7 +1,12 @@
 <?php
 
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Services\InventoryService;
+
+beforeEach(function () {
+    loginAs('Administrador');
+});
 
 it('decrements stock correctly', function () {
     $product = Product::factory()->create(['stock' => 50]);
@@ -10,6 +15,7 @@ it('decrements stock correctly', function () {
     $updated = $service->decrement($product, 10);
 
     expect($updated->stock)->toBe(40);
+    expect(StockMovement::where('product_id', $product->id)->count())->toBe(1);
 });
 
 it('increments stock correctly', function () {
@@ -19,6 +25,7 @@ it('increments stock correctly', function () {
     $updated = $service->increment($product, 25);
 
     expect($updated->stock)->toBe(75);
+    expect(StockMovement::where('product_id', $product->id)->count())->toBe(1);
 });
 
 it('throws when decrementing below zero', function () {

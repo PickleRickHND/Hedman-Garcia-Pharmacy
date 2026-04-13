@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Billing;
 
+use App\Models\Customer;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Services\BillingService;
@@ -22,6 +23,9 @@ class NewInvoice extends Component
     public string $customer_name = '';
     public ?string $customer_rtn = null;
     public ?int $payment_method_id = null;
+    public ?int $customer_id = null;
+    public string $customerSearch = '';
+    public bool $showCustomerDropdown = false;
 
     /**
      * @var array<int, array{product_id:int, sku:string, name:string, unit_price:float, quantity:int, max:int}>
@@ -67,6 +71,7 @@ class NewInvoice extends Component
             'unit_price' => (float) $product->price,
             'quantity' => 1,
             'max' => $product->stock,
+            'discount_percent' => 0,
         ];
 
         $this->search = '';
@@ -102,11 +107,50 @@ class NewInvoice extends Component
         }
     }
 
+    public function selectCustomer(int $customerId): void
+    {
+        $customer = Customer::find($customerId);
+        if ($customer) {
+            $this->customer_id = $customer->id;
+            $this->customer_name = $customer->name;
+            $this->customer_rtn = $customer->rtn;
+            $this->customerSearch = '';
+            $this->showCustomerDropdown = false;
+        }
+    }
+
+    public function clearCustomer(): void
+    {
+        $this->customer_id = null;
+        $this->customer_name = '';
+        $this->customer_rtn = null;
+        $this->customerSearch = '';
+    }
+
+    public function updatedCustomerSearch(): void
+    {
+        $this->showCustomerDropdown = mb_strlen($this->customerSearch) >= 2;
+    }
+
+    #[Computed]
+    public function customerResults()
+    {
+        if (blank($this->customerSearch) || mb_strlen($this->customerSearch) < 2) {
+            return collect();
+        }
+
+        return Customer::search($this->customerSearch)
+            ->limit(5)
+            ->get();
+    }
+
     public function clearCart(): void
     {
         $this->items = [];
         $this->customer_name = '';
         $this->customer_rtn = null;
+        $this->customer_id = null;
+        $this->customerSearch = '';
     }
 
     public function issue(BillingService $billing)
@@ -128,12 +172,17 @@ class NewInvoice extends Component
             $invoice = $billing->issueInvoice(
                 seller: auth()->user(),
                 lineItems: array_map(
-                    fn ($i) => ['product_id' => $i['product_id'], 'quantity' => $i['quantity']],
+                    fn ($i) => [
+                        'product_id' => $i['product_id'],
+                        'quantity' => $i['quantity'],
+                        'discount_percent' => (float) ($i['discount_percent'] ?? 0),
+                    ],
                     $this->items,
                 ),
                 customer: [
                     'customer_name' => $this->customer_name,
                     'customer_rtn' => $this->customer_rtn,
+                    'customer_id' => $this->customer_id,
                 ],
                 paymentMethod: PaymentMethod::findOrFail($this->payment_method_id),
             );
@@ -171,17 +220,35 @@ class NewInvoice extends Component
     public function totals(): array
     {
         $isvRate = (float) config('pharmacy.tax.isv_rate', 0.15);
-        $totalBeforeBreakdown = 0.0;
+        $maxDiscount = (float) config('pharmacy.billing.max_discount_percent', 30);
+        $grossTotal = 0.0;
+        $discountTotal = 0.0;
 
         foreach ($this->items as $item) {
-            $totalBeforeBreakdown += $item['unit_price'] * $item['quantity'];
+            $lineGross = $item['unit_price'] * $item['quantity'];
+            $dp = min(max((float) ($item['discount_percent'] ?? 0), 0), $maxDiscount);
+            $lineDiscount = round($lineGross * ($dp / 100), 2);
+
+            $grossTotal += $lineGross;
+            $discountTotal += $lineDiscount;
         }
 
-        $subtotal = round($totalBeforeBreakdown / (1 + $isvRate), 2);
-        $tax = round($totalBeforeBreakdown - $subtotal, 2);
-        $total = round($totalBeforeBreakdown, 2);
+        $afterDiscount = round($grossTotal - $discountTotal, 2);
+        $subtotal = round($afterDiscount / (1 + $isvRate), 2);
+        $tax = round($afterDiscount - $subtotal, 2);
+        $total = $afterDiscount;
 
-        return compact('subtotal', 'tax', 'total');
+        return [
+            'subtotal' => $subtotal,
+            'discount' => round($discountTotal, 2),
+            'tax' => $tax,
+            'total' => $total,
+        ];
+    }
+
+    public function canApplyDiscount(): bool
+    {
+        return auth()->user()->hasRole('Administrador');
     }
 
     public function render(): View
