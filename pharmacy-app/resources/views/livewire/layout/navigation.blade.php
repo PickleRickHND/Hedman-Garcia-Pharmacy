@@ -30,54 +30,93 @@ new class extends Component
                 </div>
 
                 <!-- Navigation Links -->
+                @php
+                    $salesActive = request()->routeIs('billing.*')
+                        || request()->routeIs('returns.*')
+                        || request()->routeIs('cash-register.*')
+                        || request()->routeIs('customers.*');
+                    $inventoryActive = request()->routeIs('inventory.*')
+                        || request()->routeIs('products.*')
+                        || request()->routeIs('categories.*')
+                        || request()->routeIs('suppliers.*');
+                    $adminActive = request()->routeIs('users.*') || request()->routeIs('reports.*');
+
+                    $triggerBase = 'inline-flex h-full items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out';
+                    $triggerInactive = 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700';
+                    $triggerActive = 'border-indigo-400 dark:border-indigo-600 text-gray-900 dark:text-gray-100';
+                    $menuPanel = 'absolute left-0 top-full z-50 mt-0 w-48 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-700 py-1';
+                @endphp
+
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         Dashboard
                     </x-nav-link>
-                    @role('Administrador')
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" wire:navigate>
-                            Usuarios
-                        </x-nav-link>
-                        <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')" wire:navigate>
-                            Categorías
-                        </x-nav-link>
-                        <x-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')" wire:navigate>
-                            Proveedores
-                        </x-nav-link>
-                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>
-                            Reportes
-                        </x-nav-link>
-                    @endrole
+
                     @hasanyrole('Administrador|Cajero')
-                        <x-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')" wire:navigate>
-                            Clientes
-                        </x-nav-link>
-                        <x-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.index') || request()->routeIs('products.*')" wire:navigate>
-                            Inventario
-                        </x-nav-link>
-                        <x-nav-link :href="route('inventory.movements')" :active="request()->routeIs('inventory.movements')" wire:navigate>
-                            Kardex
-                        </x-nav-link>
-                        <x-nav-link :href="route('billing.index')" :active="request()->routeIs('billing.*')" wire:navigate>
-                            Facturación
-                        </x-nav-link>
-                        <x-nav-link :href="route('returns.index')" :active="request()->routeIs('returns.*')" wire:navigate>
-                            Devoluciones
-                        </x-nav-link>
-                        <x-nav-link :href="route('cash-register.index')" :active="request()->routeIs('cash-register.*')" wire:navigate>
-                            Caja
-                        </x-nav-link>
+                        <div class="relative inline-flex"
+                             x-data="{ open: false, timer: null, show() { clearTimeout(this.timer); this.open = true; }, hide() { this.timer = setTimeout(() => this.open = false, 150); } }"
+                             @mouseenter="show()" @mouseleave="hide()" @click.outside="open = false">
+                            <button type="button" @click="open = !open" class="{{ $triggerBase }} {{ $salesActive ? $triggerActive : $triggerInactive }}">
+                                Ventas
+                                <svg class="ms-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <div x-show="open" x-cloak style="display:none;"
+                                 x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="{{ $menuPanel }}" @click="open = false">
+                                <x-dropdown-link :href="route('billing.index')" wire:navigate>Facturación</x-dropdown-link>
+                                <x-dropdown-link :href="route('returns.index')" wire:navigate>Devoluciones</x-dropdown-link>
+                                <x-dropdown-link :href="route('cash-register.index')" wire:navigate>Caja</x-dropdown-link>
+                                <x-dropdown-link :href="route('customers.index')" wire:navigate>Clientes</x-dropdown-link>
+                            </div>
+                        </div>
+
+                        <div class="relative inline-flex"
+                             x-data="{ open: false, timer: null, show() { clearTimeout(this.timer); this.open = true; }, hide() { this.timer = setTimeout(() => this.open = false, 150); } }"
+                             @mouseenter="show()" @mouseleave="hide()" @click.outside="open = false">
+                            <button type="button" @click="open = !open" class="{{ $triggerBase }} {{ $inventoryActive ? $triggerActive : $triggerInactive }}">
+                                Inventario
+                                <svg class="ms-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <div x-show="open" x-cloak style="display:none;"
+                                 x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="{{ $menuPanel }}" @click="open = false">
+                                <x-dropdown-link :href="route('inventory.index')" wire:navigate>Productos</x-dropdown-link>
+                                <x-dropdown-link :href="route('inventory.movements')" wire:navigate>Kardex</x-dropdown-link>
+                                @role('Administrador')
+                                    <x-dropdown-link :href="route('categories.index')" wire:navigate>Categorías</x-dropdown-link>
+                                    <x-dropdown-link :href="route('suppliers.index')" wire:navigate>Proveedores</x-dropdown-link>
+                                @endrole
+                            </div>
+                        </div>
                     @endhasanyrole
+
+                    @role('Administrador')
+                        <div class="relative inline-flex"
+                             x-data="{ open: false, timer: null, show() { clearTimeout(this.timer); this.open = true; }, hide() { this.timer = setTimeout(() => this.open = false, 150); } }"
+                             @mouseenter="show()" @mouseleave="hide()" @click.outside="open = false">
+                            <button type="button" @click="open = !open" class="{{ $triggerBase }} {{ $adminActive ? $triggerActive : $triggerInactive }}">
+                                Administración
+                                <svg class="ms-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <div x-show="open" x-cloak style="display:none;"
+                                 x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="{{ $menuPanel }}" @click="open = false">
+                                <x-dropdown-link :href="route('users.index')" wire:navigate>Usuarios</x-dropdown-link>
+                                <x-dropdown-link :href="route('reports.index')" wire:navigate>Reportes</x-dropdown-link>
+                            </div>
+                        </div>
+                    @endrole
                 </div>
             </div>
 
             <!-- Notifications + Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6 sm:gap-2">
+            <div class="hidden sm:flex sm:items-center sm:gap-2">
                 @hasanyrole('Administrador|Cajero')
                     <livewire:notifications.bell />
                 @endhasanyrole
-            </div>
-            <div class="hidden sm:flex sm:items-center">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -105,7 +144,6 @@ new class extends Component
                     </x-slot>
                 </x-dropdown>
             </div>
-
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">

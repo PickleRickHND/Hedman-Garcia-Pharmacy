@@ -43,6 +43,7 @@
                                     Ir al dashboard →
                                 </a>
                             @else
+                                <div class="hidden items-center gap-4 sm:flex">
                                 <a
                                     href="{{ route('login') }}"
                                     class="text-sm font-medium text-surface-600 underline-offset-4 transition-colors hover:text-brand-700 hover:underline dark:text-surface-400 dark:hover:text-brand-400"
@@ -58,6 +59,7 @@
                                         <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                                     </a>
                                 @endif
+                                </div>
                             @endauth
                         </div>
                     @endif
