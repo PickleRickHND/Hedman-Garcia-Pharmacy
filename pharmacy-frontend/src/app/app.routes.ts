@@ -21,8 +21,25 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
       },
 
+      // Productos (conectado a la API).
+      {
+        path: 'products',
+        loadComponent: () => import('./features/products/list/product-list').then((m) => m.ProductList),
+      },
+      {
+        path: 'products/new',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/products/form/product-form').then((m) => m.ProductForm),
+      },
+      {
+        path: 'products/:id/edit',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/products/form/product-form').then((m) => m.ProductForm),
+      },
+
       // Módulos pendientes (placeholder hasta conectar su UI a la API).
-      cs('products', 'Productos', 'products'),
       cs('categories', 'Categorías', 'categories', ADMIN),
       cs('suppliers', 'Proveedores', 'suppliers', ADMIN),
       cs('stock-movements', 'Inventario', 'inventory', STAFF),

@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AuthService } from '../../core/auth/auth.service';
 import { ThemeService } from '../../core/theme/theme.service';
 import { Icon } from '../../shared/icon/icon';
+import { ToastHost } from '../../shared/toast/toast-host';
 
 interface NavItem {
   label: string;
@@ -17,7 +18,7 @@ interface NavGroup {
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, ToastHost],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
 })

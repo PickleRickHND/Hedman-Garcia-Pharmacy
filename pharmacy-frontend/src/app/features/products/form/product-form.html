@@ -1,0 +1,108 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">
+      <a routerLink="/products" class="back-link">Productos</a> / {{ isEdit() ? 'Editar' : 'Nuevo' }}
+    </p>
+    <h1>{{ isEdit() ? 'Editar producto' : 'Nuevo producto' }}</h1>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="card state">Cargando…</div>
+} @else {
+  <form class="card form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (error()) {
+      <div class="alert" role="alert">{{ error() }}</div>
+    }
+
+    <div class="grid">
+      <div class="field">
+        <label class="label" for="sku">SKU</label>
+        <input id="sku" class="input mono" formControlName="sku" placeholder="SKU100"
+          [class.is-invalid]="form.controls.sku.touched && form.controls.sku.invalid" />
+        @if (form.controls.sku.touched && form.controls.sku.invalid) {
+          <span class="field-error">SKU requerido (máx. 30 caracteres).</span>
+        }
+      </div>
+
+      <div class="field field--wide">
+        <label class="label" for="name">Nombre</label>
+        <input id="name" class="input" formControlName="name" placeholder="Acetaminofén 500mg"
+          [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="field-error">El nombre es requerido (mín. 2 caracteres).</span>
+        }
+      </div>
+
+      <div class="field field--full">
+        <label class="label" for="description">Descripción</label>
+        <textarea id="description" class="input textarea" formControlName="description" rows="2"
+          placeholder="Analgésico y antipirético…"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label" for="stock">Stock</label>
+        <input id="stock" class="input num" type="number" min="0" formControlName="stock"
+          [class.is-invalid]="form.controls.stock.touched && form.controls.stock.invalid" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="price">Precio (L)</label>
+        <input id="price" class="input num" type="number" min="0" step="0.01" formControlName="price"
+          [class.is-invalid]="form.controls.price.touched && form.controls.price.invalid" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="expiration_date">Vencimiento</label>
+        <input id="expiration_date" class="input" type="date" formControlName="expiration_date" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="category_id">Categoría</label>
+        <select id="category_id" class="input" formControlName="category_id">
+          <option [ngValue]="null">Sin categoría</option>
+          @for (cat of categories(); track cat.id) {
+            <option [ngValue]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="label" for="supplier_id">Proveedor</label>
+        <select id="supplier_id" class="input" formControlName="supplier_id">
+          <option [ngValue]="null">Sin proveedor</option>
+          @for (sup of suppliers(); track sup.id) {
+            <option [ngValue]="sup.id">{{ sup.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="label" for="presentation">Presentación</label>
+        <input id="presentation" class="input" formControlName="presentation" placeholder="Tableta 500mg" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="administration_form">Vía de administración</label>
+        <input id="administration_form" class="input" formControlName="administration_form" placeholder="Oral" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="storage">Almacenamiento</label>
+        <input id="storage" class="input" formControlName="storage" placeholder="Temperatura ambiente" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="packaging">Empaque</label>
+        <input id="packaging" class="input" formControlName="packaging" placeholder="Caja 24 und" />
+      </div>
+    </div>
+
+    <div class="form__actions">
+      <a class="btn btn-ghost" routerLink="/products">Cancelar</a>
+      <button class="btn btn-primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Guardando…' : isEdit() ? 'Guardar cambios' : 'Crear producto' }}
+      </button>
+    </div>
+  </form>
+}
