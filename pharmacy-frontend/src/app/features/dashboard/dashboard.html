@@ -1,0 +1,50 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">{{ greeting() }}, {{ user()?.name }}</p>
+    <h1>Panel general</h1>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="grid">
+    @for (s of [1, 2, 3, 4, 5, 6]; track s) {
+      <div class="metric skeleton"></div>
+    }
+  </div>
+} @else if (error()) {
+  <div class="state">
+    <p>{{ error() }}</p>
+    <button class="btn btn-ghost" (click)="load()">Reintentar</button>
+  </div>
+} @else {
+  <section class="grid">
+    @for (card of cards(); track card.label) {
+      <article class="metric card" [class]="card.tone ? 'tone-' + card.tone : ''">
+        <span class="metric__icon"><app-icon [name]="card.icon" /></span>
+        <span class="metric__value num">{{ card.value }}</span>
+        <span class="metric__label">{{ card.label }}</span>
+      </article>
+    }
+  </section>
+
+  <section class="alerts card">
+    <header class="alerts__head">
+      <h2>Alertas de inventario</h2>
+      <span class="badge badge-neutral">{{ data()?.alerts_count ?? 0 }}</span>
+    </header>
+
+    @if (data()?.alerts?.length) {
+      <ul class="alerts__list">
+        @for (alert of data()!.alerts; track alert.type) {
+          <li class="alerts__item">
+            <span class="alerts__dot" [class]="'dot-' + alert.variant"></span>
+            <span class="alerts__text">{{ alert.label }}</span>
+            <span class="badge badge-{{ alert.variant }} num">{{ alert.count }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="alerts__empty">Todo en orden. No hay alertas de inventario.</p>
+    }
+  </section>
+}
