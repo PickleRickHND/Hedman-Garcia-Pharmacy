@@ -39,11 +39,62 @@ export const routes: Routes = [
         loadComponent: () => import('./features/products/form/product-form').then((m) => m.ProductForm),
       },
 
+      // Clientes (conectado a la API).
+      {
+        path: 'customers',
+        loadComponent: () => import('./features/customers/list/customer-list').then((m) => m.CustomerList),
+      },
+      {
+        path: 'customers/new',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () => import('./features/customers/form/customer-form').then((m) => m.CustomerForm),
+      },
+      {
+        path: 'customers/:id/edit',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () => import('./features/customers/form/customer-form').then((m) => m.CustomerForm),
+      },
+
+      // Proveedores (conectado a la API).
+      {
+        path: 'suppliers',
+        loadComponent: () => import('./features/suppliers/list/supplier-list').then((m) => m.SupplierList),
+      },
+      {
+        path: 'suppliers/new',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/suppliers/form/supplier-form').then((m) => m.SupplierForm),
+      },
+      {
+        path: 'suppliers/:id/edit',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/suppliers/form/supplier-form').then((m) => m.SupplierForm),
+      },
+
+      // Categorías (conectado a la API).
+      {
+        path: 'categories',
+        loadComponent: () => import('./features/categories/list/category-list').then((m) => m.CategoryList),
+      },
+      {
+        path: 'categories/new',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/categories/form/category-form').then((m) => m.CategoryForm),
+      },
+      {
+        path: 'categories/:id/edit',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/categories/form/category-form').then((m) => m.CategoryForm),
+      },
+
       // Módulos pendientes (placeholder hasta conectar su UI a la API).
-      cs('categories', 'Categorías', 'categories', ADMIN),
-      cs('suppliers', 'Proveedores', 'suppliers', ADMIN),
       cs('stock-movements', 'Inventario', 'inventory', STAFF),
-      cs('customers', 'Clientes', 'customers'),
       cs('users', 'Usuarios', 'users', ADMIN),
       cs('invoices', 'Facturación', 'billing', STAFF),
       cs('cash-registers', 'Caja', 'cash', STAFF),

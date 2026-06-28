@@ -1,0 +1,52 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">
+      <a routerLink="/categories" class="back-link">Categorías</a> / {{ isEdit() ? 'Editar' : 'Nueva' }}
+    </p>
+    <h1>{{ isEdit() ? 'Editar categoría' : 'Nueva categoría' }}</h1>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="card state">Cargando…</div>
+} @else {
+  <form class="card form-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (error()) {
+      <div class="form-alert" role="alert">{{ error() }}</div>
+    }
+
+    <div class="form-grid">
+      <div class="field field--full">
+        <label class="label" for="name">Nombre</label>
+        <input id="name" class="input" formControlName="name" placeholder="Analgésicos"
+          [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="field-error">El nombre es requerido (2 a 50 caracteres).</span>
+        }
+      </div>
+
+      <div class="field field--full">
+        <label class="label" for="description">Descripción</label>
+        <textarea id="description" class="input textarea" formControlName="description" rows="2"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label" for="color">Color</label>
+        <div class="color-row">
+          <input id="color" type="color" formControlName="color" aria-label="Elegir color" />
+          <input class="input mono" formControlName="color" placeholder="#12a594" />
+        </div>
+        @if (form.controls.color.touched && form.controls.color.invalid) {
+          <span class="field-error">Color hexadecimal inválido (ej. #12a594).</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn-ghost" routerLink="/categories">Cancelar</a>
+      <button class="btn btn-primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Guardando…' : isEdit() ? 'Guardar cambios' : 'Crear categoría' }}
+      </button>
+    </div>
+  </form>
+}
