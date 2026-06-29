@@ -10,6 +10,8 @@ export interface ProductQuery {
   search?: string;
   category_id?: number | null;
   low_stock?: boolean;
+  expiring_soon?: boolean;
+  expired?: boolean;
   page?: number;
   per_page?: number;
 }
@@ -24,6 +26,8 @@ export class ProductService {
     if (query.search) params = params.set('search', query.search);
     if (query.category_id) params = params.set('category_id', query.category_id);
     if (query.low_stock) params = params.set('low_stock', '1');
+    if (query.expiring_soon) params = params.set('expiring_soon', '1');
+    if (query.expired) params = params.set('expired', '1');
     params = params.set('page', query.page ?? 1).set('per_page', query.per_page ?? 12);
     return this.http.get<Paginated<Product>>(`${this.base}/products`, { params });
   }

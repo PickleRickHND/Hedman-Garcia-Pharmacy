@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\NotificationsController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReportController;
@@ -118,6 +119,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Dashboard — métricas + alertas (cualquier usuario autenticado)
     // ------------------------------------------------------------------
     Route::get('dashboard', DashboardController::class)->name('api.dashboard');
+
+    // Notificaciones — alertas operativas en tiempo real (cualquier usuario autenticado)
+    Route::get('notifications', NotificationsController::class)->name('api.notifications');
 
     // ------------------------------------------------------------------
     // Reportes — solo Administrador

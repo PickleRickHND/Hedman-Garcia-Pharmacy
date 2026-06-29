@@ -1,8 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ThemeService } from '../../core/theme/theme.service';
 import { Icon } from '../../shared/icon/icon';
+import { NotificationsBell } from '../../shared/notifications/notifications-bell';
 import { ToastHost } from '../../shared/toast/toast-host';
 
 interface NavItem {
@@ -18,7 +20,7 @@ interface NavGroup {
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, ToastHost],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, ReactiveFormsModule, Icon, ToastHost, NotificationsBell],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
 })
@@ -30,6 +32,7 @@ export class Shell {
   readonly user = this.auth.user;
   readonly collapsed = signal(false);
   readonly mobileOpen = signal(false);
+  readonly globalSearch = new FormControl('', { nonNullable: true });
 
   private readonly groups: NavGroup[] = [
     {
@@ -73,6 +76,14 @@ export class Shell {
       .map((g) => ({ ...g, items: g.items.filter(canSee) }))
       .filter((g) => g.items.length > 0);
   });
+
+  /** Búsqueda global: navega al catálogo filtrado por el término. */
+  submitGlobalSearch(): void {
+    const term = this.globalSearch.value.trim();
+    if (term === '') return;
+    this.router.navigate(['/products'], { queryParams: { search: term } });
+    this.globalSearch.reset();
+  }
 
   toggleSidebar(): void {
     this.collapsed.update((v) => !v);
