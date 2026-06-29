@@ -49,6 +49,8 @@
   --radius-sm: 8px;
   --radius: 12px;
   --radius-lg: 18px;
+  /* Altura única de todos los controles de formulario/filtro (inputs, selects, date/color pickers, botones). */
+  --control-h: 44px;
   --shadow-sm: 0 1px 2px rgba(15, 23, 41, 0.06);
   --shadow: 0 4px 16px rgba(15, 23, 41, 0.08);
   --shadow-lg: 0 18px 48px rgba(15, 23, 41, 0.14);
@@ -127,7 +129,7 @@ button { font-family: inherit; cursor: pointer; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 42px;
+  height: var(--control-h);
   padding: 0 18px;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
@@ -164,7 +166,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .label-hint { font-weight: 400; color: var(--muted); }
 .input {
-  height: 44px;
+  height: var(--control-h);
   padding: 0 14px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -253,7 +255,9 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: center;
+  /* Alinea las cajas por su base: los controles con label encima (date-pickers
+     "Desde/Hasta") quedan alineados con los que no lo tienen (búsqueda, selects). */
+  align-items: flex-end;
   padding: 12px;
   margin-bottom: 16px;
 }
@@ -263,7 +267,7 @@ button { font-family: inherit; cursor: pointer; }
   gap: 8px;
   flex: 1;
   min-width: 240px;
-  height: 42px;
+  height: var(--control-h);
   padding: 0 12px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -281,7 +285,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .filter-select { width: auto; min-width: 190px; cursor: pointer; }
 .chip {
-  height: 42px;
+  height: var(--control-h);
   padding: 0 16px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -295,7 +299,7 @@ button { font-family: inherit; cursor: pointer; }
 /* Filtro de fecha (label + input apilados) */
 .date-field { display: inline-flex; flex-direction: column; gap: 3px; }
 .date-field__label { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
-.date-field .input { height: 42px; }
+.date-field .input { height: var(--control-h); }
 
 .table-card { padding: 6px 6px 12px; }
 .table-scroll { overflow-x: auto; }
