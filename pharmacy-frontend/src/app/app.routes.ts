@@ -142,9 +142,28 @@ export const routes: Routes = [
         loadComponent: () => import('./features/returns/detail/return-detail').then((m) => m.ReturnDetail),
       },
 
+      // Usuarios (conectado a la API). Toda la sección: solo Administrador.
+      {
+        path: 'users',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/users/list/user-list').then((m) => m.UserList),
+      },
+      {
+        path: 'users/new',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/users/form/user-form').then((m) => m.UserForm),
+      },
+      {
+        path: 'users/:id/edit',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/users/form/user-form').then((m) => m.UserForm),
+      },
+
       // Módulos pendientes (placeholder hasta conectar su UI a la API).
       cs('stock-movements', 'Inventario', 'inventory', STAFF),
-      cs('users', 'Usuarios', 'users', ADMIN),
       cs('reports', 'Reportes', 'reports', ADMIN),
     ],
   },

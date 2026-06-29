@@ -162,6 +162,7 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--ink-soft);
   font-family: var(--font-display);
 }
+.label-hint { font-weight: 400; color: var(--muted); }
 .input {
   height: 44px;
   padding: 0 14px;
