@@ -1,0 +1,155 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Análisis</p>
+    <h1>Reportes</h1>
+  </div>
+</header>
+
+<div class="tabs" role="tablist">
+  <button type="button" class="tab" [class.tab--on]="tab() === 'sales'" (click)="setTab('sales')" role="tab">
+    Ventas
+  </button>
+  <button type="button" class="tab" [class.tab--on]="tab() === 'products'" (click)="setTab('products')" role="tab">
+    Top productos
+  </button>
+  <button type="button" class="tab" [class.tab--on]="tab() === 'inventory'" (click)="setTab('inventory')" role="tab">
+    Inventario
+  </button>
+</div>
+
+<!-- ===== Ventas ===== -->
+@if (tab() === 'sales') {
+  <form class="toolbar card" [formGroup]="salesRange">
+    <label class="date-field">
+      <span class="date-field__label">Desde</span>
+      <input type="date" class="input" formControlName="from" />
+    </label>
+    <label class="date-field">
+      <span class="date-field__label">Hasta</span>
+      <input type="date" class="input" formControlName="to" />
+    </label>
+  </form>
+
+  @if (salesLoading()) {
+    <div class="card state">Cargando ventas…</div>
+  } @else if (sales(); as s) {
+    <div class="stat-grid">
+      <div class="stat card"><span class="stat__label">Facturas emitidas</span><span class="stat__value">{{ s.total_invoices }}</span></div>
+      <div class="stat card"><span class="stat__label">Ingresos</span><span class="stat__value">{{ money(s.total_revenue) }}</span></div>
+      <div class="stat card"><span class="stat__label">ISV recaudado</span><span class="stat__value">{{ money(s.total_tax) }}</span></div>
+      <div class="stat card"><span class="stat__label">Descuentos</span><span class="stat__value">{{ money(s.total_discount) }}</span></div>
+      <div class="stat card"><span class="stat__label">Promedio diario</span><span class="stat__value">{{ money(s.daily_average) }}</span></div>
+    </div>
+
+    <div class="card panel">
+      <h2 class="panel__title">Ingresos por método de pago</h2>
+      <app-bar-chart [data]="salesChart()" />
+    </div>
+  }
+}
+
+<!-- ===== Top productos ===== -->
+@if (tab() === 'products') {
+  <form class="toolbar card" [formGroup]="productsForm">
+    <label class="date-field">
+      <span class="date-field__label">Desde</span>
+      <input type="date" class="input" formControlName="from" />
+    </label>
+    <label class="date-field">
+      <span class="date-field__label">Hasta</span>
+      <input type="date" class="input" formControlName="to" />
+    </label>
+    <select class="input filter-select" formControlName="sort_by" aria-label="Ordenar por">
+      <option value="quantity">Por cantidad</option>
+      <option value="revenue">Por ingresos</option>
+    </select>
+    <select class="input filter-select" formControlName="limit" aria-label="Cantidad de productos">
+      <option [ngValue]="10">Top 10</option>
+      <option [ngValue]="20">Top 20</option>
+      <option [ngValue]="50">Top 50</option>
+    </select>
+  </form>
+
+  @if (topLoading()) {
+    <div class="card state">Cargando productos…</div>
+  } @else if (top().length === 0) {
+    <div class="card empty"><p>No hubo ventas en el período seleccionado.</p></div>
+  } @else {
+    <div class="card panel">
+      <h2 class="panel__title">{{ productsForm.controls.sort_by.value === 'revenue' ? 'Ingresos por producto' : 'Unidades vendidas por producto' }}</h2>
+      <app-bar-chart [data]="topChart()" />
+    </div>
+
+    <div class="card table-card">
+      <div class="table-scroll">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="ta-right">#</th>
+              <th>Producto</th>
+              <th>SKU</th>
+              <th class="ta-right">Cantidad</th>
+              <th class="ta-right">Ingresos</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of top(); track p.product_id; let i = $index) {
+              <tr>
+                <td class="ta-right num">{{ i + 1 }}</td>
+                <td class="strong">{{ p.product_name }}</td>
+                <td class="mono">{{ p.product_sku }}</td>
+                <td class="ta-right num">{{ p.total_quantity }}</td>
+                <td class="ta-right num">{{ money(p.total_revenue) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+}
+
+<!-- ===== Inventario ===== -->
+@if (tab() === 'inventory') {
+  @if (inventoryLoading()) {
+    <div class="card state">Cargando inventario…</div>
+  } @else if (inventory(); as inv) {
+    <div class="stat-grid">
+      <div class="stat card"><span class="stat__label">Productos</span><span class="stat__value">{{ inv.total_products }}</span></div>
+      <div class="stat card"><span class="stat__label">Unidades en stock</span><span class="stat__value">{{ inv.total_units }}</span></div>
+      <div class="stat card"><span class="stat__label">Valor del inventario</span><span class="stat__value">{{ money(inv.total_value) }}</span></div>
+    </div>
+
+    <div class="card panel">
+      <h2 class="panel__title">Alertas de inventario</h2>
+      <app-bar-chart [data]="inventoryChart()" />
+    </div>
+
+    <div class="card table-card">
+      <div class="table-scroll">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>SKU</th>
+              <th>Categoría</th>
+              <th class="ta-right">Stock</th>
+              <th class="ta-right">Precio</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of inv.products; track p.id) {
+              <tr>
+                <td class="strong">{{ p.name }}</td>
+                <td class="mono">{{ p.sku }}</td>
+                <td>{{ p.category?.name ?? '—' }}</td>
+                <td class="ta-right num">{{ p.stock }}</td>
+                <td class="ta-right num">{{ money(p.price) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+}

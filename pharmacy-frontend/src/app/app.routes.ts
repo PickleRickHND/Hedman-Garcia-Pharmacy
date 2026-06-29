@@ -162,9 +162,22 @@ export const routes: Routes = [
         loadComponent: () => import('./features/users/form/user-form').then((m) => m.UserForm),
       },
 
-      // Módulos pendientes (placeholder hasta conectar su UI a la API).
-      cs('stock-movements', 'Inventario', 'inventory', STAFF),
-      cs('reports', 'Reportes', 'reports', ADMIN),
+      // Inventario / Kardex (conectado a la API). Solo lectura. Admin o Cajero.
+      {
+        path: 'stock-movements',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () =>
+          import('./features/inventory/list/stock-movement-list').then((m) => m.StockMovementList),
+      },
+
+      // Reportes (conectado a la API). Solo Administrador.
+      {
+        path: 'reports',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/reports/reports').then((m) => m.Reports),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

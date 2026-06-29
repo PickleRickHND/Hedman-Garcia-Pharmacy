@@ -37,7 +37,7 @@ class ReportController extends Controller
         $top = $reports->topProducts(
             $from,
             $to,
-            $validated['limit'] ?? 10,
+            (int) ($validated['limit'] ?? 10),
             $validated['sort_by'] ?? 'quantity',
         );
 
