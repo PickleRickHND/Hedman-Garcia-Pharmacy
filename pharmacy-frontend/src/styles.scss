@@ -227,6 +227,7 @@ button { font-family: inherit; cursor: pointer; }
 .table tbody tr:hover { background: var(--surface-2); }
 .table td.strong { font-weight: 600; color: var(--ink); }
 .ta-right { text-align: right; }
+.table tbody tr.clickable { cursor: pointer; }
 
 /* ---------- Patrón de páginas de listado / formulario (reutilizable) ---------- */
 .page-head {

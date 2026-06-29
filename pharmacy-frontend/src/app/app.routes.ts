@@ -93,10 +93,29 @@ export const routes: Routes = [
         loadComponent: () => import('./features/categories/form/category-form').then((m) => m.CategoryForm),
       },
 
+      // Facturación / POS (conectado a la API). Toda la sección: Admin o Cajero.
+      {
+        path: 'invoices',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () => import('./features/billing/list/invoice-list').then((m) => m.InvoiceList),
+      },
+      {
+        path: 'invoices/new',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () => import('./features/billing/pos/pos').then((m) => m.Pos),
+      },
+      {
+        path: 'invoices/:id',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () => import('./features/billing/detail/invoice-detail').then((m) => m.InvoiceDetail),
+      },
+
       // Módulos pendientes (placeholder hasta conectar su UI a la API).
       cs('stock-movements', 'Inventario', 'inventory', STAFF),
       cs('users', 'Usuarios', 'users', ADMIN),
-      cs('invoices', 'Facturación', 'billing', STAFF),
       cs('cash-registers', 'Caja', 'cash', STAFF),
       cs('returns', 'Devoluciones', 'returns', STAFF),
       cs('reports', 'Reportes', 'reports', ADMIN),

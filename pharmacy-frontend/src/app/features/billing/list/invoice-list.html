@@ -1,0 +1,80 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Operación</p>
+    <h1>Facturación</h1>
+  </div>
+  <a class="btn btn-primary" routerLink="/invoices/new">
+    <app-icon name="billing" /> Nueva venta
+  </a>
+</header>
+
+<div class="toolbar card">
+  <div class="search-field">
+    <app-icon name="search" />
+    <input
+      type="search"
+      class="search-field__input"
+      placeholder="Buscar por número, cliente o RTN…"
+      [formControl]="search"
+      aria-label="Buscar facturas"
+    />
+  </div>
+
+  <select class="input filter-select" (change)="onDateFilter($any($event.target).value)" aria-label="Filtrar por fecha">
+    <option value="">Todas las fechas</option>
+    <option value="today">Hoy</option>
+    <option value="week">Esta semana</option>
+    <option value="month">Este mes</option>
+  </select>
+
+  <select class="input filter-select" (change)="onStatusFilter($any($event.target).value)" aria-label="Filtrar por estado">
+    <option value="">Todos los estados</option>
+    <option value="emitted">Emitidas</option>
+    <option value="voided">Anuladas</option>
+  </select>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="loading">Cargando facturas…</div>
+  } @else if (invoices().length === 0) {
+    <div class="empty">
+      <span class="empty__icon"><app-icon name="billing" /></span>
+      <p>No hay facturas con esos filtros.</p>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Factura</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Método</th>
+            <th class="ta-right">Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (inv of invoices(); track inv.id) {
+            <tr class="clickable" (click)="open(inv)">
+              <td class="mono strong">{{ inv.invoice_number }}</td>
+              <td>{{ inv.customer_name }}</td>
+              <td>{{ formatDate(inv.issued_at) }}</td>
+              <td>{{ inv.payment_method?.name ?? '—' }}</td>
+              <td class="ta-right num">{{ money(inv.total) }}</td>
+              <td>
+                @if (inv.is_voided) {
+                  <span class="badge badge-danger">Anulada</span>
+                } @else {
+                  <span class="badge badge-success">Emitida</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [currentPage]="currentPage()" [lastPage]="lastPage()" (pageChange)="goToPage($event)" />
+  }
+</div>

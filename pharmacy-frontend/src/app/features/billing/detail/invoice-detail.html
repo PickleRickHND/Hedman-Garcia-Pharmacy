@@ -1,0 +1,114 @@
+@if (loading()) {
+  <div class="card state">Cargando factura…</div>
+} @else if (invoice(); as inv) {
+  <header class="page-head">
+    <div>
+      <p class="page-head__eyebrow">
+        <a routerLink="/invoices" class="back-link">Facturación</a> / {{ inv.invoice_number }}
+      </p>
+      <h1 class="title-row">
+        Factura {{ inv.invoice_number }}
+        @if (inv.is_voided) {
+          <span class="badge badge-danger">Anulada</span>
+        } @else {
+          <span class="badge badge-success">Emitida</span>
+        }
+      </h1>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" (click)="downloadPdf()" [disabled]="downloading()">
+        {{ downloading() ? 'Generando…' : 'Descargar PDF' }}
+      </button>
+      @if (canVoid()) {
+        <button type="button" class="btn btn-danger-outline" (click)="showVoidModal.set(true)">Anular</button>
+      }
+    </div>
+  </header>
+
+  <div class="meta-grid">
+    <div class="card meta">
+      <span class="meta__label">Cliente</span>
+      <span class="meta__value">{{ inv.customer_name }}</span>
+      @if (inv.customer_rtn) { <span class="meta__sub mono">RTN: {{ inv.customer_rtn }}</span> }
+    </div>
+    <div class="card meta">
+      <span class="meta__label">Fecha de emisión</span>
+      <span class="meta__value">{{ formatDate(inv.issued_at) }}</span>
+    </div>
+    <div class="card meta">
+      <span class="meta__label">Vendedor</span>
+      <span class="meta__value">{{ inv.seller?.name ?? '—' }}</span>
+    </div>
+    <div class="card meta">
+      <span class="meta__label">Método de pago</span>
+      <span class="meta__value">{{ inv.payment_method?.name ?? '—' }}</span>
+    </div>
+  </div>
+
+  @if (inv.is_voided && inv.void_reason) {
+    <div class="void-note">
+      <strong>Motivo de anulación:</strong> {{ inv.void_reason }} · {{ formatDate(inv.voided_at) }}
+    </div>
+  }
+
+  <div class="card table-card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th class="ta-right">Cantidad</th>
+          <th class="ta-right">Precio</th>
+          <th class="ta-right">Desc.</th>
+          <th class="ta-right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of inv.items; track item.id) {
+          <tr>
+            <td>
+              <span class="strong">{{ item.product_name }}</span>
+              <span class="cart__sku mono">{{ item.product_sku }}</span>
+            </td>
+            <td class="ta-right num">{{ item.quantity }}</td>
+            <td class="ta-right num">{{ money(item.unit_price) }}</td>
+            <td class="ta-right num">{{ money(item.discount_amount) }}</td>
+            <td class="ta-right num">{{ money(item.subtotal) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <dl class="totals">
+      <div><dt>Subtotal</dt><dd class="num">{{ money(inv.subtotal) }}</dd></div>
+      <div><dt>Descuento</dt><dd class="num">{{ money(inv.discount_total) }}</dd></div>
+      <div><dt>ISV (15%)</dt><dd class="num">{{ money(inv.tax) }}</dd></div>
+      <div class="totals__grand"><dt>Total</dt><dd class="num">{{ money(inv.total) }}</dd></div>
+    </dl>
+  </div>
+
+  @if (showVoidModal()) {
+    <div class="overlay" (click)="showVoidModal.set(false)">
+      <div class="dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <h3>Anular factura {{ inv.invoice_number }}</h3>
+        <p class="muted">Se revertirá el stock de los productos. Indica el motivo:</p>
+        <textarea
+          class="input textarea"
+          rows="3"
+          [formControl]="voidReason"
+          placeholder="Motivo de la anulación…"
+        ></textarea>
+        @if (voidReason.touched && voidReason.invalid) {
+          <span class="field-error">El motivo es requerido (mínimo 3 caracteres).</span>
+        }
+        <div class="dialog__actions">
+          <button type="button" class="btn btn-ghost" (click)="showVoidModal.set(false)">Cancelar</button>
+          <button type="button" class="btn btn-danger" (click)="confirmVoid()" [disabled]="voiding()">
+            {{ voiding() ? 'Anulando…' : 'Anular factura' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+} @else {
+  <div class="card state">No se encontró la factura.</div>
+}
