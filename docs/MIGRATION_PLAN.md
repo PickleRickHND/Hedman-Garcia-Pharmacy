@@ -62,9 +62,11 @@ cubre la funcionalidad del Livewire.
 1. **Pulido final:** estados de carga/skeleton consistentes, responsive del POS y
    tablas en móvil, selección de cliente existente en el POS (hoy es texto libre),
    `fileReplacements` en `angular.json` para un `environment.prod` real.
-2. **Tests:** unit Karma/Jasmine de servicios + `BarChart` y tests de API (Pest) ya
-   versionados; E2E Playwright versionado para login (`pharmacy-frontend/e2e/`, config
-   `e2e` → :8001). Pendiente: ampliar E2E a los flujos críticos (POS, caja, devoluciones).
+2. **Tests:** unit Karma/Jasmine de servicios + `BarChart`, tests de API (Pest) y E2E
+   Playwright versionado (`pharmacy-frontend/e2e/`, config `e2e` → :8001) cubriendo
+   login + flujos críticos (Caja, POS con PDF y anulación, Devoluciones), con datos
+   aislados (`E2E-*`) y teardown completo. Pendiente: cobertura E2E de descuentos por
+   línea y casos negativos.
 3. Eventual **retiro del Livewire** una vez el frontend cubra todo.
 
 ## 4. Cómo levantar el entorno (para probar)
