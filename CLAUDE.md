@@ -15,7 +15,9 @@ La migración en curso: de **Laravel + Livewire** a **Laravel API (headless) + A
 ## Stack
 
 - **Backend:** PHP 8.2+, Laravel 11.31, Sanctum 4 (token Bearer), spatie/laravel-permission 6, dompdf 3, MySQL. Lógica de negocio en `app/Services/` (BillingService, InventoryService, CashRegisterService, ReturnService, ReportService, NotificationService).
-- **Frontend:** Angular 20 standalone + SCSS, routing lazy con guards. Sin librería de componentes (UI propia con tokens en `src/styles.scss`).
+- **Frontend:** Angular 20 standalone + SCSS, routing lazy con guards. Sin librería de componentes (UI propia con tokens en `src/styles.scss`). Gráficos con `BarChart` propio (CSS, sin libs).
+- **Testing:** Pest (backend, incluye tests de la API en `tests/Feature/Api/`), Karma + Jasmine (unit frontend, `HttpTestingController`), Playwright **versionado** (`pharmacy-frontend/e2e/`, configuración `e2e` → :8001) cubriendo login + flujos críticos.
+- **Marca:** monograma **HG** (teal `#12a594 → #0b6557`). Assets en `pharmacy-frontend/public/` (`logo.png`, `favicon.ico`, `apple-touch-icon.png`); login y sidebar usan el logo.
 
 ## Comandos
 
@@ -29,15 +31,17 @@ php artisan tinker --execute="…"  # consultas rápidas
 
 **Frontend** (`cd pharmacy-frontend`):
 ```bash
-NG_CLI_ANALYTICS=false npx ng build --configuration development   # verificar compilación
-NG_CLI_ANALYTICS=false npx ng serve --port 4200                   # dev server
+NG_CLI_ANALYTICS=false npx ng build --configuration development          # verificar compilación
+NG_CLI_ANALYTICS=false npx ng serve --configuration e2e --port 4200      # dev server apuntando a :8001 (no toca environment.ts)
+CHROME_BIN="…/Google Chrome" npx ng test --watch=false --browsers=ChromeHeadless  # unit (Karma)
+npm run e2e                                                              # E2E Playwright (levanta backend :8001 + Angular)
 ```
 `ng` no está global; usar `npx`. Angular 22 requiere Node ≥22.22; la máquina tiene Node 22.20 → el proyecto está fijado en **Angular 20**.
 
 ## Entorno local (importante)
 
 - **MySQL:** `127.0.0.1`, usuario `root`, pass `DaHg10@2000`. DB del backend nuevo: **`pharmacy`** (la legacy es `FarmaciaHG`).
-- **Puerto 8000 ocupado por petlab** (`/Development/petlabhn`). Para correr/probar la farmacia: backend en **8001** y apuntar `pharmacy-frontend/src/environments/environment.ts` a `http://localhost:8001/api` temporalmente; **revertir a 8000 antes de commitear** (8000 es el default del proyecto). Nunca matar el server de petlab.
+- **Puerto 8000 ocupado por petlab** (`/Development/petlabhn`). Para correr/probar la farmacia: backend en **8001**. Forma limpia (recomendada): `ng serve --configuration e2e` apunta la API a :8001 vía `fileReplacements` (`environment.e2e.ts`) **sin tocar** `environment.ts`. Alternativa manual: editar `environment.ts` a `http://localhost:8001/api` temporalmente y **revertir a 8000 antes de commitear**. Nunca matar el server de petlab.
 - **CORS:** el backend permite el origen del frontend vía `FRONTEND_URL` (`.env`, default `http://localhost:4200`).
 - **Usuarios:** `admin@pharmacy.hn` (rol Administrador). Roles: **Administrador**, **Cajero**. Para pruebas E2E se crea un usuario demo temporal y se borra al final.
 
@@ -55,8 +59,8 @@ Cada módulo de negocio sigue: `core/models/<x>.model.ts` + `features/<x>/<x>.se
 
 ## Verificación
 
-- **Backend:** `php -l` + `php artisan route:list` + smoke test con `curl`/`tinker` sin tocar datos reales (crear y borrar registros de prueba).
-- **Frontend:** `ng build` (sin warnings) + smoke test E2E con Playwright MCP. En headless, el click sobre `button[type=submit]` no siempre propaga el evento; usar `form.requestSubmit()` o `window.ng.getComponent(host)` para conducir el componente. Limpiar siempre datos/usuarios/tokens de prueba y borrar artefactos `.playwright-mcp` (ya en `.gitignore`).
+- **Backend:** `php -l` + `php artisan route:list` + `php artisan test` (192 tests; los de la API viven en `tests/Feature/Api/`). Smoke con `curl`/`tinker` sin tocar datos reales (crear y borrar registros de prueba).
+- **Frontend:** `ng build` (sin warnings) + `ng test` (Karma headless). E2E: harness **versionado** `npm run e2e` (Playwright; `global-setup`/`teardown` crean y borran usuario demo + productos `E2E-*`). En headless el click sobre `button[type=submit]` no siempre propaga; usar `form.requestSubmit()` o `window.ng.getComponent(host)`. Para smoke ad-hoc con Playwright MCP, limpiar datos/tokens de prueba y borrar artefactos `.playwright-mcp` (ya en `.gitignore`).
 
 ## Git
 
