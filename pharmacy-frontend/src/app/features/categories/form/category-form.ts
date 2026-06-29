@@ -2,25 +2,14 @@ import { Component, computed, inject, input, OnInit, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CategoryPayload } from '../../../core/models/catalog.model';
+import { ColorPickerComponent } from '../../../shared/color-picker/color-picker';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { CategoryService } from '../category.service';
 
 @Component({
   selector: 'app-category-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, ColorPickerComponent],
   templateUrl: './category-form.html',
-  styles: `
-    .color-row { display: flex; align-items: center; gap: 12px; }
-    .color-row input[type='color'] {
-      width: 52px;
-      height: 44px;
-      padding: 4px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      cursor: pointer;
-    }
-  `,
 })
 export class CategoryForm implements OnInit {
   private readonly fb = inject(FormBuilder);

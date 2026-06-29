@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Category } from '../../../core/models/catalog.model';
@@ -22,12 +22,15 @@ export class ProductList implements OnInit {
   private readonly service = inject(ProductService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly canManage = this.auth.hasRole('Administrador');
 
   readonly search = new FormControl('', { nonNullable: true });
   readonly categoryId = signal<number | null>(null);
   readonly lowStock = signal(false);
+  readonly expiringSoon = signal(false);
+  readonly expired = signal(false);
   readonly page = signal(1);
 
   readonly products = signal<Product[]>([]);
@@ -45,6 +48,15 @@ export class ProductList implements OnInit {
 
   ngOnInit(): void {
     this.service.categories().subscribe((res) => this.categories.set(res.data));
+
+    // Deep-linking: aplica filtros desde la URL (ej. desde la campana o el buscador global).
+    const qp = this.route.snapshot.queryParamMap;
+    const search = qp.get('search');
+    if (search) this.search.setValue(search, { emitEvent: false });
+    this.lowStock.set(qp.get('low_stock') === '1');
+    this.expiringSoon.set(qp.get('expiring_soon') === '1');
+    this.expired.set(qp.get('expired') === '1');
+
     this.search.valueChanges
       .pipe(debounceTime(350), distinctUntilChanged())
       .subscribe(() => this.resetAndLoad());
@@ -58,6 +70,8 @@ export class ProductList implements OnInit {
         search: this.search.value,
         category_id: this.categoryId(),
         low_stock: this.lowStock(),
+        expiring_soon: this.expiringSoon(),
+        expired: this.expired(),
         page: this.page(),
       })
       .subscribe({

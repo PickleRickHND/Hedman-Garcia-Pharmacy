@@ -29,6 +29,7 @@ class ProductController extends Controller
             ->byCategory($request->integer('category_id') ?: null)
             ->when($request->boolean('low_stock'), fn ($q) => $q->lowStock())
             ->when($request->boolean('expiring_soon'), fn ($q) => $q->expiringSoon())
+            ->when($request->boolean('expired'), fn ($q) => $q->expired())
             ->orderBy('name')
             ->paginate($request->integer('per_page', 15));
 
