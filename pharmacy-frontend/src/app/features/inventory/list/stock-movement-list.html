@@ -1,0 +1,97 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Catálogo</p>
+    <h1>Inventario · Kardex</h1>
+  </div>
+</header>
+
+<form class="toolbar card" [formGroup]="filters">
+  <div class="search-field">
+    <app-icon name="search" />
+    <input
+      type="search"
+      class="search-field__input"
+      placeholder="Buscar producto…"
+      [formControl]="productSearch"
+      aria-label="Buscar producto para filtrar"
+    />
+  </div>
+
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por producto"
+    valueType="string"
+    placeholder="Todos los productos"
+    [searchable]="false"
+    [options]="productSelectOptions()"
+    formControlName="product_id"
+  />
+
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por tipo de movimiento"
+    valueType="string"
+    placeholder="Todos los tipos"
+    [options]="typeOptions"
+    formControlName="type"
+  />
+
+  <app-date-picker label="Desde" ariaLabel="Fecha desde" formControlName="date_from" [nullable]="true" />
+
+  <app-date-picker label="Hasta" ariaLabel="Fecha hasta" formControlName="date_to" [nullable]="true" />
+
+  <button type="button" class="btn btn-ghost" (click)="clearFilters()">Limpiar</button>
+</form>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="loading">Cargando kardex…</div>
+  } @else if (movements().length === 0) {
+    <div class="empty">
+      <span class="empty__icon"><app-icon name="inventory" /></span>
+      <p>No hay movimientos con esos filtros.</p>
+    </div>
+  } @else {
+    <div class="table-meta">{{ total() }} movimiento(s)</div>
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th class="ta-right">Cantidad</th>
+            <th class="ta-right">Stock</th>
+            <th>Motivo</th>
+            <th>Usuario</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of movements(); track m.id) {
+            <tr>
+              <td class="mono nowrap">{{ fmtDateTime(m.created_at) }}</td>
+              <td>
+                @if (m.product) {
+                  <span class="strong">{{ m.product.name }}</span>
+                  <span class="prod-sub mono">{{ m.product.sku }}</span>
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              <td><span class="badge badge-{{ badge(m.type) }}">{{ m.type_label }}</span></td>
+              <td class="ta-right num">
+                <span [class.pos]="delta(m) > 0" [class.neg]="delta(m) < 0">
+                  {{ delta(m) > 0 ? '+' : '' }}{{ delta(m) }}
+                </span>
+              </td>
+              <td class="ta-right num mono">{{ m.stock_before }} → {{ m.stock_after }}</td>
+              <td>{{ m.reason ?? '—' }}</td>
+              <td>{{ m.user?.name ?? '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [currentPage]="currentPage()" [lastPage]="lastPage()" (pageChange)="goToPage($event)" />
+  }
+</div>

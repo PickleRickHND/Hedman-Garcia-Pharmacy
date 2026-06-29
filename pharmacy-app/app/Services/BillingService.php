@@ -107,6 +107,7 @@ class BillingService
                     'product_id' => $p->id,
                     'product_sku' => $p->sku,
                     'product_name' => $p->name,
+                    'product_image_path' => $p->image_path,
                     'quantity' => $snap['quantity'],
                     'unit_price' => $snap['unit_price'],
                     'discount_percent' => $snap['discount_percent'],

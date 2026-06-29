@@ -1,0 +1,140 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">
+      <a routerLink="/products" class="back-link">Productos</a> / {{ isEdit() ? 'Editar' : 'Nuevo' }}
+    </p>
+    <h1>{{ isEdit() ? 'Editar producto' : 'Nuevo producto' }}</h1>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="card state">Cargando…</div>
+} @else {
+  <form class="card form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (error()) {
+      <div class="alert" role="alert">{{ error() }}</div>
+    }
+
+    <div class="grid">
+      <div class="field">
+        <label class="label" for="sku">SKU</label>
+        <input id="sku" class="input mono" formControlName="sku" placeholder="SKU100"
+          [class.is-invalid]="form.controls.sku.touched && form.controls.sku.invalid" />
+        @if (form.controls.sku.touched && form.controls.sku.invalid) {
+          <span class="field-error">SKU requerido (máx. 30 caracteres).</span>
+        }
+      </div>
+
+      <div class="field field--wide">
+        <label class="label" for="name">Nombre</label>
+        <input id="name" class="input" formControlName="name" placeholder="Acetaminofén 500mg"
+          [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="field-error">El nombre es requerido (mín. 2 caracteres).</span>
+        }
+      </div>
+
+      <div class="field field--full">
+        <label class="label" for="description">Descripción</label>
+        <textarea id="description" class="input textarea" formControlName="description" rows="2"
+          placeholder="Analgésico y antipirético…"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label" for="stock">Stock</label>
+        <input id="stock" class="input num" type="number" min="0" formControlName="stock"
+          [class.is-invalid]="form.controls.stock.touched && form.controls.stock.invalid" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="price">Precio (L)</label>
+        <input id="price" class="input num" type="number" min="0" step="0.01" formControlName="price"
+          [class.is-invalid]="form.controls.price.touched && form.controls.price.invalid" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="expiration_date">Vencimiento</label>
+        <app-date-picker
+          inputId="expiration_date"
+          ariaLabel="Vencimiento"
+          formControlName="expiration_date"
+          [nullable]="true"
+        />
+      </div>
+
+      <div class="field">
+        <label class="label" for="category_id">Categoría</label>
+        <app-select
+          inputId="category_id"
+          ariaLabel="Categoría"
+          valueType="number"
+          placeholder="Sin categoría"
+          [options]="categoryOptions()"
+          formControlName="category_id"
+        />
+      </div>
+
+      <div class="field">
+        <label class="label" for="supplier_id">Proveedor</label>
+        <app-select
+          inputId="supplier_id"
+          ariaLabel="Proveedor"
+          valueType="number"
+          placeholder="Sin proveedor"
+          [options]="supplierOptions()"
+          formControlName="supplier_id"
+        />
+      </div>
+
+      <div class="field field--full">
+        <label class="label">Imagen del producto</label>
+        <div class="image-upload">
+          @if (imagePreview() || currentImageUrl()) {
+            <img class="image-upload__preview" [src]="imagePreview() ?? currentImageUrl()" alt="Vista previa del producto" />
+          } @else {
+            <div class="image-upload__placeholder" aria-hidden="true">Sin imagen</div>
+          }
+          <div class="image-upload__side">
+            <div class="image-upload__actions">
+              <label class="btn btn-ghost">
+                {{ imagePreview() || currentImageUrl() ? 'Cambiar imagen' : 'Subir imagen' }}
+                <input type="file" accept="image/png,image/jpeg,image/webp" hidden (change)="onImageSelected($event)" />
+              </label>
+              @if (imagePreview()) {
+                <button type="button" class="btn btn-ghost" (click)="removeImage()">Quitar</button>
+              }
+            </div>
+            <span class="image-upload__hint">JPG, PNG o WEBP. Máximo 2 MB.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="presentation">Presentación</label>
+        <input id="presentation" class="input" formControlName="presentation" placeholder="Tableta 500mg" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="administration_form">Vía de administración</label>
+        <input id="administration_form" class="input" formControlName="administration_form" placeholder="Oral" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="storage">Almacenamiento</label>
+        <input id="storage" class="input" formControlName="storage" placeholder="Temperatura ambiente" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="packaging">Empaque</label>
+        <input id="packaging" class="input" formControlName="packaging" placeholder="Caja 24 und" />
+      </div>
+    </div>
+
+    <div class="form__actions">
+      <a class="btn btn-ghost" routerLink="/products">Cancelar</a>
+      <button class="btn btn-primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Guardando…' : isEdit() ? 'Guardar cambios' : 'Crear producto' }}
+      </button>
+    </div>
+  </form>
+}

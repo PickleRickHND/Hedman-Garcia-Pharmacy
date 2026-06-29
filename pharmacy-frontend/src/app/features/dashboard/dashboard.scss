@@ -1,0 +1,96 @@
+:host { display: block; }
+
+.page-head { margin-bottom: 24px; }
+.page-head__eyebrow {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.page-head h1 { font-size: 1.7rem; margin-top: 2px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 18px 16px;
+  position: relative;
+}
+.metric__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  --icon-size: 19px;
+  margin-bottom: 6px;
+}
+.metric__value {
+  font-size: 1.7rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.metric__label { color: var(--muted); font-size: 0.85rem; }
+
+.metric.tone-accent .metric__icon { background: var(--accent-soft); color: var(--accent-strong); }
+.metric.tone-warning .metric__icon { background: var(--warning-bg); color: var(--warning); }
+.metric.tone-warning .metric__value { color: var(--warning); }
+.metric.tone-danger .metric__icon { background: var(--danger-bg); color: var(--danger); }
+
+/* Skeleton de carga */
+.skeleton {
+  height: 116px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(100deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* Alertas */
+.alerts { padding: 20px 22px; max-width: 560px; }
+.alerts__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.alerts__head h2 { font-size: 1.05rem; }
+
+.alerts__list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.alerts__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.alerts__item:last-child { border-bottom: none; }
+.alerts__text { flex: 1; font-size: 0.9rem; color: var(--ink-soft); }
+.alerts__dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.dot-warning { background: var(--warning); }
+.dot-danger { background: var(--danger); }
+.dot-info { background: var(--info); }
+.alerts__empty { color: var(--muted); font-size: 0.9rem; }
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 32px;
+  color: var(--muted);
+}

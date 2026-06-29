@@ -1,0 +1,80 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Personas</p>
+    <h1>Clientes</h1>
+  </div>
+  @if (canManage) {
+    <a class="btn btn-primary" routerLink="/customers/new">
+      <app-icon name="customers" /> Nuevo cliente
+    </a>
+  }
+</header>
+
+<div class="toolbar card">
+  <div class="search-field">
+    <app-icon name="search" />
+    <input
+      type="search"
+      class="search-field__input"
+      placeholder="Buscar por nombre, RTN, teléfono o correo…"
+      [formControl]="search"
+      aria-label="Buscar clientes"
+    />
+  </div>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="loading">Cargando clientes…</div>
+  } @else if (customers().length === 0) {
+    <div class="empty">
+      <span class="empty__icon"><app-icon name="customers" /></span>
+      <p>Aún no hay clientes registrados.</p>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>RTN</th>
+            <th>Teléfono</th>
+            <th>Correo</th>
+            <th class="ta-right">Facturas</th>
+            @if (canManage) { <th class="ta-right">Acciones</th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of customers(); track c.id) {
+            <tr>
+              <td class="strong">{{ c.name }}</td>
+              <td class="mono">{{ c.rtn ?? '—' }}</td>
+              <td class="mono">{{ c.phone ?? '—' }}</td>
+              <td>{{ c.email ?? '—' }}</td>
+              <td class="ta-right num">{{ c.invoices_count ?? 0 }}</td>
+              @if (canManage) {
+                <td class="ta-right">
+                  <div class="row-actions">
+                    <a class="link-btn" [routerLink]="['/customers', c.id, 'edit']">Editar</a>
+                    <button type="button" class="link-btn link-btn--danger" (click)="toDelete.set(c)">
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [currentPage]="currentPage()" [lastPage]="lastPage()" (pageChange)="goToPage($event)" />
+  }
+</div>
+
+<app-confirm-dialog
+  [open]="toDelete() !== null"
+  title="Eliminar cliente"
+  [message]="'¿Eliminar «' + (toDelete()?.name ?? '') + '»? Esta acción no se puede deshacer.'"
+  (confirmed)="doDelete()"
+  (cancelled)="toDelete.set(null)"
+/>

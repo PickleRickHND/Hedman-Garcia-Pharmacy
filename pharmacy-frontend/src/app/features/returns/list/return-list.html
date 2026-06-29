@@ -1,0 +1,48 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Operación</p>
+    <h1>Devoluciones</h1>
+  </div>
+  @if (canCreate) {
+    <a class="btn btn-primary" routerLink="/returns/new">
+      <app-icon name="returns" /> Nueva devolución
+    </a>
+  }
+</header>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="loading">Cargando devoluciones…</div>
+  } @else if (returns().length === 0) {
+    <div class="empty">
+      <span class="empty__icon"><app-icon name="returns" /></span>
+      <p>Aún no hay devoluciones registradas.</p>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Devolución</th>
+            <th>Factura</th>
+            <th>Fecha</th>
+            <th>Procesó</th>
+            <th class="ta-right">Reembolso</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of returns(); track r.id) {
+            <tr class="clickable" (click)="open(r)">
+              <td class="mono strong">{{ r.return_number }}</td>
+              <td class="mono">{{ r.invoice?.invoice_number ?? '—' }}</td>
+              <td>{{ formatDate(r.processed_at) }}</td>
+              <td>{{ r.processed_by?.name ?? '—' }}</td>
+              <td class="ta-right num">{{ money(r.total_refund) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [currentPage]="currentPage()" [lastPage]="lastPage()" (pageChange)="load($event)" />
+  }
+</div>

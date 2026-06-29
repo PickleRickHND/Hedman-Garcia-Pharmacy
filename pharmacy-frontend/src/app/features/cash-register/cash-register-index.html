@@ -1,0 +1,105 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Operación</p>
+    <h1>Caja</h1>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="card state">Cargando…</div>
+} @else {
+  <!-- Estado actual de la caja -->
+  @if (current(); as reg) {
+    <div class="card cash-open">
+      <div class="cash-open__head">
+        <span class="badge badge-success">Caja abierta</span>
+        <span class="cash-open__since">Desde {{ formatDate(reg.opened_at) }} · {{ reg.user?.name }}</span>
+      </div>
+      <div class="cash-open__body">
+        <div class="stat">
+          <span class="stat__label">Monto de apertura</span>
+          <span class="stat__value num">{{ money(reg.opening_amount) }}</span>
+        </div>
+        <button type="button" class="btn btn-primary" (click)="showCloseModal.set(true)">Cerrar caja</button>
+      </div>
+    </div>
+  } @else {
+    <div class="card cash-closed">
+      <span class="empty__icon"><app-icon name="cash" /></span>
+      <h2>No hay caja abierta</h2>
+      <p class="muted">Abre la caja para comenzar a registrar ventas del día.</p>
+      <div class="open-form">
+        <div class="field">
+          <label class="label" for="opening">Monto de apertura (L)</label>
+          <input id="opening" class="input num" type="number" min="0" step="0.01" [formControl]="openingAmount" />
+        </div>
+        <button type="button" class="btn btn-primary" (click)="open()" [disabled]="busy()">
+          {{ busy() ? 'Abriendo…' : 'Abrir caja' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Historial de cierres -->
+  <h2 class="section-title">Cierres anteriores</h2>
+  <div class="card table-card">
+    @if (history().length === 0) {
+      <div class="empty"><p>Aún no hay cierres de caja registrados.</p></div>
+    } @else {
+      <div class="table-scroll">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Apertura</th>
+              <th>Cierre</th>
+              <th>Cajero</th>
+              <th class="ta-right">Ventas</th>
+              <th class="ta-right">Esperado</th>
+              <th class="ta-right">Real</th>
+              <th class="ta-right">Diferencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of history(); track r.id) {
+              <tr>
+                <td>{{ formatDate(r.opened_at) }}</td>
+                <td>{{ formatDate(r.closed_at) }}</td>
+                <td>{{ r.user?.name ?? '—' }}</td>
+                <td class="ta-right num">{{ money(r.total_sales) }}</td>
+                <td class="ta-right num">{{ money(r.expected_amount) }}</td>
+                <td class="ta-right num">{{ money(r.actual_amount) }}</td>
+                <td class="ta-right num" [class.diff-neg]="+(r.difference ?? 0) < 0" [class.diff-pos]="+(r.difference ?? 0) > 0">
+                  {{ money(r.difference) }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}
+
+<!-- Modal de cierre / arqueo -->
+@if (showCloseModal()) {
+  <div class="overlay" (click)="showCloseModal.set(false)">
+    <div class="dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <h3>Cerrar caja</h3>
+      <p class="muted">Cuenta el efectivo en caja e ingresa el monto real para el arqueo.</p>
+      <div class="field">
+        <label class="label" for="actual">Monto real contado (L)</label>
+        <input id="actual" class="input num" type="number" min="0" step="0.01" [formControl]="actualAmount" />
+      </div>
+      <div class="field">
+        <label class="label" for="notes">Notas (opcional)</label>
+        <textarea id="notes" class="input textarea" rows="2" [formControl]="closeNotes"></textarea>
+      </div>
+      <div class="dialog__actions">
+        <button type="button" class="btn btn-ghost" (click)="showCloseModal.set(false)">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="close()" [disabled]="busy()">
+          {{ busy() ? 'Cerrando…' : 'Confirmar cierre' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

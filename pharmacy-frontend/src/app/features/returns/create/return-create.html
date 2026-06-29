@@ -1,0 +1,114 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">
+      <a routerLink="/returns" class="back-link">Devoluciones</a> / Nueva
+    </p>
+    <h1>Nueva devolución</h1>
+  </div>
+</header>
+
+@if (invoice(); as inv) {
+  <!-- Paso 2: seleccionar items a devolver -->
+  <div class="card sel-invoice">
+    <div>
+      <span class="muted">Factura</span>
+      <span class="mono strong"> {{ inv.invoice_number }}</span>
+      <span class="muted"> · {{ inv.customer_name }}</span>
+    </div>
+    <button type="button" class="link-btn" (click)="reset()">Cambiar factura</button>
+  </div>
+
+  <div class="card table-card">
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th class="ta-right">Comprado</th>
+            <th class="ta-center">A devolver</th>
+            <th class="ta-center">Reingresar stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of lines(); track line.item.id; let i = $index) {
+            <tr>
+              <td>
+                <span class="strong">{{ line.item.product_name }}</span>
+                <span class="sub mono">{{ line.item.product_sku }}</span>
+              </td>
+              <td class="ta-right num">{{ line.item.quantity }}</td>
+              <td class="ta-center">
+                <input
+                  class="input qty-input num"
+                  type="number"
+                  min="0"
+                  [max]="line.item.quantity"
+                  [value]="line.quantity"
+                  (input)="changeQty(i, $any($event.target).value)"
+                  aria-label="Cantidad a devolver"
+                />
+              </td>
+              <td class="ta-center">
+                <input type="checkbox" [checked]="line.restock" (change)="toggleRestock(i)" aria-label="Reingresar stock" />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card foot">
+    <div class="field">
+      <label class="label" for="reason">Motivo de la devolución</label>
+      <textarea id="reason" class="input textarea" rows="2" [formControl]="reason"
+        placeholder="Producto en mal estado, error de venta…"></textarea>
+      @if (reason.touched && reason.invalid) {
+        <span class="field-error">El motivo es requerido (mínimo 5 caracteres).</span>
+      }
+    </div>
+    <div class="foot__actions">
+      <div class="refund">
+        <span class="muted">Reembolso estimado</span>
+        <span class="refund__value num">{{ money(totalRefund()) }}</span>
+      </div>
+      <button type="button" class="btn btn-primary" [disabled]="!canProcess() || submitting()" (click)="process()">
+        {{ submitting() ? 'Procesando…' : 'Procesar devolución' }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <!-- Paso 1: buscar factura -->
+  <div class="card search-card">
+    <div class="search-row">
+      <div class="search-field">
+        <app-icon name="search" />
+        <input
+          type="search"
+          class="search-field__input"
+          placeholder="Número de factura, cliente o RTN…"
+          [formControl]="searchControl"
+          (keyup.enter)="searchInvoices()"
+          aria-label="Buscar factura"
+        />
+      </div>
+      <button type="button" class="btn btn-primary" (click)="searchInvoices()" [disabled]="searching()">Buscar</button>
+    </div>
+
+    @if (searchResults().length) {
+      <ul class="results">
+        @for (inv of searchResults(); track inv.id) {
+          <li class="results__item" (click)="selectInvoice(inv)">
+            <span>
+              <span class="mono strong">{{ inv.invoice_number }}</span>
+              <span class="muted"> · {{ inv.customer_name }}</span>
+            </span>
+            <span class="num">{{ money(inv.total) }}</span>
+          </li>
+        }
+      </ul>
+    } @else if (!searching()) {
+      <p class="hint muted">Busca la factura emitida sobre la que harás la devolución.</p>
+    }
+  </div>
+}

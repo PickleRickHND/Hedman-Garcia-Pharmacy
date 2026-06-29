@@ -1,0 +1,146 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Operación</p>
+    <h1>Nueva venta</h1>
+  </div>
+</header>
+
+<div class="pos">
+  <!-- Columna izquierda: búsqueda + carrito -->
+  <section class="pos__main">
+    <div class="card search-card">
+      <div class="search-field">
+        <app-icon name="search" />
+        <input
+          type="search"
+          class="search-field__input"
+          placeholder="Buscar producto por nombre o SKU…"
+          [formControl]="searchControl"
+          aria-label="Buscar producto"
+        />
+      </div>
+
+      @if (searchResults().length) {
+        <ul class="results">
+          @for (p of searchResults(); track p.id) {
+            <li class="results__item" (click)="addProduct(p)">
+              @if (p.image_url) {
+                <img class="results__thumb" [src]="p.image_url" [alt]="p.name" loading="lazy" />
+              } @else {
+                <span class="results__thumb results__thumb--empty" aria-hidden="true"><app-icon name="products" /></span>
+              }
+              <span class="results__info">
+                <span class="results__name">{{ p.name }}</span>
+                <span class="results__meta mono">{{ p.sku }} · stock {{ p.stock }}</span>
+              </span>
+              <span class="results__price num">{{ money(+p.price) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="card cart">
+      @if (cart().length === 0) {
+        <div class="empty">
+          <span class="empty__icon"><app-icon name="billing" /></span>
+          <p>Busca productos y agrégalos a la venta.</p>
+        </div>
+      } @else {
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="ta-center">Cantidad</th>
+              <th class="ta-right">Precio</th>
+              @if (canDiscount) { <th class="ta-right">Desc. %</th> }
+              <th class="ta-right">Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of cart(); track line.product.id; let i = $index) {
+              <tr>
+                <td>
+                  <div class="cart__prod">
+                    @if (line.product.image_url) {
+                      <img class="cart__thumb" [src]="line.product.image_url" [alt]="line.product.name" loading="lazy" />
+                    }
+                    <span class="cart__prodinfo">
+                      <span class="strong">{{ line.product.name }}</span>
+                      <span class="cart__sku mono">{{ line.product.sku }}</span>
+                    </span>
+                  </div>
+                </td>
+                <td class="ta-center">
+                  <div class="qty">
+                    <button type="button" (click)="changeQty(i, -1)" aria-label="Restar">−</button>
+                    <span class="num">{{ line.quantity }}</span>
+                    <button type="button" (click)="changeQty(i, 1)" aria-label="Sumar">+</button>
+                  </div>
+                </td>
+                <td class="ta-right num">{{ money(+line.product.price) }}</td>
+                @if (canDiscount) {
+                  <td class="ta-right">
+                    <input
+                      class="input disc-input num"
+                      type="number"
+                      min="0"
+                      max="100"
+                      [value]="line.discount_percent"
+                      (input)="setDiscount(i, $any($event.target).value)"
+                      aria-label="Descuento por línea"
+                    />
+                  </td>
+                }
+                <td class="ta-right num">{{ money(lineSubtotal(line)) }}</td>
+                <td class="ta-right">
+                  <button type="button" class="link-btn link-btn--danger" (click)="removeLine(i)">Quitar</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <button type="button" class="link-btn clear-btn" (click)="clearCart()">Vaciar carrito</button>
+      }
+    </div>
+  </section>
+
+  <!-- Columna derecha: resumen -->
+  <aside class="pos__summary card">
+    <h2>Resumen</h2>
+
+    <div class="field">
+      <label class="label" for="customer">Cliente</label>
+      <input id="customer" class="input" [formControl]="customerName" placeholder="Nombre del cliente" />
+    </div>
+    <div class="field">
+      <label class="label" for="rtn">RTN (opcional)</label>
+      <input id="rtn" class="input mono" [formControl]="customerRtn" placeholder="0801-1990-12345" />
+    </div>
+    <div class="field">
+      <label class="label" for="pm">Método de pago</label>
+      <app-select
+        inputId="pm"
+        ariaLabel="Método de pago"
+        valueType="number"
+        [value]="paymentMethodId()"
+        [options]="paymentMethodOptions()"
+        (valueChange)="paymentMethodId.set($event === null ? null : +$event)"
+      />
+    </div>
+
+    <dl class="totals">
+      <div><dt>Subtotal</dt><dd class="num">{{ money(totals().subtotal) }}</dd></div>
+      @if (totals().discount > 0) {
+        <div class="totals__disc"><dt>Descuento</dt><dd class="num">− {{ money(totals().discount) }}</dd></div>
+      }
+      <div><dt>ISV (15%)</dt><dd class="num">{{ money(totals().tax) }}</dd></div>
+      <div class="totals__grand"><dt>Total</dt><dd class="num">{{ money(totals().total) }}</dd></div>
+    </dl>
+
+    <button type="button" class="btn btn-primary btn-block" [disabled]="!canIssue() || submitting()" (click)="issue()">
+      {{ submitting() ? 'Emitiendo…' : 'Emitir factura' }}
+    </button>
+  </aside>
+</div>

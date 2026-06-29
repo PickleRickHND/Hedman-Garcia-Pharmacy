@@ -35,6 +35,12 @@
         .item-name { font-weight: 600; color: #1c1917; }
         .item-sku { font-family: 'Courier', monospace; font-size: 8pt; color: #78716c; margin-top: 1px; }
 
+        .logo { height: 42px; width: auto; margin-bottom: 6px; display: block; }
+        table.item-cell { border-collapse: collapse; }
+        table.item-cell td { border: none; padding: 0; vertical-align: middle; }
+        .item-thumb-cell { width: 44px; padding-right: 8px !important; }
+        .item-thumb { width: 36px; height: 36px; border: 1px solid #e7e5e4; border-radius: 4px; }
+
         .totals { width: 280px; margin-left: auto; margin-top: 10px; }
         .totals-row { display: table; width: 100%; }
         .totals-label, .totals-value { display: table-cell; padding: 4px 0; font-size: 11pt; }
@@ -49,12 +55,43 @@
     </style>
 </head>
 <body>
+    @php
+        // Incrusta imagenes como data URI base64: evita problemas de chroot/red en dompdf.
+        // Memoiza por ruta (un producto repetido no se re-lee) y descarta archivos enormes.
+        $embedCache = [];
+        $embed = function (?string $absPath) use (&$embedCache): ?string {
+            if (! $absPath || ! is_file($absPath)) {
+                return null;
+            }
+            if (array_key_exists($absPath, $embedCache)) {
+                return $embedCache[$absPath];
+            }
+            // Cap defensivo: no inflar el PDF con imágenes desproporcionadas.
+            if (filesize($absPath) > 1024 * 1024) {
+                return $embedCache[$absPath] = null;
+            }
+            $ext = strtolower(pathinfo($absPath, PATHINFO_EXTENSION));
+            $mime = match ($ext) {
+                'png' => 'image/png',
+                'webp' => 'image/webp',
+                'gif' => 'image/gif',
+                default => 'image/jpeg',
+            };
+
+            return $embedCache[$absPath] = 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absPath));
+        };
+        $logoSrc = $embed(public_path('images/logo.png'));
+    @endphp
+
     @if ($invoice->status === 'voided')
         <div class="watermark">ANULADA</div>
     @endif
 
     <div class="header">
         <div class="header-left">
+            @if ($logoSrc)
+                <img src="{{ $logoSrc }}" class="logo" alt="Hedman Garcia Pharmacy">
+            @endif
             <div class="brand">Hedman Garcia Pharmacy</div>
             <div class="tagline">Tegucigalpa, Honduras</div>
         </div>
@@ -92,10 +129,20 @@
         </thead>
         <tbody>
             @foreach ($invoice->items as $item)
+                @php $itemImg = $embed($item->product_image_path ? storage_path('app/public/'.$item->product_image_path) : null); @endphp
                 <tr>
                     <td>
-                        <div class="item-name">{{ $item->product_name }}</div>
-                        <div class="item-sku">{{ $item->product_sku }}</div>
+                        <table class="item-cell">
+                            <tr>
+                                @if ($itemImg)
+                                    <td class="item-thumb-cell"><img src="{{ $itemImg }}" class="item-thumb" alt=""></td>
+                                @endif
+                                <td>
+                                    <div class="item-name">{{ $item->product_name }}</div>
+                                    <div class="item-sku">{{ $item->product_sku }}</div>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                     <td class="num">L. {{ number_format((float) $item->unit_price, 2) }}</td>
                     <td class="num">{{ $item->quantity }}</td>

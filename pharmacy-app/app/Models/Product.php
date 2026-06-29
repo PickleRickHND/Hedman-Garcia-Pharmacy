@@ -9,11 +9,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        // Limpia el archivo de imagen solo en borrado definitivo (un restore lo necesitaría).
+        static::forceDeleted(function (Product $product): void {
+            if (filled($product->image_path)) {
+                Storage::disk('public')->delete($product->image_path);
+            }
+        });
+    }
 
     protected $fillable = [
         'sku',
@@ -26,6 +37,7 @@ class Product extends Model
         'administration_form',
         'storage',
         'packaging',
+        'image_path',
         'category_id',
         'supplier_id',
     ];
@@ -113,6 +125,19 @@ class Product extends Model
     // -----------------------------------------------------------------------
     // Accessors
     // -----------------------------------------------------------------------
+
+    /**
+     * URL publica de la imagen del producto, o null si no tiene.
+     * Usa el disco 'public' (requiere `php artisan storage:link`).
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (blank($this->image_path)) {
+            return null;
+        }
+
+        return asset('storage/'.$this->image_path);
+    }
 
     public function getIsLowStockAttribute(): bool
     {

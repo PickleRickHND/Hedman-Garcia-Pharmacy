@@ -44,6 +44,18 @@ function loginAs(string $role): User
     return $user;
 }
 
+/**
+ * Autentica un usuario con el rol dado contra el guard de Sanctum
+ * (para los tests de la API REST headless que consume Angular).
+ */
+function apiAs(string $role, array $attributes = []): User
+{
+    $user = createUserWithRole($role, $attributes);
+    Laravel\Sanctum\Sanctum::actingAs($user);
+
+    return $user;
+}
+
 /*
 |--------------------------------------------------------------------------
 | Expectations

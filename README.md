@@ -4,8 +4,11 @@ Sistema de gestión integral para farmacias desarrollado en PHP con MySQL. Propo
 
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-11%20LTS-FF2D20?logo=laravel)](https://laravel.com/)
-[![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1?logo=mysql)](https://www.mysql.com/)
-[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.0-7952B3?logo=bootstrap)](https://getbootstrap.com/)
+[![Sanctum](https://img.shields.io/badge/Sanctum-API%20Bearer-FF2D20?logo=laravel)](https://laravel.com/docs/sanctum)
+[![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular)](https://angular.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql)](https://www.mysql.com/)
+[![Playwright](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright)](https://playwright.dev/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
 ---
@@ -22,6 +25,7 @@ Sistema de gestión integral para farmacias desarrollado en PHP con MySQL. Propo
 - [Seguridad](#-seguridad)
 - [API Endpoints](#-api-endpoints)
 - [Rewrite Laravel](#-rewrite-laravel-pharmacy-app)
+- [Migración API + Angular SPA](#-migración-api-rest-headless--angular-20-spa)
 - [Contribuir](#-contribuir)
 - [Licencia](#-licencia)
 
@@ -756,7 +760,7 @@ vulnerabilidades de seguridad identificadas en la auditoría del legacy,
 introduce arquitectura moderna con tests automatizados, y presenta una
 interfaz editorial premium diseñada con Fraunces + Inter.
 
-**Estado:** Fases 0–7 completadas. Sistema de gestión farmacéutica completo con 10 módulos funcionales, 159 tests y 373 assertions.
+**Estado:** Fases 0–7 completadas (Livewire). Sistema de gestión farmacéutica completo con 10 módulos funcionales. Tras el rewrite Livewire se inició la **migración a API REST headless + Angular 20 SPA** (ver sección dedicada más abajo); la suite total del backend es de **192 tests / 505 assertions** (Livewire + API REST).
 
 ### Stack
 
@@ -930,8 +934,12 @@ interfaz editorial premium diseñada con Fraunces + Inter.
 ### Tests
 
 ```
-159 tests, 373 assertions, 0 failures
+192 tests, 505 assertions, 0 failures   (Livewire + API REST)
 ```
+
+> La tabla siguiente lista las suites del rewrite **Livewire**. Los tests de la
+> **API REST** (Usuarios, Kardex, Reportes — con guard Sanctum y regresiones) y
+> el **E2E Playwright** se documentan en la sección de migración a Angular.
 
 | Suite | Tests | Cobertura |
 |-------|-------|-----------|
@@ -1074,6 +1082,101 @@ git checkout v1.0-legacy
 
 ---
 
+## 🅰️ Migración: API REST headless + Angular 20 SPA
+
+La fase actual desacopla el frontend: el backend Laravel se expone como **API
+REST headless (Sanctum, token Bearer)** y un **SPA en Angular 20** la consume.
+El Livewire/Blade sigue funcionando en paralelo durante la transición.
+
+> No se reescribe el backend: se reutilizan modelos, migraciones y la capa de
+> **Services** (`BillingService`, `InventoryService`, `CashRegisterService`,
+> `ReturnService`, `ReportService`, `NotificationService`). Los controllers de
+> la API solo validan y delegan.
+
+```
+Antes:  Laravel + Livewire + Blade  ──►  MySQL
+Ahora:  Angular 20 SPA  ──HTTP/JSON──►  Laravel API (Sanctum) ──► Services ──► MySQL
+```
+
+### Stack del frontend (`pharmacy-frontend/`)
+
+| Capa | Tecnología | Versión |
+|------|------------|---------|
+| Framework | Angular (standalone + signals) | 20 |
+| Lenguaje | TypeScript | 5.9 |
+| Estilos | SCSS con design tokens propios (sin librería de componentes) | — |
+| HTTP / estado | HttpClient + RxJS + signals | — |
+| Auth | Token Bearer (Sanctum) en interceptor + guards de ruta por rol | — |
+| Gráficos | Componente `BarChart` propio (CSS puro, sin dependencias) | — |
+| Tipografía | Plus Jakarta Sans (display) + Inter (body) + IBM Plex Mono | — |
+| Unit tests | Karma + Jasmine (`HttpTestingController`) | — |
+| E2E | Playwright (versionado, configuración `e2e` → :8001) | 1.x |
+
+### API REST (`pharmacy-app/`, Sanctum)
+
+- Auth stateless: `POST /api/login` · `POST /api/logout` · `GET /api/me`.
+- Recursos: productos, clientes, proveedores, categorías, facturación (+PDF,
+  anulación, métodos de pago), caja, devoluciones, inventario/kardex, reportes,
+  dashboard, usuarios/roles.
+- Autorización por rol con middleware `role:` (paridad con Livewire). Contrato
+  completo en [`docs/API.md`](docs/API.md).
+
+### Módulos del SPA
+
+| Módulo | Estado |
+|--------|--------|
+| Login + sesión (token, guards, interceptor) | ✅ |
+| Shell admin (sidebar por rol, topbar, tema claro/oscuro) | ✅ |
+| Dashboard · Productos · Clientes · Proveedores · Categorías | ✅ |
+| Facturación / POS (carrito, ISV, emisión, PDF, anulación) | ✅ |
+| Caja (apertura/cierre con arqueo) · Devoluciones | ✅ |
+| Usuarios (CRUD + roles) · Inventario / Kardex · Reportes (con gráficos) | ✅ |
+
+Patrón replicable por módulo: `core/models` + `features/<x>/<x>.service` +
+`list/` + `form/`, reusando `shared/` (Icon, Toast, ConfirmDialog, Pagination,
+BarChart) y los tokens de `styles.scss`.
+
+### Testing
+
+| Suite | Herramienta | Cobertura |
+|-------|-------------|-----------|
+| API REST | Pest | Usuarios (CRUD, roles, guard de "último admin"), Kardex (filtros), Reportes (incl. regresiones), sobre los endpoints reales con guard Sanctum |
+| Unit frontend | Karma / Jasmine | Servicios (params/verbos vía `HttpTestingController`) + `BarChart` |
+| E2E | Playwright | Login + flujos críticos: Caja, POS (factura → PDF → anulación) y Devoluciones; datos aislados `E2E-*` y teardown completo |
+
+```bash
+# Backend (Pest)
+cd pharmacy-app && php artisan test
+# Frontend unit (Karma headless)
+cd pharmacy-frontend && CHROME_BIN="/ruta/a/Chrome" npx ng test --watch=false --browsers=ChromeHeadless
+# E2E (Playwright: levanta backend :8001 + Angular config e2e :4200)
+cd pharmacy-frontend && npm run e2e
+```
+
+### Setup del frontend
+
+```bash
+cd pharmacy-frontend
+npm install
+# La configuración `e2e` apunta la API a :8001 sin tocar environment.ts:
+NG_CLI_ANALYTICS=false npx ng serve --configuration e2e --port 4200
+# abrir http://localhost:4200  (el backend debe correr en :8001)
+```
+
+### Identidad de marca
+
+Monograma **HG** (Hedman & Garcia) sobre cuadro teal con degradado
+(`#12a594 → #0b6557`). Assets en `pharmacy-frontend/public/`: `logo.png`,
+`favicon.ico`, `apple-touch-icon.png`. El login y el sidebar usan el logo; el
+login conserva la animación del pastillero (blister) y entradas escalonadas,
+respetando `prefers-reduced-motion`.
+
+Plan, estado y convenciones completas en
+[`docs/MIGRATION_PLAN.md`](docs/MIGRATION_PLAN.md) y
+[`CLAUDE.md`](CLAUDE.md).
+
+---
+
 ## 📄 Licencia
 
 **Proprietary — All Rights Reserved.** Este código es de solo lectura para
@@ -1102,9 +1205,11 @@ Si encuentras algún problema o tienes preguntas:
 ## 🙏 Agradecimientos
 
 - [Laravel](https://laravel.com/) — Framework PHP
-- [Livewire](https://livewire.laravel.com/) — Componentes reactivos
-- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS
+- [Laravel Sanctum](https://laravel.com/docs/sanctum) — Autenticación API por token
+- [Livewire](https://livewire.laravel.com/) — Componentes reactivos (rewrite)
+- [Angular](https://angular.dev/) — SPA del frontend desacoplado
+- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS (rewrite Livewire)
 - [Spatie Permission](https://spatie.be/docs/laravel-permission) — Roles y permisos
-- [Fraunces](https://fonts.google.com/specimen/Fraunces) — Tipografía display serif
 - [SendGrid](https://sendgrid.com/) — Servicio de email
-- [Pest PHP](https://pestphp.com/) — Framework de testing
+- [Pest PHP](https://pestphp.com/) — Testing del backend
+- [Playwright](https://playwright.dev/) — Testing E2E del SPA

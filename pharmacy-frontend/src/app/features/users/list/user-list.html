@@ -1,0 +1,100 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Personas</p>
+    <h1>Usuarios</h1>
+  </div>
+  <a class="btn btn-primary" routerLink="/users/new">
+    <app-icon name="users" /> Nuevo usuario
+  </a>
+</header>
+
+<div class="toolbar card">
+  <div class="search-field">
+    <app-icon name="search" />
+    <input
+      type="search"
+      class="search-field__input"
+      placeholder="Buscar por nombre o correo…"
+      [formControl]="search"
+      aria-label="Buscar usuarios"
+    />
+  </div>
+
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por rol"
+    valueType="string"
+    placeholder="Todos los roles"
+    [options]="roleFilterOptions()"
+    [formControl]="roleFilter"
+  />
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="loading">Cargando usuarios…</div>
+  } @else if (users().length === 0) {
+    <div class="empty">
+      <span class="empty__icon"><app-icon name="users" /></span>
+      <p>No se encontraron usuarios con esos filtros.</p>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Contraseña</th>
+            <th class="ta-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of users(); track u.id) {
+            <tr>
+              <td class="strong">
+                {{ u.name }}
+                @if (u.id === currentUserId) { <span class="badge badge-neutral">Tú</span> }
+              </td>
+              <td class="mono">{{ u.email }}</td>
+              <td>
+                @if (u.role) {
+                  <span class="badge badge-info">{{ u.role }}</span>
+                } @else {
+                  <span class="badge badge-neutral">Sin rol</span>
+                }
+              </td>
+              <td>
+                @if (u.must_change_password) {
+                  <span class="badge badge-warning">Debe cambiarla</span>
+                } @else {
+                  <span class="badge badge-success">OK</span>
+                }
+              </td>
+              <td class="ta-right">
+                <div class="row-actions">
+                  <a class="link-btn" [routerLink]="['/users', u.id, 'edit']">Editar</a>
+                  @if (u.id !== currentUserId) {
+                    <button type="button" class="link-btn link-btn--danger" (click)="toDelete.set(u)">
+                      Eliminar
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [currentPage]="currentPage()" [lastPage]="lastPage()" (pageChange)="goToPage($event)" />
+  }
+</div>
+
+<app-confirm-dialog
+  [open]="toDelete() !== null"
+  title="Eliminar usuario"
+  [message]="'¿Eliminar a «' + (toDelete()?.name ?? '') + '»? Esta acción no se puede deshacer.'"
+  (confirmed)="doDelete()"
+  (cancelled)="toDelete.set(null)"
+/>

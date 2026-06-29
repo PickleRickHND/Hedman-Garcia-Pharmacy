@@ -1,0 +1,132 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Catálogo</p>
+    <h1>Productos</h1>
+  </div>
+  @if (canManage) {
+    <a class="btn btn-primary" routerLink="/products/new">
+      <app-icon name="products" /> Nuevo producto
+    </a>
+  }
+</header>
+
+<div class="toolbar card">
+  <div class="search-field">
+    <app-icon name="search" />
+    <input
+      type="search"
+      class="search-field__input"
+      placeholder="Buscar por nombre, SKU o descripción…"
+      [formControl]="search"
+      aria-label="Buscar productos"
+    />
+  </div>
+
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por categoría"
+    valueType="number"
+    placeholder="Todas las categorías"
+    [value]="categoryId()"
+    [options]="categoryOptions()"
+    (valueChange)="onCategoryChange($event)"
+  />
+
+  <button
+    type="button"
+    class="chip"
+    [class.chip--on]="lowStock()"
+    (click)="toggleLowStock()"
+  >
+    Solo stock bajo
+  </button>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="loading">Cargando productos…</div>
+  } @else if (products().length === 0) {
+    <div class="empty">
+      <span class="empty__icon"><app-icon name="products" /></span>
+      <p>No se encontraron productos con esos filtros.</p>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th class="ta-right">Stock</th>
+            <th class="ta-right">Precio</th>
+            <th>Vence</th>
+            <th>Estado</th>
+            @if (canManage) { <th class="ta-right">Acciones</th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of products(); track p.id) {
+            <tr>
+              <td class="mono">{{ p.sku }}</td>
+              <td>
+                <div class="prod-cell">
+                  @if (p.image_url) {
+                    <img class="prod-thumb" [src]="p.image_url" [alt]="p.name" loading="lazy" />
+                  } @else {
+                    <span class="prod-thumb prod-thumb--empty" aria-hidden="true"><app-icon name="products" /></span>
+                  }
+                  <span class="prod-cell__text">
+                    <span class="prod-name">{{ p.name }}</span>
+                    @if (p.presentation) { <span class="prod-sub">{{ p.presentation }}</span> }
+                  </span>
+                </div>
+              </td>
+              <td>{{ p.category?.name ?? '—' }}</td>
+              <td class="ta-right num">{{ p.stock }}</td>
+              <td class="ta-right num">{{ money(p.price) }}</td>
+              <td class="mono">{{ p.expiration_date ?? '—' }}</td>
+              <td>
+                @if (p.is_out_of_stock) {
+                  <span class="badge badge-danger">Agotado</span>
+                } @else if (p.is_low_stock) {
+                  <span class="badge badge-warning">Stock bajo</span>
+                } @else if (p.is_expired) {
+                  <span class="badge badge-danger">Vencido</span>
+                } @else if (p.is_expiring_soon) {
+                  <span class="badge badge-warning">Por vencer</span>
+                } @else {
+                  <span class="badge badge-success">OK</span>
+                }
+              </td>
+              @if (canManage) {
+                <td class="ta-right">
+                  <div class="row-actions">
+                    <a class="link-btn" [routerLink]="['/products', p.id, 'edit']">Editar</a>
+                    <button type="button" class="link-btn link-btn--danger" (click)="confirmDelete(p)">
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [currentPage]="currentPage()"
+      [lastPage]="lastPage()"
+      (pageChange)="goToPage($event)"
+    />
+  }
+</div>
+
+<app-confirm-dialog
+  [open]="toDelete() !== null"
+  title="Eliminar producto"
+  [message]="'¿Eliminar «' + (toDelete()?.name ?? '') + '»? Esta acción no se puede deshacer.'"
+  (confirmed)="doDelete()"
+  (cancelled)="toDelete.set(null)"
+/>

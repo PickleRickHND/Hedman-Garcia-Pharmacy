@@ -1,0 +1,79 @@
+<div class="shell" [class.is-collapsed]="collapsed()" [class.mobile-open]="mobileOpen()">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <img class="sidebar__mark" src="logo.png" alt="Farmacia Hedman & Garcia" />
+      <span class="sidebar__name">
+        <small class="sidebar__eyebrow">Farmacia</small>
+        <span class="sidebar__title">Hedman <em>&amp;</em> Garcia</span>
+      </span>
+    </div>
+
+    <nav class="nav">
+      @for (group of navGroups(); track group.label) {
+        <div class="nav__group">
+          <span class="nav__label">{{ group.label }}</span>
+          @for (item of group.items; track item.path) {
+            <a
+              class="nav__item"
+              [routerLink]="item.path"
+              routerLinkActive="is-active"
+              (click)="mobileOpen.set(false)"
+            >
+              <app-icon [name]="item.icon" />
+              <span class="nav__text">{{ item.label }}</span>
+            </a>
+          }
+        </div>
+      }
+    </nav>
+
+    <button type="button" class="nav__item nav__logout" (click)="logout()">
+      <app-icon name="logout" />
+      <span class="nav__text">Cerrar sesión</span>
+    </button>
+  </aside>
+
+  <!-- Backdrop móvil -->
+  <div class="backdrop" (click)="toggleMobile()"></div>
+
+  <!-- Área principal -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button type="button" class="icon-btn mobile-only" (click)="toggleMobile()" aria-label="Abrir menú">
+          <app-icon name="menu" />
+        </button>
+        <button type="button" class="icon-btn desktop-only" (click)="toggleSidebar()" aria-label="Colapsar menú">
+          <app-icon name="menu" />
+        </button>
+        <div class="search">
+          <app-icon name="search" />
+          <input type="search" placeholder="Buscar…" aria-label="Buscar" />
+        </div>
+      </div>
+
+      <div class="topbar__right">
+        <button type="button" class="icon-btn" (click)="theme.toggle()" aria-label="Cambiar tema">
+          {{ theme.theme() === 'dark' ? '☀' : '☾' }}
+        </button>
+        <button type="button" class="icon-btn" aria-label="Alertas">
+          <app-icon name="bell" />
+        </button>
+        <div class="profile">
+          <span class="profile__avatar">{{ user()?.initials }}</span>
+          <span class="profile__meta">
+            <span class="profile__name">{{ user()?.name }}</span>
+            <span class="profile__role">{{ user()?.role }}</span>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+
+  <app-toast-host />
+</div>

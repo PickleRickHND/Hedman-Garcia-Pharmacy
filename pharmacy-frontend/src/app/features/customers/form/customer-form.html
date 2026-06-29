@@ -1,0 +1,65 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">
+      <a routerLink="/customers" class="back-link">Clientes</a> / {{ isEdit() ? 'Editar' : 'Nuevo' }}
+    </p>
+    <h1>{{ isEdit() ? 'Editar cliente' : 'Nuevo cliente' }}</h1>
+  </div>
+</header>
+
+@if (loading()) {
+  <div class="card state">Cargando…</div>
+} @else {
+  <form class="card form-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (error()) {
+      <div class="form-alert" role="alert">{{ error() }}</div>
+    }
+
+    <div class="form-grid">
+      <div class="field field--full">
+        <label class="label" for="name">Nombre</label>
+        <input id="name" class="input" formControlName="name" placeholder="Nombre del cliente"
+          [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="field-error">El nombre es requerido (2 a 100 caracteres).</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="label" for="rtn">RTN</label>
+        <input id="rtn" class="input mono" formControlName="rtn" placeholder="0801-1990-12345" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="phone">Teléfono</label>
+        <input id="phone" class="input mono" formControlName="phone" placeholder="9999-9999" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="email">Correo</label>
+        <input id="email" class="input" type="email" formControlName="email" placeholder="cliente@correo.com"
+          [class.is-invalid]="form.controls.email.touched && form.controls.email.invalid" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error">Correo inválido.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="label" for="address">Dirección</label>
+        <input id="address" class="input" formControlName="address" placeholder="Dirección" />
+      </div>
+
+      <div class="field field--full">
+        <label class="label" for="notes">Notas</label>
+        <textarea id="notes" class="input textarea" formControlName="notes" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn-ghost" routerLink="/customers">Cancelar</a>
+      <button class="btn btn-primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Guardando…' : isEdit() ? 'Guardar cambios' : 'Crear cliente' }}
+      </button>
+    </div>
+  </form>
+}

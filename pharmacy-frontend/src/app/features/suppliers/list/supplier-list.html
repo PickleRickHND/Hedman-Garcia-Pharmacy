@@ -1,0 +1,86 @@
+<header class="page-head">
+  <div>
+    <p class="page-head__eyebrow">Catálogo</p>
+    <h1>Proveedores</h1>
+  </div>
+  @if (canManage) {
+    <a class="btn btn-primary" routerLink="/suppliers/new">
+      <app-icon name="suppliers" /> Nuevo proveedor
+    </a>
+  }
+</header>
+
+<div class="toolbar card">
+  <div class="search-field">
+    <app-icon name="search" />
+    <input
+      type="search"
+      class="search-field__input"
+      placeholder="Buscar por nombre, contacto, teléfono o correo…"
+      [formControl]="search"
+      aria-label="Buscar proveedores"
+    />
+  </div>
+</div>
+
+<div class="card table-card">
+  @if (loading()) {
+    <div class="loading">Cargando proveedores…</div>
+  } @else if (suppliers().length === 0) {
+    <div class="empty">
+      <span class="empty__icon"><app-icon name="suppliers" /></span>
+      <p>Aún no hay proveedores registrados.</p>
+    </div>
+  } @else {
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Proveedor</th>
+            <th>Contacto</th>
+            <th>Teléfono</th>
+            <th class="ta-right">Productos</th>
+            <th>Estado</th>
+            @if (canManage) { <th class="ta-right">Acciones</th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of suppliers(); track s.id) {
+            <tr>
+              <td class="strong">{{ s.name }}</td>
+              <td>{{ s.contact_name ?? '—' }}</td>
+              <td class="mono">{{ s.phone ?? '—' }}</td>
+              <td class="ta-right num">{{ s.products_count ?? 0 }}</td>
+              <td>
+                @if (s.is_active) {
+                  <span class="badge badge-success">Activo</span>
+                } @else {
+                  <span class="badge badge-neutral">Inactivo</span>
+                }
+              </td>
+              @if (canManage) {
+                <td class="ta-right">
+                  <div class="row-actions">
+                    <a class="link-btn" [routerLink]="['/suppliers', s.id, 'edit']">Editar</a>
+                    <button type="button" class="link-btn link-btn--danger" (click)="toDelete.set(s)">
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [currentPage]="currentPage()" [lastPage]="lastPage()" (pageChange)="goToPage($event)" />
+  }
+</div>
+
+<app-confirm-dialog
+  [open]="toDelete() !== null"
+  title="Eliminar proveedor"
+  [message]="'¿Eliminar «' + (toDelete()?.name ?? '') + '»? Esta acción no se puede deshacer.'"
+  (confirmed)="doDelete()"
+  (cancelled)="toDelete.set(null)"
+/>
