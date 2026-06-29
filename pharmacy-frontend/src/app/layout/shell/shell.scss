@@ -29,22 +29,26 @@
   padding: 6px 8px 16px;
 }
 .sidebar__mark {
-  display: grid;
-  place-items: center;
   width: 38px;
   height: 38px;
   flex: none;
-  border-radius: 11px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 1.3rem;
-  font-weight: 700;
+  object-fit: contain;
 }
 .sidebar__name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.02rem;
-  white-space: nowrap;
+}
+.sidebar__title { white-space: nowrap; }
+.sidebar__eyebrow {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 .sidebar__name em { font-style: normal; color: var(--muted); }
 
