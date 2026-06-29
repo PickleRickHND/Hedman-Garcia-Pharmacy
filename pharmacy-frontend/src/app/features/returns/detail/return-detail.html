@@ -1,0 +1,66 @@
+@if (loading()) {
+  <div class="card state">Cargando devolución…</div>
+} @else if (order(); as ord) {
+  <header class="page-head">
+    <div>
+      <p class="page-head__eyebrow">
+        <a routerLink="/returns" class="back-link">Devoluciones</a> / {{ ord.return_number }}
+      </p>
+      <h1>Devolución {{ ord.return_number }}</h1>
+    </div>
+  </header>
+
+  <div class="meta-grid">
+    <div class="card meta">
+      <span class="meta__label">Factura origen</span>
+      <span class="meta__value mono">{{ ord.invoice?.invoice_number ?? '—' }}</span>
+    </div>
+    <div class="card meta">
+      <span class="meta__label">Fecha</span>
+      <span class="meta__value">{{ formatDate(ord.processed_at) }}</span>
+    </div>
+    <div class="card meta">
+      <span class="meta__label">Procesó</span>
+      <span class="meta__value">{{ ord.processed_by?.name ?? '—' }}</span>
+    </div>
+    <div class="card meta">
+      <span class="meta__label">Reembolso total</span>
+      <span class="meta__value num">{{ money(ord.total_refund) }}</span>
+    </div>
+  </div>
+
+  <div class="reason-note"><strong>Motivo:</strong> {{ ord.reason }}</div>
+
+  <div class="card table-card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Producto (item)</th>
+          <th class="ta-right">Cantidad</th>
+          <th class="ta-right">Precio</th>
+          <th class="ta-right">Subtotal</th>
+          <th>Reingresó stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of ord.items; track item.id) {
+          <tr>
+            <td class="mono">#{{ item.invoice_item_id }}</td>
+            <td class="ta-right num">{{ item.quantity }}</td>
+            <td class="ta-right num">{{ money(item.unit_price) }}</td>
+            <td class="ta-right num">{{ money(item.subtotal) }}</td>
+            <td>
+              @if (item.restock) {
+                <span class="badge badge-success">Sí</span>
+              } @else {
+                <span class="badge badge-neutral">No</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="card state">No se encontró la devolución.</div>
+}

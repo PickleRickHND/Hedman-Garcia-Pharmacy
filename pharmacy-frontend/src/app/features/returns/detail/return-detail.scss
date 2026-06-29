@@ -1,0 +1,26 @@
+:host { display: block; }
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.meta { display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; }
+.meta__label {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 600;
+}
+.meta__value { font-weight: 600; color: var(--ink); }
+
+.reason-note {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}

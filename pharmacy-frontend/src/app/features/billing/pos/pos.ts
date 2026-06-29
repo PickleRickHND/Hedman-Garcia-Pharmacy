@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -41,6 +42,9 @@ export class Pos implements OnInit {
     nonNullable: true,
     validators: [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
   });
+  private readonly customerNameText = toSignal(this.customerName.valueChanges, {
+    initialValue: this.customerName.value,
+  });
   readonly customerRtn = new FormControl('', { nonNullable: true });
   readonly paymentMethodId = signal<number | null>(null);
   readonly paymentMethods = signal<PaymentMethod[]>([]);
@@ -60,7 +64,10 @@ export class Pos implements OnInit {
   });
 
   readonly canIssue = computed(
-    () => this.cart().length > 0 && this.paymentMethodId() !== null && this.customerName.valid,
+    () =>
+      this.cart().length > 0 &&
+      this.paymentMethodId() !== null &&
+      this.customerNameText().trim().length >= 2,
   );
 
   ngOnInit(): void {

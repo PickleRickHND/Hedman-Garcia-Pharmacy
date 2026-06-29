@@ -113,11 +113,38 @@ export const routes: Routes = [
         loadComponent: () => import('./features/billing/detail/invoice-detail').then((m) => m.InvoiceDetail),
       },
 
+      // Caja (conectado a la API). Admin o Cajero.
+      {
+        path: 'cash-registers',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () =>
+          import('./features/cash-register/cash-register-index').then((m) => m.CashRegisterIndex),
+      },
+
+      // Devoluciones (conectado a la API). Ver: Admin o Cajero; crear: solo Admin.
+      {
+        path: 'returns',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () => import('./features/returns/list/return-list').then((m) => m.ReturnList),
+      },
+      {
+        path: 'returns/new',
+        canActivate: [roleGuard],
+        data: { roles: ADMIN },
+        loadComponent: () => import('./features/returns/create/return-create').then((m) => m.ReturnCreate),
+      },
+      {
+        path: 'returns/:id',
+        canActivate: [roleGuard],
+        data: { roles: STAFF },
+        loadComponent: () => import('./features/returns/detail/return-detail').then((m) => m.ReturnDetail),
+      },
+
       // Módulos pendientes (placeholder hasta conectar su UI a la API).
       cs('stock-movements', 'Inventario', 'inventory', STAFF),
       cs('users', 'Usuarios', 'users', ADMIN),
-      cs('cash-registers', 'Caja', 'cash', STAFF),
-      cs('returns', 'Devoluciones', 'returns', STAFF),
       cs('reports', 'Reportes', 'reports', ADMIN),
     ],
   },
