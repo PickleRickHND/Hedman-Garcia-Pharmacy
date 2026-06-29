@@ -396,7 +396,35 @@ select.input { cursor: pointer; }
 .check input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
 @media (max-width: 640px) {
   .form-grid { grid-template-columns: 1fr; }
-  .filter-select { flex: 1; }
+
+  /* Encabezado: el botón de acción baja bajo el título */
+  .page-head { flex-wrap: wrap; align-items: flex-start; }
+  .page-head .btn { width: 100%; justify-content: center; }
+
+  /* Toolbars de filtros: cada control ocupa el ancho completo y se apila */
+  .toolbar { gap: 10px; }
+  .search-field,
+  .filter-select,
+  .date-field { flex: 1 1 100%; width: 100%; min-width: 0; }
+  .toolbar .btn { width: 100%; justify-content: center; }
+
+  /* Tabs (Reportes): scroll horizontal en vez de desbordar; barra oculta */
+  .tabs {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 1 0 auto; white-space: nowrap; }
+
+  /* Métricas en una sola columna */
+  .stat-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Formularios y paneles con menos padding */
+  .form-card,
+  .panel { padding: 18px; }
 }
 
 /* Accesibilidad: respeta reduce-motion */

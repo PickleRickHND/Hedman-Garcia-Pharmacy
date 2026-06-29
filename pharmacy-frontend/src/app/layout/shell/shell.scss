@@ -193,3 +193,12 @@
   .profile__meta { display: none; }
   .search { min-width: 0; width: 140px; }
 }
+
+/* Teléfonos angostos: evitar desbordamiento horizontal del topbar */
+@media (max-width: 640px) {
+  .topbar { padding: 0 14px; gap: 10px; }
+  .topbar__left,
+  .topbar__right { gap: 8px; }
+  .search { display: none; } /* buscador global aún no funcional en móvil */
+  .content { padding: 20px 14px 40px; }
+}
