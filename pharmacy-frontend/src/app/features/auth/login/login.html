@@ -9,7 +9,7 @@
     <div class="brand__center">
       <div class="blister" aria-hidden="true">
         @for (c of cells; track c) {
-          <span class="blister__pill" [class.is-on]="filled.has(c)"></span>
+          <span class="blister__pill" [class.is-on]="filled.has(c)" [style.--d]="c * 14 + 'ms'"></span>
         }
       </div>
       <h2 class="brand__headline">Inventario y ventas,<br />con precisión de farmacia.</h2>
