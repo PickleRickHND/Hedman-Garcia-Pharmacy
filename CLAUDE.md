@@ -64,6 +64,6 @@ Cada módulo de negocio sigue: `core/models/<x>.model.ts` + `features/<x>/<x>.se
 
 ## Git
 
-- Branch de trabajo de la migración: `feature/laravel-api-angular`. PR contra `master`.
+- Rama principal: `production` (antes `master`; renombrada). Branch de trabajo de la migración: `feature/laravel-api-angular`. PR contra `production`.
 - Conventional Commits en español. **No** incluir footer "Generated with Claude Code" ni "Co-Authored-By".
 - Escanear secretos antes de commitear; `.env` está ignorado.
