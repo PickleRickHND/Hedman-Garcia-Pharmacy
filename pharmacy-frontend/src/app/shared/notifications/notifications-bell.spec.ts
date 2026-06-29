@@ -27,8 +27,6 @@ describe('NotificationsBell', () => {
             alerts,
             count,
             refresh: () => of({ data: [], count: 0 }),
-            dismiss: jasmine.createSpy('dismiss'),
-            dismissAll: jasmine.createSpy('dismissAll'),
           },
         },
         { provide: Router, useValue: router },
@@ -83,17 +81,24 @@ describe('NotificationsBell', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/cash-registers']);
   });
 
-  it('descarta la alerta accionada al hacer click', () => {
-    const service = TestBed.inject(NotificationService);
+  it('al accionar una alerta navega y cierra el panel (sin ocultarla del estado)', () => {
+    alerts.set([{ type: 'low_stock', label: 'Stock bajo: 2 productos', count: 2, variant: 'warning' }]);
+    count.set(1);
+    cmp.toggle();
     cmp.go({ type: 'low_stock', label: 'Stock bajo: 2 productos', count: 2, variant: 'warning' });
-    expect(service.dismiss).toHaveBeenCalledWith('low_stock');
+    expect(router.navigate).toHaveBeenCalledWith(['/products'], { queryParams: { low_stock: 1 } });
+    expect(cmp.open()).toBeFalse();
+    // La alerta sigue vigente: el componente no la descarta, solo se quita
+    // cuando el backend deja de reportarla en el siguiente refresco.
+    expect(alerts().length).toBe(1);
+    expect(count()).toBe(1);
   });
 
-  it('descarta las alertas vistas al cerrar el panel', () => {
-    const service = TestBed.inject(NotificationService);
+  it('abrir y cerrar el panel no altera el conteo de alertas', () => {
+    count.set(3);
     cmp.toggle(); // abre
     cmp.toggle(); // cierra
-    expect(service.dismissAll).toHaveBeenCalled();
     expect(cmp.open()).toBeFalse();
+    expect(cmp['service'].count()).toBe(3);
   });
 });

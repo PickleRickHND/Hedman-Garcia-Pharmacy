@@ -6,43 +6,28 @@ import { Alert, AlertsResponse } from '../../core/models/notification.model';
 
 /**
  * Alertas operativas (stock, vencimientos, caja) calculadas en el backend.
- * Mantiene un estado reactivo para el badge de la campana. Las alertas vistas o
- * accionadas se descartan en memoria de sesión (no reaparecen hasta recargar).
+ *
+ * Son estado EN VIVO: una alerta permanece visible mientras la condición exista
+ * (p. ej. hay productos agotados) y desaparece sola cuando se resuelve, al
+ * siguiente refresco. No se "descartan" en memoria: el badge siempre refleja la
+ * situación operativa real y vuelve a avisar si surge una condición nueva.
  */
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private readonly http = inject(HttpClient);
   private readonly base = environment.apiUrl;
 
-  /** Alertas crudas del backend. */
-  private readonly raw = signal<Alert[]>([]);
-  /** Tipos de alerta descartados en esta sesión (vistos o accionados). */
-  private readonly dismissed = signal<ReadonlySet<string>>(new Set());
+  /** Alertas vigentes según el backend. */
+  private readonly _alerts = signal<Alert[]>([]);
 
-  /** Alertas pendientes (no descartadas) — para el panel y el badge. */
-  readonly alerts = computed(() => this.raw().filter((a) => !this.dismissed().has(a.type)));
-  readonly count = computed(() => this.alerts().length);
+  /** Alertas a mostrar en el panel y para el badge. */
+  readonly alerts = this._alerts.asReadonly();
+  readonly count = computed(() => this._alerts().length);
 
   /** Pide las alertas al backend y refresca el estado. */
   refresh(): Observable<AlertsResponse> {
     return this.http
       .get<AlertsResponse>(`${this.base}/notifications`)
-      .pipe(tap((res) => this.raw.set(res.data)));
-  }
-
-  /** Descarta una alerta concreta (al accionarla). */
-  dismiss(type: string): void {
-    this.dismissed.update((set) => new Set(set).add(type));
-  }
-
-  /** Marca como vistas todas las alertas pendientes (al cerrar el panel). */
-  dismissAll(): void {
-    const types = this.alerts().map((a) => a.type);
-    if (types.length === 0) return;
-    this.dismissed.update((set) => {
-      const next = new Set(set);
-      types.forEach((t) => next.add(t));
-      return next;
-    });
+      .pipe(tap((res) => this._alerts.set(res.data ?? [])));
   }
 }

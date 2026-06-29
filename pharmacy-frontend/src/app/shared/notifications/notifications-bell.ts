@@ -75,10 +75,14 @@ const REFRESH_MS = 5 * 60 * 1000;
       color: var(--ink-soft);
       cursor: pointer;
       --icon-size: 19px;
-      transition: background 0.12s ease;
+      transition: background var(--dur-1, 0.12s) var(--ease-out, ease), transform var(--dur-1, 0.12s) var(--ease-out, ease);
     }
     .nb__trigger:hover {
       background: var(--surface-2);
+      color: var(--ink);
+    }
+    .nb__trigger:active {
+      transform: scale(0.9);
     }
     .nb__badge {
       position: absolute;
@@ -109,6 +113,25 @@ const REFRESH_MS = 5 * 60 * 1000;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow-lg);
+      transform-origin: top right;
+      animation: nb-pop var(--dur-2, 0.2s) var(--ease-spring, cubic-bezier(0.34, 1.4, 0.64, 1)) both;
+    }
+    @keyframes nb-pop {
+      from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .nb__badge {
+      animation: nb-badge var(--dur-2, 0.2s) var(--ease-spring, cubic-bezier(0.34, 1.4, 0.64, 1)) both;
+    }
+    @keyframes nb-badge {
+      from { transform: scale(0); }
+      to { transform: scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nb__panel, .nb__badge { animation-duration: 0.001ms; }
+    }
+    .nb__item {
+      transition: background var(--dur-1, 0.12s) var(--ease-out, ease);
     }
     .nb__head {
       padding: 8px 10px;
@@ -192,19 +215,17 @@ export class NotificationsBell implements OnInit, OnDestroy {
       this.close();
     } else {
       this.open.set(true);
+      // Al abrir, trae el estado más reciente (las alertas son en vivo).
       this.service.refresh().subscribe({ error: () => {} });
     }
   }
 
-  /** Al cerrar, descarta las alertas vistas (no reaparecen en la sesión). */
   close(): void {
     if (!this.open()) return;
     this.open.set(false);
-    this.service.dismissAll();
   }
 
   go(alert: Alert): void {
-    this.service.dismiss(alert.type);
     switch (alert.type) {
       case 'low_stock':
       case 'out_of_stock':
