@@ -17,7 +17,7 @@
     <button class="btn btn-ghost" (click)="load()">Reintentar</button>
   </div>
 } @else {
-  <section class="grid">
+  <section class="grid stagger">
     @for (card of cards(); track card.label) {
       <article class="metric card" [class]="card.tone ? 'tone-' + card.tone : ''">
         <span class="metric__icon"><app-icon [name]="card.icon" /></span>
