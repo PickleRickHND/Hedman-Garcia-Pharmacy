@@ -41,3 +41,10 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Playwright E2E (artefactos de corrida; los specs en e2e/ SÍ se versionan)
+/playwright-report/
+/test-results/
+/blob-report/
+/.last-run.json
+.playwright-mcp/
