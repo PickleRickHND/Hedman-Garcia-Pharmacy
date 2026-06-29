@@ -19,17 +19,8 @@ export interface TopProduct {
   total_revenue: number;
 }
 
-/** Producto dentro del snapshot de inventario (modelo crudo del backend). */
-export interface InventoryProduct {
-  id: number;
-  name: string;
-  sku: string;
-  stock: number;
-  price: string | number;
-  category?: { id: number; name: string } | null;
-}
-
-/** GET /reports/inventory — snapshot del inventario. */
+/** GET /reports/inventory — snapshot del inventario (solo agregados; el detalle
+ *  por producto vive en el módulo de Productos, paginado). */
 export interface InventoryReport {
   total_products: number;
   total_units: number;
@@ -38,5 +29,4 @@ export interface InventoryReport {
   out_of_stock: number;
   expired: number;
   expiring_soon: number;
-  products: InventoryProduct[];
 }

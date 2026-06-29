@@ -29,7 +29,7 @@ class UserController extends Controller
             })
             ->when($request->filled('role'), fn ($q) => $q->role($request->string('role')->toString()))
             ->orderBy('name')
-            ->paginate($request->integer('per_page', 15));
+            ->paginate(min($request->integer('per_page', 15), 100));
 
         return UserResource::collection($users);
     }
@@ -65,9 +65,21 @@ class UserController extends Controller
         return new UserResource($user->load('roles'));
     }
 
-    public function update(UpdateUserRequest $request, User $user): UserResource
+    public function update(UpdateUserRequest $request, User $user): JsonResponse|UserResource
     {
         $validated = $request->validated();
+
+        // Evitar dejar el sistema sin administradores (lockout administrativo).
+        if (
+            $user->hasRole('Administrador')
+            && $validated['role'] !== 'Administrador'
+            && User::role('Administrador')->count() <= 1
+        ) {
+            return response()->json(
+                ['message' => 'No puedes quitar el rol Administrador al último administrador.'],
+                422
+            );
+        }
 
         $updates = [
             'name' => $validated['name'],
@@ -91,6 +103,11 @@ class UserController extends Controller
         // No permitir que un usuario se elimine a sí mismo.
         if ($user->id === $request->user()->id) {
             return response()->json(['message' => 'No puedes eliminar tu propia cuenta.'], 422);
+        }
+
+        // No dejar el sistema sin administradores.
+        if ($user->hasRole('Administrador') && User::role('Administrador')->count() <= 1) {
+            return response()->json(['message' => 'No puedes eliminar al último administrador.'], 422);
         }
 
         $user->delete();

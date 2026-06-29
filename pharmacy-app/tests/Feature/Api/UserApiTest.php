@@ -172,6 +172,39 @@ it('impide que un administrador se elimine a sí mismo (422)', function () {
     expect(User::find($admin->id))->not->toBeNull();
 });
 
+it('impide que el último administrador se quite el rol (lockout)', function () {
+    $admin = apiAs('Administrador'); // único administrador
+
+    $this->putJson("/api/users/{$admin->id}", [
+        'name' => $admin->name,
+        'email' => $admin->email,
+        'role' => 'Cajero',
+    ])->assertStatus(422)->assertJsonPath('message', 'No puedes quitar el rol Administrador al último administrador.');
+
+    expect($admin->fresh()->hasRole('Administrador'))->toBeTrue();
+});
+
+it('permite degradar a un administrador si hay otro (no es el último)', function () {
+    apiAs('Administrador');
+    $other = createUserWithRole('Administrador');
+
+    $this->putJson("/api/users/{$other->id}", [
+        'name' => $other->name,
+        'email' => $other->email,
+        'role' => 'Cajero',
+    ])->assertOk();
+
+    expect($other->fresh()->hasRole('Cajero'))->toBeTrue();
+});
+
+it('permite eliminar a un administrador si no es el último', function () {
+    apiAs('Administrador');
+    $other = createUserWithRole('Administrador');
+    // Borrar el segundo admin deja uno: permitido (el guard de "último admin" no aplica).
+    $this->deleteJson("/api/users/{$other->id}")->assertNoContent();
+    expect(User::role('Administrador')->count())->toBe(1);
+});
+
 // ------------------------------------------------------------------
 // Roles
 // ------------------------------------------------------------------

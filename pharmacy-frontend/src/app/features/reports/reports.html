@@ -123,33 +123,10 @@
     <div class="card panel">
       <h2 class="panel__title">Alertas de inventario</h2>
       <app-bar-chart [data]="inventoryChart()" />
-    </div>
-
-    <div class="card table-card">
-      <div class="table-scroll">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>SKU</th>
-              <th>Categoría</th>
-              <th class="ta-right">Stock</th>
-              <th class="ta-right">Precio</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (p of inv.products; track p.id) {
-              <tr>
-                <td class="strong">{{ p.name }}</td>
-                <td class="mono">{{ p.sku }}</td>
-                <td>{{ p.category?.name ?? '—' }}</td>
-                <td class="ta-right num">{{ p.stock }}</td>
-                <td class="ta-right num">{{ money(p.price) }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <p class="panel__note">
+        El detalle por producto (con filtros y paginación) está en
+        <a routerLink="/products">Productos</a>.
+      </p>
     </div>
   }
 }

@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import {
   StockMovement,
   StockMovementType,
@@ -28,6 +29,7 @@ export class StockMovementList implements OnInit {
   private readonly service = inject(StockMovementService);
   private readonly products = inject(ProductService);
   private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly types = STOCK_MOVEMENT_TYPES;
 
@@ -38,6 +40,9 @@ export class StockMovementList implements OnInit {
     date_to: new FormControl<string>('', { nonNullable: true }),
   });
 
+  /** Búsqueda de producto (server-side): evita precargar todo el catálogo. */
+  readonly productSearch = new FormControl<string>('', { nonNullable: true });
+
   readonly page = signal(1);
   readonly movements = signal<StockMovement[]>([]);
   readonly productOptions = signal<ProductOption[]>([]);
@@ -47,18 +52,29 @@ export class StockMovementList implements OnInit {
   readonly loading = signal(true);
 
   ngOnInit(): void {
-    // Productos para el filtro (tope alto para traerlos todos en un select).
-    this.products.list({ per_page: 200 }).subscribe({
+    // Opciones iniciales del filtro (primeros 30 por nombre); la búsqueda las refina.
+    this.loadProductOptions('');
+
+    this.productSearch.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((term) => this.loadProductOptions(term));
+
+    this.filters.valueChanges
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.page.set(1);
+        this.load();
+      });
+
+    this.load();
+  }
+
+  /** Carga hasta 30 productos coincidentes para el <select> del filtro. */
+  private loadProductOptions(search: string): void {
+    this.products.list({ search: search || undefined, per_page: 30 }).subscribe({
       next: (res) => this.productOptions.set(res.data.map((p) => ({ id: p.id, name: p.name, sku: p.sku }))),
       error: () => this.toast.error('No pudimos cargar los productos para el filtro.'),
     });
-
-    this.filters.valueChanges.pipe(debounceTime(300)).subscribe(() => {
-      this.page.set(1);
-      this.load();
-    });
-
-    this.load();
   }
 
   load(): void {
@@ -94,6 +110,7 @@ export class StockMovementList implements OnInit {
 
   clearFilters(): void {
     this.filters.reset({ product_id: '', type: '', date_from: '', date_to: '' });
+    this.productSearch.setValue('');
   }
 
   badge(type: StockMovementType): string {

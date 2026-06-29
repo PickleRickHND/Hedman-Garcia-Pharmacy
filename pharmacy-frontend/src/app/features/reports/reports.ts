@@ -1,5 +1,7 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import { InventoryReport, SalesReport, TopProduct } from '../../core/models/report.model';
 import { BarChart, BarDatum } from '../../shared/chart/bar-chart';
@@ -10,12 +12,13 @@ type Tab = 'sales' | 'products' | 'inventory';
 
 @Component({
   selector: 'app-reports',
-  imports: [ReactiveFormsModule, BarChart],
+  imports: [ReactiveFormsModule, RouterLink, BarChart],
   templateUrl: './reports.html',
 })
 export class Reports implements OnInit {
   private readonly service = inject(ReportService);
   private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly tab = signal<Tab>('sales');
 
@@ -45,11 +48,17 @@ export class Reports implements OnInit {
   readonly top = signal<TopProduct[]>([]);
   readonly topLoading = signal(false);
 
+  /** Señal derivada del select (no leer FormControl.value dentro de un computed). */
+  private readonly sortBy = toSignal(this.productsForm.controls.sort_by.valueChanges, {
+    initialValue: this.productsForm.controls.sort_by.value,
+  });
+
   readonly topChart = computed<BarDatum[]>(() => {
-    const byRevenue = this.productsForm.controls.sort_by.value === 'revenue';
+    const byRevenue = this.sortBy() === 'revenue';
+    // Los SUM del backend llegan como string (MySQL); coercionar en el borde.
     return this.top().map((p) => ({
       label: p.product_name,
-      value: byRevenue ? p.total_revenue : p.total_quantity,
+      value: Number(byRevenue ? p.total_revenue : p.total_quantity),
       display: byRevenue ? this.money(p.total_revenue) : String(p.total_quantity),
     }));
   });
@@ -71,8 +80,12 @@ export class Reports implements OnInit {
 
   ngOnInit(): void {
     this.loadSales();
-    this.salesRange.valueChanges.pipe(debounceTime(300)).subscribe(() => this.loadSales());
-    this.productsForm.valueChanges.pipe(debounceTime(300)).subscribe(() => this.loadTop());
+    this.salesRange.valueChanges
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadSales());
+    this.productsForm.valueChanges
+      .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadTop());
   }
 
   setTab(tab: Tab): void {

@@ -101,7 +101,9 @@ it('devuelve el snapshot de inventario', function () {
         ->assertOk()
         ->assertJsonStructure(['data' => [
             'total_products', 'total_units', 'total_value',
-            'low_stock', 'out_of_stock', 'expired', 'expiring_soon', 'products',
+            'low_stock', 'out_of_stock', 'expired', 'expiring_soon',
         ]])
-        ->assertJsonPath('data.total_products', 3);
+        ->assertJsonPath('data.total_products', 3)
+        // El resumen no embebe el catálogo completo (se quitó por performance).
+        ->assertJsonMissingPath('data.products');
 });

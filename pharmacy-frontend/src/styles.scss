@@ -324,6 +324,9 @@ button { font-family: inherit; cursor: pointer; }
 /* Panel con título (para gráficos) */
 .panel { padding: 22px; margin-bottom: 18px; }
 .panel__title { font-size: 1rem; font-weight: 700; margin-bottom: 18px; font-family: var(--font-display); color: var(--ink); }
+.panel__note { margin-top: 16px; font-size: 0.85rem; color: var(--muted); }
+.panel__note a { color: var(--accent-strong); font-weight: 600; }
+.panel__note a:hover { text-decoration: underline; }
 
 /* Utilidades de celda */
 .nowrap { white-space: nowrap; }

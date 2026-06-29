@@ -49,7 +49,13 @@ class ReportController extends Controller
      */
     public function inventory(ReportService $reports): JsonResponse
     {
-        return response()->json(['data' => $reports->inventorySnapshot()]);
+        $snapshot = $reports->inventorySnapshot();
+
+        // El resumen solo necesita los agregados; el detalle por producto vive en
+        // el módulo de Productos (paginado). Evita serializar todo el catálogo.
+        unset($snapshot['products']);
+
+        return response()->json(['data' => $snapshot]);
     }
 
     /**

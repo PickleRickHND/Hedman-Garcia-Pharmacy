@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -19,6 +20,7 @@ export class UserList implements OnInit {
   private readonly service = inject(UserAdminService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
 
   /** Id del usuario autenticado: no puede eliminarse a sí mismo. */
   readonly currentUserId = this.auth.user()?.id ?? null;
@@ -39,11 +41,13 @@ export class UserList implements OnInit {
       error: () => this.toast.error('No pudimos cargar los roles.'),
     });
 
-    this.search.valueChanges.pipe(debounceTime(350), distinctUntilChanged()).subscribe(() => {
-      this.page.set(1);
-      this.load();
-    });
-    this.roleFilter.valueChanges.subscribe(() => {
+    this.search.valueChanges
+      .pipe(debounceTime(350), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.page.set(1);
+        this.load();
+      });
+    this.roleFilter.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.page.set(1);
       this.load();
     });

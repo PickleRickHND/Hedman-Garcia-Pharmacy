@@ -6,6 +6,17 @@
 </header>
 
 <form class="toolbar card" [formGroup]="filters">
+  <div class="search-field">
+    <app-icon name="search" />
+    <input
+      type="search"
+      class="search-field__input"
+      placeholder="Buscar producto…"
+      [formControl]="productSearch"
+      aria-label="Buscar producto para filtrar"
+    />
+  </div>
+
   <select class="input filter-select" formControlName="product_id" aria-label="Filtrar por producto">
     <option value="">Todos los productos</option>
     @for (p of productOptions(); track p.id) {
