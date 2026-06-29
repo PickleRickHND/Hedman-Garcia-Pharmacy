@@ -73,12 +73,10 @@
         }
       </div>
 
-      @if (!isEdit()) {
-        <label class="check field--full">
-          <input type="checkbox" formControlName="must_change_password" />
-          <span>Obligar a cambiar la contraseña en el próximo inicio de sesión</span>
-        </label>
-      }
+      <label class="check field--full">
+        <input type="checkbox" formControlName="must_change_password" />
+        <span>Obligar a cambiar la contraseña en el próximo inicio de sesión</span>
+      </label>
     </div>
 
     <div class="form-actions">

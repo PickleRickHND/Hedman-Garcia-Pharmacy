@@ -29,6 +29,7 @@ class UpdateUserRequest extends FormRequest
             'role' => ['required', Rule::in(Role::pluck('name')->toArray())],
             // Password opcional en edición: solo se cambia si viene en el payload.
             'password' => ['nullable', 'confirmed', Password::defaults()],
+            'must_change_password' => ['boolean'],
         ];
     }
 }

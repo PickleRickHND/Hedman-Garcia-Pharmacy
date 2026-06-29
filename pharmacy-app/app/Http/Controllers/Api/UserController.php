@@ -72,11 +72,12 @@ class UserController extends Controller
         $updates = [
             'name' => $validated['name'],
             'email' => $validated['email'],
+            // El administrador controla el flag explícitamente desde el formulario.
+            'must_change_password' => $validated['must_change_password'] ?? $user->must_change_password,
         ];
 
         if (! empty($validated['password'])) {
             $updates['password'] = Hash::make($validated['password']);
-            $updates['must_change_password'] = false;
         }
 
         $user->update($updates);
