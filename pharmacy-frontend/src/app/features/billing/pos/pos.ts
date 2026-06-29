@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { Product } from '../../../core/models/product.model';
 import { CreateInvoicePayload, PaymentMethod } from '../../../core/models/invoice.model';
 import { Icon } from '../../../shared/icon/icon';
+import { SelectComponent, SelectOption } from '../../../shared/select/select';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { ProductService } from '../../products/product.service';
 import { InvoiceService } from '../invoice.service';
@@ -21,7 +22,7 @@ const ISV_RATE = 0.15;
 
 @Component({
   selector: 'app-pos',
-  imports: [ReactiveFormsModule, Icon],
+  imports: [ReactiveFormsModule, Icon, SelectComponent],
   templateUrl: './pos.html',
   styleUrl: './pos.scss',
 })
@@ -48,6 +49,9 @@ export class Pos implements OnInit {
   readonly customerRtn = new FormControl('', { nonNullable: true });
   readonly paymentMethodId = signal<number | null>(null);
   readonly paymentMethods = signal<PaymentMethod[]>([]);
+  readonly paymentMethodOptions = computed<SelectOption[]>(() =>
+    this.paymentMethods().map((pm) => ({ value: pm.id, label: pm.name })),
+  );
   readonly submitting = signal(false);
 
   readonly totals = computed(() => {

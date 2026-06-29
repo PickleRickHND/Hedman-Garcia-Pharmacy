@@ -10,6 +10,7 @@ export interface Product {
   administration_form: string | null;
   storage: string | null;
   packaging: string | null;
+  image_url: string | null;
   category_id: number | null;
   supplier_id: number | null;
   category: { id: number; name: string } | null;
@@ -36,4 +37,6 @@ export interface ProductPayload {
   packaging: string | null;
   category_id: number | null;
   supplier_id: number | null;
+  /** Archivo de imagen a subir (solo cuando el usuario selecciona una nueva). */
+  image?: File | null;
 }

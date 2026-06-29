@@ -65,6 +65,22 @@
 .table-scroll { overflow-x: auto; }
 .ta-right { text-align: right; }
 
+.prod-cell { display: flex; align-items: center; gap: 10px; }
+.prod-cell__text { display: block; }
+.prod-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.prod-thumb--empty {
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+  color: var(--muted);
+}
 .prod-name { display: block; font-weight: 600; color: var(--ink); }
 .prod-sub { display: block; font-size: 0.78rem; color: var(--muted); }
 

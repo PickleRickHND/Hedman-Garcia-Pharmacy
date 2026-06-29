@@ -29,6 +29,7 @@ class ProductResource extends JsonResource
             'administration_form' => $this->administration_form,
             'storage' => $this->storage,
             'packaging' => $this->packaging,
+            'image_url' => $this->image_url,
             'category_id' => $this->category_id,
             'supplier_id' => $this->supplier_id,
             'category' => $this->whenLoaded('category', fn () => [

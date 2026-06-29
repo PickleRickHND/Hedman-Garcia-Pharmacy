@@ -17,29 +17,28 @@
     />
   </div>
 
-  <select class="input filter-select" formControlName="product_id" aria-label="Filtrar por producto">
-    <option value="">Todos los productos</option>
-    @for (p of productOptions(); track p.id) {
-      <option [value]="p.id">{{ p.name }} ({{ p.sku }})</option>
-    }
-  </select>
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por producto"
+    valueType="string"
+    placeholder="Todos los productos"
+    [searchable]="false"
+    [options]="productSelectOptions()"
+    formControlName="product_id"
+  />
 
-  <select class="input filter-select" formControlName="type" aria-label="Filtrar por tipo de movimiento">
-    <option value="">Todos los tipos</option>
-    @for (t of types; track t.value) {
-      <option [value]="t.value">{{ t.label }}</option>
-    }
-  </select>
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por tipo de movimiento"
+    valueType="string"
+    placeholder="Todos los tipos"
+    [options]="typeOptions"
+    formControlName="type"
+  />
 
-  <label class="date-field">
-    <span class="date-field__label">Desde</span>
-    <input type="date" class="input" formControlName="date_from" aria-label="Fecha desde" />
-  </label>
+  <app-date-picker label="Desde" ariaLabel="Fecha desde" formControlName="date_from" [nullable]="true" />
 
-  <label class="date-field">
-    <span class="date-field__label">Hasta</span>
-    <input type="date" class="input" formControlName="date_to" aria-label="Fecha hasta" />
-  </label>
+  <app-date-picker label="Hasta" ariaLabel="Fecha hasta" formControlName="date_to" [nullable]="true" />
 
   <button type="button" class="btn btn-ghost" (click)="clearFilters()">Limpiar</button>
 </form>

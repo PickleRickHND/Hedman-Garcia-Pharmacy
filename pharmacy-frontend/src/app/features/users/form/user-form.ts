@@ -2,6 +2,7 @@ import { Component, computed, inject, input, OnInit, signal } from '@angular/cor
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserPayload } from '../../../core/models/user.model';
+import { SelectComponent, SelectOption } from '../../../shared/select/select';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { UserAdminService } from '../user-admin.service';
 
@@ -14,7 +15,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-user-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SelectComponent],
   templateUrl: './user-form.html',
 })
 export class UserForm implements OnInit {
@@ -30,6 +31,9 @@ export class UserForm implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly roles = signal<string[]>([]);
+  readonly roleOptions = computed<SelectOption[]>(() =>
+    this.roles().map((r) => ({ value: r, label: r })),
+  );
 
   readonly form = this.fb.nonNullable.group(
     {

@@ -5,12 +5,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Invoice, PaymentMethod } from '../../../core/models/invoice.model';
 import { Icon } from '../../../shared/icon/icon';
 import { Pagination } from '../../../shared/pagination/pagination';
+import { SelectComponent, SelectOption, SelectValue } from '../../../shared/select/select';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { InvoiceQuery, InvoiceService } from '../invoice.service';
 
 @Component({
   selector: 'app-invoice-list',
-  imports: [ReactiveFormsModule, RouterLink, Icon, Pagination],
+  imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, SelectComponent],
   templateUrl: './invoice-list.html',
 })
 export class InvoiceList implements OnInit {
@@ -22,6 +23,18 @@ export class InvoiceList implements OnInit {
   readonly dateFilter = signal<InvoiceQuery['date_filter']>(null);
   readonly statusFilter = signal<string | null>(null);
   readonly page = signal(1);
+
+  readonly dateFilterOptions: SelectOption[] = [
+    { value: '', label: 'Todas las fechas' },
+    { value: 'today', label: 'Hoy' },
+    { value: 'week', label: 'Esta semana' },
+    { value: 'month', label: 'Este mes' },
+  ];
+  readonly statusFilterOptions: SelectOption[] = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'emitted', label: 'Emitidas' },
+    { value: 'voided', label: 'Anuladas' },
+  ];
 
   readonly invoices = signal<Invoice[]>([]);
   readonly currentPage = signal(1);
@@ -60,13 +73,13 @@ export class InvoiceList implements OnInit {
       });
   }
 
-  onDateFilter(value: string): void {
+  onDateFilter(value: SelectValue): void {
     this.dateFilter.set((value || null) as InvoiceQuery['date_filter']);
     this.resetAndLoad();
   }
 
-  onStatusFilter(value: string): void {
-    this.statusFilter.set(value || null);
+  onStatusFilter(value: SelectValue): void {
+    this.statusFilter.set((value as string) || null);
     this.resetAndLoad();
   }
 

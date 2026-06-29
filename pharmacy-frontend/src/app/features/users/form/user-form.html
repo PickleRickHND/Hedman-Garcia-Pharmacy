@@ -36,13 +36,15 @@
 
       <div class="field">
         <label class="label" for="role">Rol</label>
-        <select id="role" class="input" formControlName="role"
-          [class.is-invalid]="form.controls.role.touched && form.controls.role.invalid">
-          <option value="" disabled>Seleccione un rol…</option>
-          @for (role of roles(); track role) {
-            <option [value]="role">{{ role }}</option>
-          }
-        </select>
+        <app-select
+          inputId="role"
+          ariaLabel="Rol"
+          valueType="string"
+          placeholder="Seleccione un rol…"
+          [options]="roleOptions()"
+          [invalid]="form.controls.role.touched && form.controls.role.invalid"
+          formControlName="role"
+        />
         @if (form.controls.role.touched && form.controls.role.invalid) {
           <span class="field-error">Seleccione un rol.</span>
         }

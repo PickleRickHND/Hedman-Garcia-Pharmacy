@@ -20,14 +20,8 @@
 <!-- ===== Ventas ===== -->
 @if (tab() === 'sales') {
   <form class="toolbar card" [formGroup]="salesRange">
-    <label class="date-field">
-      <span class="date-field__label">Desde</span>
-      <input type="date" class="input" formControlName="from" />
-    </label>
-    <label class="date-field">
-      <span class="date-field__label">Hasta</span>
-      <input type="date" class="input" formControlName="to" />
-    </label>
+    <app-date-picker label="Desde" ariaLabel="Ventas desde" formControlName="from" [nullable]="false" />
+    <app-date-picker label="Hasta" ariaLabel="Ventas hasta" formControlName="to" [nullable]="false" />
   </form>
 
   @if (salesLoading()) {
@@ -51,23 +45,22 @@
 <!-- ===== Top productos ===== -->
 @if (tab() === 'products') {
   <form class="toolbar card" [formGroup]="productsForm">
-    <label class="date-field">
-      <span class="date-field__label">Desde</span>
-      <input type="date" class="input" formControlName="from" />
-    </label>
-    <label class="date-field">
-      <span class="date-field__label">Hasta</span>
-      <input type="date" class="input" formControlName="to" />
-    </label>
-    <select class="input filter-select" formControlName="sort_by" aria-label="Ordenar por">
-      <option value="quantity">Por cantidad</option>
-      <option value="revenue">Por ingresos</option>
-    </select>
-    <select class="input filter-select" formControlName="limit" aria-label="Cantidad de productos">
-      <option [ngValue]="10">Top 10</option>
-      <option [ngValue]="20">Top 20</option>
-      <option [ngValue]="50">Top 50</option>
-    </select>
+    <app-date-picker label="Desde" ariaLabel="Top desde" formControlName="from" [nullable]="false" />
+    <app-date-picker label="Hasta" ariaLabel="Top hasta" formControlName="to" [nullable]="false" />
+    <app-select
+      class="filter-select"
+      ariaLabel="Ordenar por"
+      valueType="string"
+      [options]="sortByOptions"
+      formControlName="sort_by"
+    />
+    <app-select
+      class="filter-select"
+      ariaLabel="Cantidad de productos"
+      valueType="number"
+      [options]="limitOptions"
+      formControlName="limit"
+    />
   </form>
 
   @if (topLoading()) {

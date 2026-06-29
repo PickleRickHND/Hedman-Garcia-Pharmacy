@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import { InventoryReport, SalesReport, TopProduct } from '../../core/models/report.model';
 import { BarChart, BarDatum } from '../../shared/chart/bar-chart';
+import { DatePickerComponent } from '../../shared/date-picker/date-picker';
+import { SelectComponent, SelectOption } from '../../shared/select/select';
 import { ToastService } from '../../shared/toast/toast.service';
 import { ReportService } from './report.service';
 
@@ -12,7 +14,7 @@ type Tab = 'sales' | 'products' | 'inventory';
 
 @Component({
   selector: 'app-reports',
-  imports: [ReactiveFormsModule, RouterLink, BarChart],
+  imports: [ReactiveFormsModule, RouterLink, BarChart, SelectComponent, DatePickerComponent],
   templateUrl: './reports.html',
 })
 export class Reports implements OnInit {
@@ -21,6 +23,16 @@ export class Reports implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly tab = signal<Tab>('sales');
+
+  readonly sortByOptions: SelectOption[] = [
+    { value: 'quantity', label: 'Por cantidad' },
+    { value: 'revenue', label: 'Por ingresos' },
+  ];
+  readonly limitOptions: SelectOption[] = [
+    { value: 10, label: 'Top 10' },
+    { value: 20, label: 'Top 20' },
+    { value: 50, label: 'Top 50' },
+  ];
 
   // --- Ventas ---
   readonly salesRange = new FormGroup({

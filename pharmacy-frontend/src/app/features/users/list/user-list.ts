@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -8,12 +8,13 @@ import { User } from '../../../core/models/user.model';
 import { ConfirmDialog } from '../../../shared/confirm/confirm-dialog';
 import { Icon } from '../../../shared/icon/icon';
 import { Pagination } from '../../../shared/pagination/pagination';
+import { SelectComponent, SelectOption } from '../../../shared/select/select';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { UserAdminService } from '../user-admin.service';
 
 @Component({
   selector: 'app-user-list',
-  imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, ConfirmDialog],
+  imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, ConfirmDialog, SelectComponent],
   templateUrl: './user-list.html',
 })
 export class UserList implements OnInit {
@@ -30,6 +31,10 @@ export class UserList implements OnInit {
   readonly page = signal(1);
   readonly users = signal<User[]>([]);
   readonly roles = signal<string[]>([]);
+  readonly roleFilterOptions = computed<SelectOption[]>(() => [
+    { value: '', label: 'Todos los roles' },
+    ...this.roles().map((r) => ({ value: r, label: r })),
+  ]);
   readonly currentPage = signal(1);
   readonly lastPage = signal(1);
   readonly loading = signal(true);

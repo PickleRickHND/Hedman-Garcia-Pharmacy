@@ -33,11 +33,36 @@ export class ProductService {
   }
 
   create(payload: ProductPayload): Observable<DataEnvelope<Product>> {
+    if (payload.image instanceof File) {
+      return this.http.post<DataEnvelope<Product>>(`${this.base}/products`, this.toFormData(payload));
+    }
     return this.http.post<DataEnvelope<Product>>(`${this.base}/products`, payload);
   }
 
   update(id: number, payload: ProductPayload): Observable<DataEnvelope<Product>> {
+    if (payload.image instanceof File) {
+      // PHP no parsea multipart en PUT: usamos POST con method spoofing (_method=PUT).
+      const body = this.toFormData(payload);
+      body.append('_method', 'PUT');
+      return this.http.post<DataEnvelope<Product>>(`${this.base}/products/${id}`, body);
+    }
     return this.http.put<DataEnvelope<Product>>(`${this.base}/products/${id}`, payload);
+  }
+
+  /** Serializa el payload a FormData para subir la imagen junto a los campos. */
+  private toFormData(payload: ProductPayload): FormData {
+    const fd = new FormData();
+    for (const [key, value] of Object.entries(payload)) {
+      if (key === 'image') continue;
+      if (value === undefined) continue;
+      // Los nulos se envían como cadena vacía para que el backend los limpie
+      // (paridad con el path JSON; multipart no transmite null nativo).
+      fd.append(key, value === null ? '' : String(value));
+    }
+    if (payload.image instanceof File) {
+      fd.append('image', payload.image);
+    }
+    return fd;
   }
 
   remove(id: number): Observable<void> {

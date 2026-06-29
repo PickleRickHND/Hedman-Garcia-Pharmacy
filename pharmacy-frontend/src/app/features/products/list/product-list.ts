@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -8,12 +8,13 @@ import { Product } from '../../../core/models/product.model';
 import { ConfirmDialog } from '../../../shared/confirm/confirm-dialog';
 import { Icon } from '../../../shared/icon/icon';
 import { Pagination } from '../../../shared/pagination/pagination';
+import { SelectComponent, SelectOption, SelectValue } from '../../../shared/select/select';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { ProductService } from '../product.service';
 
 @Component({
   selector: 'app-product-list',
-  imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, ConfirmDialog],
+  imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, ConfirmDialog, SelectComponent],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
 })
@@ -36,6 +37,11 @@ export class ProductList implements OnInit {
   readonly loading = signal(true);
   readonly categories = signal<Category[]>([]);
   readonly toDelete = signal<Product | null>(null);
+
+  readonly categoryOptions = computed<SelectOption[]>(() => [
+    { value: null, label: 'Todas las categorías' },
+    ...this.categories().map((c) => ({ value: c.id, label: c.name })),
+  ]);
 
   ngOnInit(): void {
     this.service.categories().subscribe((res) => this.categories.set(res.data));
@@ -69,8 +75,8 @@ export class ProductList implements OnInit {
       });
   }
 
-  onCategoryChange(value: string): void {
-    this.categoryId.set(value ? Number(value) : null);
+  onCategoryChange(value: SelectValue): void {
+    this.categoryId.set(value !== null && value !== '' ? Number(value) : null);
     this.resetAndLoad();
   }
 

@@ -3,12 +3,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Category, Supplier } from '../../../core/models/catalog.model';
 import { ProductPayload } from '../../../core/models/product.model';
+import { SelectComponent, SelectOption } from '../../../shared/select/select';
+import { DatePickerComponent } from '../../../shared/date-picker/date-picker';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { ProductService } from '../product.service';
 
 @Component({
   selector: 'app-product-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SelectComponent, DatePickerComponent],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
 })
@@ -27,6 +29,20 @@ export class ProductForm implements OnInit {
   readonly error = signal<string | null>(null);
   readonly categories = signal<Category[]>([]);
   readonly suppliers = signal<Supplier[]>([]);
+
+  /** Imagen: archivo nuevo seleccionado, preview local y URL actual (en edición). */
+  readonly imageFile = signal<File | null>(null);
+  readonly imagePreview = signal<string | null>(null);
+  readonly currentImageUrl = signal<string | null>(null);
+
+  readonly categoryOptions = computed<SelectOption[]>(() => [
+    { value: null, label: 'Sin categoría' },
+    ...this.categories().map((c) => ({ value: c.id, label: c.name })),
+  ]);
+  readonly supplierOptions = computed<SelectOption[]>(() => [
+    { value: null, label: 'Sin proveedor' },
+    ...this.suppliers().map((s) => ({ value: s.id, label: s.name })),
+  ]);
 
   readonly form = this.fb.nonNullable.group({
     sku: ['', [Validators.required, Validators.maxLength(30)]],
@@ -67,6 +83,7 @@ export class ProductForm implements OnInit {
             category_id: p.category_id,
             supplier_id: p.supplier_id,
           });
+          this.currentImageUrl.set(p.image_url);
           this.loading.set(false);
         },
         error: () => {
@@ -75,6 +92,21 @@ export class ProductForm implements OnInit {
         },
       });
     }
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    if (!file) return;
+    this.imageFile.set(file);
+    const reader = new FileReader();
+    reader.onload = () => this.imagePreview.set(reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.imageFile.set(null);
+    this.imagePreview.set(null);
   }
 
   submit(): void {
@@ -119,6 +151,7 @@ export class ProductForm implements OnInit {
       packaging: nullify(v.packaging),
       category_id: v.category_id ? Number(v.category_id) : null,
       supplier_id: v.supplier_id ? Number(v.supplier_id) : null,
+      image: this.imageFile(),
     };
   }
 

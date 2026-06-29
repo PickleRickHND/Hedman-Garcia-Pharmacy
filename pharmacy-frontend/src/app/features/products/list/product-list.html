@@ -22,12 +22,15 @@
     />
   </div>
 
-  <select class="input filter-select" (change)="onCategoryChange($any($event.target).value)" aria-label="Filtrar por categoría">
-    <option value="">Todas las categorías</option>
-    @for (cat of categories(); track cat.id) {
-      <option [value]="cat.id">{{ cat.name }}</option>
-    }
-  </select>
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por categoría"
+    valueType="number"
+    placeholder="Todas las categorías"
+    [value]="categoryId()"
+    [options]="categoryOptions()"
+    (valueChange)="onCategoryChange($event)"
+  />
 
   <button
     type="button"
@@ -67,8 +70,17 @@
             <tr>
               <td class="mono">{{ p.sku }}</td>
               <td>
-                <span class="prod-name">{{ p.name }}</span>
-                @if (p.presentation) { <span class="prod-sub">{{ p.presentation }}</span> }
+                <div class="prod-cell">
+                  @if (p.image_url) {
+                    <img class="prod-thumb" [src]="p.image_url" [alt]="p.name" loading="lazy" />
+                  } @else {
+                    <span class="prod-thumb prod-thumb--empty" aria-hidden="true"><app-icon name="products" /></span>
+                  }
+                  <span class="prod-cell__text">
+                    <span class="prod-name">{{ p.name }}</span>
+                    @if (p.presentation) { <span class="prod-sub">{{ p.presentation }}</span> }
+                  </span>
+                </div>
               </td>
               <td>{{ p.category?.name ?? '—' }}</td>
               <td class="ta-right num">{{ p.stock }}</td>

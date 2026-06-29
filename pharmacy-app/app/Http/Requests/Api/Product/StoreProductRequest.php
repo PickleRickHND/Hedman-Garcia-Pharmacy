@@ -36,6 +36,7 @@ class StoreProductRequest extends FormRequest
             'packaging' => ['nullable', 'string', 'max:'.config('pharmacy.limits.product_packaging_max')],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ];
     }
 }

@@ -54,27 +54,59 @@
 
       <div class="field">
         <label class="label" for="expiration_date">Vencimiento</label>
-        <input id="expiration_date" class="input" type="date" formControlName="expiration_date" />
+        <app-date-picker
+          inputId="expiration_date"
+          ariaLabel="Vencimiento"
+          formControlName="expiration_date"
+          [nullable]="true"
+        />
       </div>
 
       <div class="field">
         <label class="label" for="category_id">Categoría</label>
-        <select id="category_id" class="input" formControlName="category_id">
-          <option [ngValue]="null">Sin categoría</option>
-          @for (cat of categories(); track cat.id) {
-            <option [ngValue]="cat.id">{{ cat.name }}</option>
-          }
-        </select>
+        <app-select
+          inputId="category_id"
+          ariaLabel="Categoría"
+          valueType="number"
+          placeholder="Sin categoría"
+          [options]="categoryOptions()"
+          formControlName="category_id"
+        />
       </div>
 
       <div class="field">
         <label class="label" for="supplier_id">Proveedor</label>
-        <select id="supplier_id" class="input" formControlName="supplier_id">
-          <option [ngValue]="null">Sin proveedor</option>
-          @for (sup of suppliers(); track sup.id) {
-            <option [ngValue]="sup.id">{{ sup.name }}</option>
+        <app-select
+          inputId="supplier_id"
+          ariaLabel="Proveedor"
+          valueType="number"
+          placeholder="Sin proveedor"
+          [options]="supplierOptions()"
+          formControlName="supplier_id"
+        />
+      </div>
+
+      <div class="field field--full">
+        <label class="label">Imagen del producto</label>
+        <div class="image-upload">
+          @if (imagePreview() || currentImageUrl()) {
+            <img class="image-upload__preview" [src]="imagePreview() ?? currentImageUrl()" alt="Vista previa del producto" />
+          } @else {
+            <div class="image-upload__placeholder" aria-hidden="true">Sin imagen</div>
           }
-        </select>
+          <div class="image-upload__side">
+            <div class="image-upload__actions">
+              <label class="btn btn-ghost">
+                {{ imagePreview() || currentImageUrl() ? 'Cambiar imagen' : 'Subir imagen' }}
+                <input type="file" accept="image/png,image/jpeg,image/webp" hidden (change)="onImageSelected($event)" />
+              </label>
+              @if (imagePreview()) {
+                <button type="button" class="btn btn-ghost" (click)="removeImage()">Quitar</button>
+              }
+            </div>
+            <span class="image-upload__hint">JPG, PNG o WEBP. Máximo 2 MB.</span>
+          </div>
+        </div>
       </div>
 
       <div class="field">

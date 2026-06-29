@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -8,8 +8,10 @@ import {
   STOCK_MOVEMENT_BADGE,
   STOCK_MOVEMENT_TYPES,
 } from '../../../core/models/stock-movement.model';
+import { DatePickerComponent } from '../../../shared/date-picker/date-picker';
 import { Icon } from '../../../shared/icon/icon';
 import { Pagination } from '../../../shared/pagination/pagination';
+import { SelectComponent, SelectOption } from '../../../shared/select/select';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { ProductService } from '../../products/product.service';
 import { StockMovementService } from '../stock-movement.service';
@@ -22,7 +24,7 @@ interface ProductOption {
 
 @Component({
   selector: 'app-stock-movement-list',
-  imports: [ReactiveFormsModule, Icon, Pagination],
+  imports: [ReactiveFormsModule, Icon, Pagination, SelectComponent, DatePickerComponent],
   templateUrl: './stock-movement-list.html',
 })
 export class StockMovementList implements OnInit {
@@ -32,6 +34,16 @@ export class StockMovementList implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly types = STOCK_MOVEMENT_TYPES;
+
+  /** Opciones para los app-select (valores string para conservar la lógica de filtros). */
+  readonly typeOptions: SelectOption[] = [
+    { value: '', label: 'Todos los tipos' },
+    ...STOCK_MOVEMENT_TYPES.map((t) => ({ value: t.value, label: t.label })),
+  ];
+  readonly productSelectOptions = computed<SelectOption[]>(() => [
+    { value: '', label: 'Todos los productos' },
+    ...this.productOptions().map((p) => ({ value: String(p.id), label: `${p.name} (${p.sku})` })),
+  ]);
 
   readonly filters = new FormGroup({
     product_id: new FormControl<string>('', { nonNullable: true }),

@@ -20,12 +20,14 @@
     />
   </div>
 
-  <select class="input filter-select" [formControl]="roleFilter" aria-label="Filtrar por rol">
-    <option value="">Todos los roles</option>
-    @for (role of roles(); track role) {
-      <option [value]="role">{{ role }}</option>
-    }
-  </select>
+  <app-select
+    class="filter-select"
+    ariaLabel="Filtrar por rol"
+    valueType="string"
+    placeholder="Todos los roles"
+    [options]="roleFilterOptions()"
+    [formControl]="roleFilter"
+  />
 </div>
 
 <div class="card table-card">
