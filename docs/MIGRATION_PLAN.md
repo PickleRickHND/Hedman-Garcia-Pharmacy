@@ -48,28 +48,23 @@ Proyecto en `pharmacy-frontend/`. Implementado y verificado E2E:
 | Facturación / POS (carrito, ISV, emisión, PDF, anulación) | ✅ |
 | Caja (abrir/cerrar con arqueo + historial) | ✅ |
 | Devoluciones (lista, crear sobre factura, detalle) | ✅ |
-| **Inventario / Kardex** | ⛔ placeholder (`ComingSoon`) |
-| **Reportes** (ventas, top productos, inventario) | ⛔ placeholder |
-| **Usuarios** (CRUD + roles) | ⛔ placeholder |
+| Usuarios (CRUD + roles, filtro por rol) | ✅ |
+| Inventario / Kardex (solo lectura, filtros producto/tipo/fechas) | ✅ |
+| Reportes (ventas, top productos, inventario; con gráficos) | ✅ |
 
 Branch: `feature/laravel-api-angular` → PR contra `master`.
 
+Con esto **todos los módulos de negocio están migrados**. El frontend Angular
+cubre la funcionalidad del Livewire.
+
 ## 3. Pendiente (próximos pasos sugeridos, en orden)
 
-1. **Usuarios** (`/users`) — CRUD solo Administrador. Endpoints listos
-   (`GET/POST/PUT/DELETE /users`, `GET /roles`). Form con password opcional en
-   edición y select de rol. Sigue el patrón de Productos.
-2. **Inventario / Kardex** (`/stock-movements`) — solo lectura. Tabla con filtros
-   (producto, tipo, rango de fechas). Badges por tipo de movimiento.
-3. **Reportes** (`/reports`) — solo Administrador. Tres vistas (ventas por período,
-   top productos, snapshot de inventario). Considerar gráficos (ej. una lib ligera
-   o SVG propio para mantener el bundle chico).
-4. **Pulido final:** estados de carga/skeleton consistentes, responsive del POS y
+1. **Pulido final:** estados de carga/skeleton consistentes, responsive del POS y
    tablas en móvil, selección de cliente existente en el POS (hoy es texto libre),
    `fileReplacements` en `angular.json` para un `environment.prod` real.
-5. **Tests:** unit (Vitest/Jasmine) de servicios y guards; E2E Playwright como specs
+2. **Tests:** unit (Vitest/Jasmine) de servicios y guards; E2E Playwright como specs
    versionadas (hoy se valida con smoke tests manuales).
-6. Eventual **retiro del Livewire** una vez el frontend cubra todo.
+3. Eventual **retiro del Livewire** una vez el frontend cubra todo.
 
 ## 4. Cómo levantar el entorno (para probar)
 
