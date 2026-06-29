@@ -52,7 +52,7 @@ return [
 
     'password_reset' => [
         'code_ttl_minutes' => 15,
-        'code_length_bytes' => 8,
+        'code_length' => 6,
     ],
 
     'roles' => [

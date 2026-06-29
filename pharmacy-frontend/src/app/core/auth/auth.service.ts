@@ -24,6 +24,21 @@ export class AuthService {
     );
   }
 
+  /** Solicita un código de recuperación al correo indicado. */
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.base}/forgot-password`, { email });
+  }
+
+  /** Restablece la contraseña con el código recibido. */
+  resetPassword(payload: {
+    email: string;
+    code: string;
+    password: string;
+    password_confirmation: string;
+  }): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.base}/reset-password`, payload);
+  }
+
   logout(): Observable<unknown> {
     return this.http.post(`${this.base}/logout`, {}).pipe(
       tap({

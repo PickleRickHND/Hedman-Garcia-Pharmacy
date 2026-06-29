@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\NotificationsController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReportController;
@@ -25,6 +26,14 @@ use Illuminate\Support\Facades\Route;
 
 // Públicas
 Route::post('login', [AuthController::class, 'login'])->name('api.login');
+
+// Recuperación de contraseña por código (público + throttle anti-abuso)
+Route::post('forgot-password', [PasswordResetController::class, 'forgot'])
+    ->middleware('throttle:6,1')
+    ->name('api.password.forgot');
+Route::post('reset-password', [PasswordResetController::class, 'reset'])
+    ->middleware('throttle:6,1')
+    ->name('api.password.reset');
 
 // Protegidas por token Sanctum
 Route::middleware('auth:sanctum')->group(function () {
