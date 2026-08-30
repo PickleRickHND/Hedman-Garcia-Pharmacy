@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CategoryPayload } from '../../../core/models/catalog.model';
@@ -9,6 +9,7 @@ import { CategoryService } from '../category.service';
 @Component({
   selector: 'app-category-form',
   imports: [ReactiveFormsModule, RouterLink, ColorPickerComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './category-form.html',
 })
 export class CategoryForm implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -15,6 +15,7 @@ import { UserAdminService } from '../user-admin.service';
 @Component({
   selector: 'app-user-list',
   imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, ConfirmDialog, SelectComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './user-list.html',
 })
 export class UserList implements OnInit {

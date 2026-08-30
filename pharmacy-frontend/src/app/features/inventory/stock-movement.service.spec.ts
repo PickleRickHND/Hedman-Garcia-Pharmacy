@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { StockMovementService } from './stock-movement.service';
 
@@ -11,7 +11,7 @@ describe('StockMovementService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [StockMovementService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [StockMovementService, provideHttpClient(withXhr()), provideHttpClientTesting()],
     });
     service = TestBed.inject(StockMovementService);
     httpMock = TestBed.inject(HttpTestingController);

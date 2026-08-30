@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -24,6 +24,7 @@ const ISV_RATE = 0.15;
   selector: 'app-pos',
   imports: [ReactiveFormsModule, Icon, SelectComponent],
   templateUrl: './pos.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './pos.scss',
 })
 export class Pos implements OnInit {

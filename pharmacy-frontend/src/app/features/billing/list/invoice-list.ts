@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -12,6 +12,7 @@ import { InvoiceQuery, InvoiceService } from '../invoice.service';
 @Component({
   selector: 'app-invoice-list',
   imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, SelectComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './invoice-list.html',
 })
 export class InvoiceList implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -25,6 +25,7 @@ interface ProductOption {
 @Component({
   selector: 'app-stock-movement-list',
   imports: [ReactiveFormsModule, Icon, Pagination, SelectComponent, DatePickerComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './stock-movement-list.html',
 })
 export class StockMovementList implements OnInit {

@@ -1,6 +1,11 @@
 {
+    "name": "pickle-rick-hnd/hedman-garcia-pharmacy-legacy",
+    "description": "Sistema historico de farmacia conservado como referencia durante la migracion a Laravel y Angular.",
+    "type": "project",
+    "license": "proprietary",
     "require": {
-        "sendgrid/sendgrid": "^8.0",
-      "ext-mysqli": "*"
+        "php": "^8.2",
+        "ext-mysqli": "*",
+        "sendgrid/sendgrid": "^8.1"
     }
 }

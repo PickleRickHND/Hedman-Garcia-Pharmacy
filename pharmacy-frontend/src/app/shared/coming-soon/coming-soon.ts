@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Icon } from '../icon/icon';
 
@@ -13,6 +13,7 @@ import { Icon } from '../icon/icon';
       <p>Este módulo se conectará a la API en una próxima iteración.</p>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .cs {
       display: flex;

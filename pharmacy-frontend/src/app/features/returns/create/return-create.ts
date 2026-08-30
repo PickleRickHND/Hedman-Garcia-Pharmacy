@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -19,6 +19,7 @@ interface ReturnLine {
   selector: 'app-return-create',
   imports: [ReactiveFormsModule, RouterLink, Icon],
   templateUrl: './return-create.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './return-create.scss',
 })
 export class ReturnCreate {

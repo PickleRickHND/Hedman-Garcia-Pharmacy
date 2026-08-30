@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { CategoryService } from '../category.service';
   selector: 'app-category-list',
   imports: [ReactiveFormsModule, RouterLink, Icon, ConfirmDialog],
   templateUrl: './category-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .cat-name { display: inline-flex; align-items: center; gap: 10px; }
     .swatch { width: 16px; height: 16px; border-radius: 5px; flex: none; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }

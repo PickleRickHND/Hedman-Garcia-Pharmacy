@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ReportService } from './report.service';
 
@@ -11,7 +11,7 @@ describe('ReportService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ReportService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [ReportService, provideHttpClient(withXhr()), provideHttpClientTesting()],
     });
     service = TestBed.inject(ReportService);
     httpMock = TestBed.inject(HttpTestingController);

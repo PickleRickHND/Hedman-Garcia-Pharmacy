@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ReturnOrder } from '../../../core/models/return.model';
@@ -10,6 +10,7 @@ import { ReturnService } from '../return.service';
 @Component({
   selector: 'app-return-list',
   imports: [RouterLink, Icon, Pagination],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './return-list.html',
 })
 export class ReturnList implements OnInit {

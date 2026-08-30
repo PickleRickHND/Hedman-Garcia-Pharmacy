@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { UserPayload } from '../../core/models/user.model';
 import { UserAdminService } from './user-admin.service';
@@ -12,7 +12,7 @@ describe('UserAdminService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [UserAdminService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [UserAdminService, provideHttpClient(withXhr()), provideHttpClientTesting()],
     });
     service = TestBed.inject(UserAdminService);
     httpMock = TestBed.inject(HttpTestingController);

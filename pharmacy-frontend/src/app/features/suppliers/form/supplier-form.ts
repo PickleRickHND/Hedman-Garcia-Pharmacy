@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { SupplierPayload } from '../../../core/models/catalog.model';
@@ -8,6 +8,7 @@ import { SupplierService } from '../supplier.service';
 @Component({
   selector: 'app-supplier-form',
   imports: [ReactiveFormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './supplier-form.html',
 })
 export class SupplierForm implements OnInit {

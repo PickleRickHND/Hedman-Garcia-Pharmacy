@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -15,6 +15,7 @@ type Tab = 'sales' | 'products' | 'inventory';
 @Component({
   selector: 'app-reports',
   imports: [ReactiveFormsModule, RouterLink, BarChart, SelectComponent, DatePickerComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './reports.html',
 })
 export class Reports implements OnInit {

@@ -1,6 +1,6 @@
 # API REST — Hedman & Garcia Pharmacy
 
-Backend Laravel 11 expuesto como API REST headless para el frontend Angular.
+Backend Laravel 13 expuesto como API REST headless para el frontend Angular 22.
 Base URL local: `http://localhost:8001/api` (ver nota de puertos en [CLAUDE.md](../CLAUDE.md)).
 
 ## Autenticación

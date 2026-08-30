@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -13,6 +13,7 @@ import { CustomerService } from '../customer.service';
 @Component({
   selector: 'app-customer-list',
   imports: [ReactiveFormsModule, RouterLink, Icon, Pagination, ConfirmDialog],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './customer-list.html',
 })
 export class CustomerList implements OnInit {

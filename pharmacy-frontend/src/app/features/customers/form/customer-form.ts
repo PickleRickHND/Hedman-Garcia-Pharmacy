@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CustomerPayload } from '../../../core/models/customer.model';
@@ -8,6 +8,7 @@ import { CustomerService } from '../customer.service';
 @Component({
   selector: 'app-customer-form',
   imports: [ReactiveFormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './customer-form.html',
 })
 export class CustomerForm implements OnInit {

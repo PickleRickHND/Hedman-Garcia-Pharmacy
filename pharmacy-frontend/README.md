@@ -1,52 +1,83 @@
-# Pharmacy Frontend — Angular 20
+<div align="center">
+  <img src="public/logo.png" alt="Logo de Hedman-Garcia Pharmacy" width="120">
+  <h1>Frontend Hedman-Garcia Pharmacy</h1>
+  <p><strong>SPA operativa para inventario, ventas, caja, devoluciones, reportes y administración.</strong></p>
+</div>
 
-SPA del sistema de farmacia Hedman & Garcia. Consume la API REST de `pharmacy-app/`
-(ver [../docs/API.md](../docs/API.md)).
+---
+
+Frontend principal del sistema de farmacia. La aplicación Angular consume la API REST de `../pharmacy-app/`, aplica navegación por rol y organiza cada dominio como un módulo independiente con rutas diferidas.
+
+## Stack
+
+| Capa | Tecnología |
+| --- | --- |
+| Runtime | Node.js 24 LTS y npm 11 |
+| Framework | Angular 22.1 standalone |
+| Lenguaje | TypeScript 6.0 |
+| Reactividad | Signals, RxJS 7.8 y Zone.js 0.16 |
+| Estilos | SCSS y tokens propios |
+| Unit testing | Karma 6.4 y Jasmine 6.3 |
+| E2E | Playwright 1.62 |
 
 ## Requisitos
 
-- Node 22.20+ (el proyecto está fijado en **Angular 20** por compatibilidad).
-- Backend Laravel corriendo (ver [../CLAUDE.md](../CLAUDE.md)).
+- Node.js 24.15 o posterior dentro de la línea 24 LTS.
+- Backend Laravel disponible en el puerto 8001 para pruebas E2E.
 
 ## Desarrollo
 
 ```bash
-npm install
-NG_CLI_ANALYTICS=false npx ng serve --port 4200
+npm ci
+NG_CLI_ANALYTICS=false npx ng serve --configuration e2e --port 4200
 ```
 
-La URL de la API se configura en `src/environments/environment.ts` (`apiUrl`, default
-`http://localhost:8000/api`). Si el backend corre en otro puerto (p. ej. 8001 por
-conflicto con otro proyecto), ajustar ahí.
+La configuración `e2e` reemplaza el entorno mediante `angular.json` y apunta a `http://localhost:8001/api`; no es necesario editar `environment.ts`.
 
-## Build
+## Verificación
 
 ```bash
-NG_CLI_ANALYTICS=false npx ng build --configuration development
+NG_CLI_ANALYTICS=false npm run build -- --configuration development
+NG_CLI_ANALYTICS=false npm run test:unit
+npm run e2e
+npm audit
 ```
+
+La suite actual cubre 59 pruebas unitarias y 6 escenarios E2E para login, caja, devoluciones y facturación. El setup crea usuarios y productos temporales; el teardown comprueba que no queden facturas, movimientos, productos ni usuarios de prueba.
 
 ## Arquitectura
 
-```
+```text
 src/app/
-  core/            modelos, AuthService, interceptor Bearer, guards, ThemeService
-  layout/shell/    shell del admin (sidebar + topbar, nav filtrado por rol)
-  features/        módulos de negocio (auth, dashboard, products, customers,
-                   suppliers, categories, billing, cash-register, returns)
-  shared/          Icon, Toast, ConfirmDialog, Pagination, ComingSoon
+  core/            modelos, autenticación, interceptor, guards y tema
+  layout/shell/    navegación principal filtrada por rol
+  features/        módulos de negocio y servicios HTTP
+  shared/          controles, diálogos, toast, paginación y gráficos
 ```
 
-- **Standalone components**, routing lazy con `loadComponent` y guards (`authGuard`,
-  `guestGuard`, `roleGuard`).
-- **Auth:** token Bearer en `localStorage`; el interceptor lo adjunta y, ante 401,
-  limpia sesión y redirige a `/login`.
-- **Diseño:** tokens claro/oscuro y clases utilitarias en `src/styles.scss`.
-  Tipografías Plus Jakarta Sans / Inter / IBM Plex Mono (datos en monoespaciada).
+- Componentes standalone y rutas lazy con `loadComponent`.
+- Token Bearer almacenado en `localStorage` y agregado por el interceptor.
+- Roles Administrador y Cajero aplicados por guards y validados nuevamente por Laravel.
+- Change Detection explícito para conservar el comportamiento de Angular 20 durante la migración a Angular 22.
 
 ## Módulos implementados
 
-Login · Dashboard · Productos · Clientes · Proveedores · Categorías ·
-Facturación/POS (con PDF y anulación) · Caja (arqueo) · Devoluciones.
+- Login, recuperación de contraseña y sesión.
+- Dashboard y notificaciones operativas.
+- Productos, clientes, proveedores y categorías.
+- Facturación, POS, PDF y anulación.
+- Caja, arqueo y movimientos.
+- Devoluciones.
+- Inventario y Kardex.
+- Reportes y gráficos.
+- Usuarios y roles.
 
-Pendientes (placeholders): Inventario/Kardex, Reportes, Usuarios.
-Ver el estado completo en [../docs/MIGRATION_PLAN.md](../docs/MIGRATION_PLAN.md).
+## Documentación relacionada
+
+- [Referencia de API](../docs/API.md)
+- [Plan de migración](../docs/MIGRATION_PLAN.md)
+- [Guía general del repositorio](../README.md)
+
+## Licencia
+
+Código disponible únicamente para evaluación. Consulta la [licencia propietaria](../LICENSE).

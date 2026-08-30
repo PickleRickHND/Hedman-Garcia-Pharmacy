@@ -8,11 +8,12 @@
 
 Sistema de gestión para farmacias que evoluciona desde una aplicación PHP legacy hacia una arquitectura desacoplada con API REST en Laravel y una SPA en Angular. El backend centraliza reglas de negocio y autorización; el frontend ofrece una interfaz modular para los flujos operativos.
 
-[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php)](https://www.php.net/)
-[![Laravel](https://img.shields.io/badge/Laravel-11.31-FF2D20?logo=laravel)](https://laravel.com/)
-[![Sanctum](https://img.shields.io/badge/Sanctum-4-FF2D20?logo=laravel)](https://laravel.com/docs/11.x/sanctum)
-[![Angular](https://img.shields.io/badge/Angular-20.3-DD0031?logo=angular)](https://angular.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/Laravel-13.29-FF2D20?logo=laravel)](https://laravel.com/)
+[![Sanctum](https://img.shields.io/badge/Sanctum-4.3-FF2D20?logo=laravel)](https://laravel.com/docs/13.x/sanctum)
+[![Node.js](https://img.shields.io/badge/Node.js-24_LTS-5FA04E?logo=nodedotjs)](https://nodejs.org/)
+[![Angular](https://img.shields.io/badge/Angular-22.1-DD0031?logo=angular)](https://angular.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql)](https://www.mysql.com/)
 [![Playwright](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright)](https://playwright.dev/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
@@ -27,6 +28,7 @@ Sistema de gestión para farmacias que evoluciona desde una aplicación PHP lega
 - [Seguridad](#seguridad)
 - [Estructura del repositorio](#estructura-del-repositorio)
 - [Desarrollo local](#desarrollo-local)
+- [Decisiones de compatibilidad](#decisiones-de-compatibilidad)
 - [Pruebas](#pruebas)
 - [Documentación](#documentación)
 - [Licencia](#licencia)
@@ -40,8 +42,8 @@ El repositorio contiene tres generaciones claramente separadas:
 | Ubicación            | Tecnología                                           | Estado                                |
 | -------------------- | ---------------------------------------------------- | ------------------------------------- |
 | Raíz                 | PHP plano, MySQLi, Bootstrap y jQuery                | Histórico, conservado como referencia |
-| `pharmacy-app/`      | Laravel 11, Sanctum, servicios de dominio y API REST | Backend activo y fuente de verdad     |
-| `pharmacy-frontend/` | Angular 20 standalone, SCSS y rutas lazy             | Frontend activo                       |
+| `pharmacy-app/`      | Laravel 13, Sanctum, servicios de dominio y API REST | Backend activo y fuente de verdad     |
+| `pharmacy-frontend/` | Angular 22 standalone, SCSS y rutas lazy             | Frontend activo                       |
 
 La dirección vigente es Laravel como API headless y Angular como SPA. Las vistas Livewire del backend continúan disponibles durante la transición, pero no representan la arquitectura objetivo.
 
@@ -64,24 +66,25 @@ La dirección vigente es Laravel como API headless y Angular como SPA. Las vista
 
 | Capa                | Tecnología                  |
 | ------------------- | --------------------------- |
-| Runtime             | PHP 8.2 o superior          |
-| Framework           | Laravel 11.31               |
-| API y autenticación | REST + Laravel Sanctum 4    |
-| Autorización        | spatie/laravel-permission 6 |
+| Runtime             | PHP 8.4 o superior          |
+| Framework           | Laravel 13.29               |
+| API y autenticación | REST + Laravel Sanctum 4.3  |
+| Autorización        | spatie/laravel-permission 8 |
 | Persistencia        | MySQL y Eloquent ORM        |
 | Documentos          | dompdf 3                    |
-| Pruebas             | Pest                        |
+| Pruebas             | Pest 5                      |
 
 ### Frontend
 
 | Capa         | Tecnología                     |
 | ------------ | ------------------------------ |
-| Framework    | Angular 20.3 standalone        |
-| Lenguaje     | TypeScript 5.9                 |
+| Runtime      | Node.js 24 LTS y npm 11         |
+| Framework    | Angular 22.1 standalone        |
+| Lenguaje     | TypeScript 6.0                 |
 | Reactividad  | Signals y RxJS 7.8             |
 | Estilos      | SCSS con sistema visual propio |
-| Unit testing | Karma + Jasmine                |
-| E2E          | Playwright 1.61                |
+| Unit testing | Karma 6.4 + Jasmine 6.3        |
+| E2E          | Playwright 1.62                |
 
 ## Arquitectura
 
@@ -165,11 +168,20 @@ Configura una base MySQL de desarrollo y `FRONTEND_URL=http://localhost:4200`. N
 
 ```bash
 cd pharmacy-frontend
-npm install
+npm ci
 NG_CLI_ANALYTICS=false npx ng serve --configuration e2e --port 4200
 ```
 
 La configuración `e2e` apunta al backend local en el puerto 8001 sin modificar la configuración normal del proyecto.
+
+## Decisiones de compatibilidad
+
+- Laravel se actualizó de forma incremental, primero a 12 y después a 13.
+- Las sesiones conservan serialización PHP para no desconectar usuarios durante la migración; cambiar a JSON requiere un rollout separado.
+- Livewire 3.8 y Volt 1.11 permanecen como interfaz de transición porque soportan Laravel 13. La interfaz objetivo sigue siendo Angular.
+- El frontend Livewire conserva Tailwind CSS 3.4 para evitar un rediseño incidental, pero utiliza Vite 8.2 y Laravel Vite Plugin 3.2.
+- Angular se actualizó de forma incremental, primero a 21 y después a 22, con los codemods oficiales.
+- No se agregaron migraciones ni se modificaron bases de datos.
 
 ## Pruebas
 
@@ -180,13 +192,15 @@ php artisan test
 
 # Frontend unit
 cd ../pharmacy-frontend
-NG_CLI_ANALYTICS=false npx ng test --watch=false --browsers=ChromeHeadless
+NG_CLI_ANALYTICS=false npm run test:unit
 
 # Flujos E2E
 npm run e2e
 ```
 
 La cobertura incluye pruebas de API, servicios de dominio, componentes Angular y flujos críticos de login, inventario y facturación.
+
+Estado verificado: 222 pruebas backend, 59 unitarias Angular y 6 escenarios E2E, con auditorías Composer y npm en cero.
 
 ## Documentación
 

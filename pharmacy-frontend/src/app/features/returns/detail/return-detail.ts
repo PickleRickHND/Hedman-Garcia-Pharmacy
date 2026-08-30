@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReturnOrder } from '../../../core/models/return.model';
 import { ToastService } from '../../../shared/toast/toast.service';
@@ -8,6 +8,7 @@ import { ReturnService } from '../return.service';
   selector: 'app-return-detail',
   imports: [RouterLink],
   templateUrl: './return-detail.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './return-detail.scss',
 })
 export class ReturnDetail implements OnInit {

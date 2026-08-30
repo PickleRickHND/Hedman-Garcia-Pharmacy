@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Category, Supplier } from '../../../core/models/catalog.model';
@@ -12,6 +12,7 @@ import { ProductService } from '../product.service';
   selector: 'app-product-form',
   imports: [ReactiveFormsModule, RouterLink, SelectComponent, DatePickerComponent],
   templateUrl: './product-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './product-form.scss',
 })
 export class ProductForm implements OnInit {

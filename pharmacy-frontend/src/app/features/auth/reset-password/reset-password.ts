@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,6 +23,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   selector: 'app-reset-password',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './reset-password.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: '../auth.scss',
 })
 export class ResetPassword {

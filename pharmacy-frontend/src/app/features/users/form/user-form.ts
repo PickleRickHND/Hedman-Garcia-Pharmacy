@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserPayload } from '../../../core/models/user.model';
@@ -16,6 +16,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-user-form',
   imports: [ReactiveFormsModule, RouterLink, SelectComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './user-form.html',
 })
 export class UserForm implements OnInit {

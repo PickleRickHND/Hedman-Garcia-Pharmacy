@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CashRegister } from '../../core/models/cash-register.model';
 import { Icon } from '../../shared/icon/icon';
@@ -9,6 +9,7 @@ import { CashRegisterService } from './cash-register.service';
   selector: 'app-cash-register-index',
   imports: [ReactiveFormsModule, Icon],
   templateUrl: './cash-register-index.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './cash-register-index.scss',
 })
 export class CashRegisterIndex implements OnInit {

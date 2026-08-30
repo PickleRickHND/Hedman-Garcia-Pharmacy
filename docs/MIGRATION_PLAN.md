@@ -1,11 +1,11 @@
-# Plan de migración a Angular — Hedman & Garcia Pharmacy
+# Plan de migración a Angular 22: Hedman & Garcia Pharmacy
 
 > Documento de handoff. Resume el plan acordado, lo hecho y lo pendiente para
-> continuar en una próxima sesión. Última actualización: 2026-06-28.
+> continuar en una próxima sesión. Última actualización: 2026-08-30.
 
 ## 1. Contexto y decisión
 
-El sistema de farmacia (`pharmacy-app/`) estaba hecho en **Laravel 11 + Livewire**.
+El sistema de farmacia (`pharmacy-app/`) estaba hecho en Laravel con Livewire.
 El objetivo es **migrar el frontend a Angular** (proyecto de portafolio: demostrar
 Angular full-stack y arquitectura desacoplada, muy demandada en ofertas).
 
@@ -21,19 +21,19 @@ solo validan y delegan, sin duplicar lógica.
 
 ```
 Antes:  Laravel + Livewire + Blade  ──►  MySQL
-Ahora:  Angular SPA  ──HTTP/JSON──►  Laravel API (Sanctum) ──► Services ──► MySQL
+Ahora:  Angular 22 SPA  ──HTTP/JSON──►  Laravel 13 API (Sanctum) ──► Services ──► MySQL
 ```
 
 ## 2. Estado actual
 
-### Backend — API REST: COMPLETO (48 rutas)
+### Backend — API REST: COMPLETO (51 rutas)
 Sanctum + CORS + `routes/api.php`. Recursos: auth, products, customers, suppliers,
 categories, invoices (+PDF +void +payment-methods), cash-registers, returns,
 stock-movements, reports, dashboard, users/roles. Detalle en
 [API.md](API.md). Autorización por rol con middleware `role:` (paridad con los
 checks de los componentes Livewire).
 
-### Frontend — Angular 20: EN CONSTRUCCIÓN
+### Frontend — Angular 22: MÓDULOS DE NEGOCIO COMPLETOS
 Proyecto en `pharmacy-frontend/`. Implementado y verificado E2E:
 
 | Módulo | Estado |
@@ -52,7 +52,7 @@ Proyecto en `pharmacy-frontend/`. Implementado y verificado E2E:
 | Inventario / Kardex (solo lectura, filtros producto/tipo/fechas) | ✅ |
 | Reportes (ventas, top productos, inventario; con gráficos) | ✅ |
 
-Branch: `feature/laravel-api-angular` → PR contra `master`.
+Rama principal vigente: `production`.
 
 Con esto **todos los módulos de negocio están migrados**. El frontend Angular
 cubre la funcionalidad del Livewire.
@@ -77,14 +77,11 @@ cubre la funcionalidad del Livewire.
 # Backend (en pharmacy-app/)
 php artisan serve --port=8001
 
-# Apuntar el frontend al 8001 TEMPORALMENTE (revertir a 8000 antes de commitear):
-#   pharmacy-frontend/src/environments/environment.ts → apiUrl: http://localhost:8001/api
-
 # Frontend (en pharmacy-frontend/)
-NG_CLI_ANALYTICS=false npx ng serve --port 4200
+NG_CLI_ANALYTICS=false npx ng serve --configuration e2e --port 4200
 ```
 
-- MySQL: `root` / `DaHg10@2000`, DB `pharmacy`.
+- MySQL: configura las credenciales y la base `pharmacy` únicamente mediante `pharmacy-app/.env`.
 - Usuario admin: `admin@pharmacy.hn` (rol Administrador; password no documentada —
   para pruebas crear un usuario demo temporal vía `tinker` y borrarlo al final).
 - CORS permite `http://localhost:4200` (`FRONTEND_URL` en `.env`).
@@ -105,11 +102,12 @@ NG_CLI_ANALYTICS=false npx ng serve --port 4200
 
 ## 6. Verificación antes de cerrar cada módulo
 
-1. `ng build --configuration development` sin warnings.
-2. Smoke test E2E (Playwright MCP): login → operar el módulo contra datos reales.
+1. `npm run build -- --configuration development` sin warnings.
+2. `npm run test:unit` con 59 pruebas verdes.
+3. `npm run e2e`: login → operar el módulo contra datos temporales.
    En headless usar `form.requestSubmit()` o `window.ng.getComponent(host)` para
    conducir el componente (el click sobre submit no siempre propaga).
-3. Limpiar datos/usuarios/tokens de prueba; revertir `environment.ts` a 8000.
-4. Confirmar que petlab sigue vivo en :8000 y que no se colaron artefactos
+4. Limpiar datos/usuarios/tokens de prueba; el teardown debe confirmar cero residuos.
+5. Confirmar que petlab sigue vivo en :8000 y que no se colaron artefactos
    (`.playwright-mcp`, `*.png`) — ya están en `.gitignore`.
-5. Commit + push al branch `feature/laravel-api-angular`.
+6. Commit + push a la rama autorizada.

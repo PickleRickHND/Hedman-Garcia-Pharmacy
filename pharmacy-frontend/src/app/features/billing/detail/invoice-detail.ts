@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -10,6 +10,7 @@ import { InvoiceService } from '../invoice.service';
   selector: 'app-invoice-detail',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './invoice-detail.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './invoice-detail.scss',
 })
 export class InvoiceDetail implements OnInit {

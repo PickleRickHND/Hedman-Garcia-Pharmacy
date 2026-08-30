@@ -1,20 +1,37 @@
 # Prompt para la siguiente sesión
 
-Copiá y pegá esto al iniciar la próxima sesión de Claude Code en este repo:
+Copiá y pegá este contexto al iniciar una nueva sesión de trabajo en el repositorio:
 
 ---
 
-Estoy migrando el sistema de farmacia de Laravel+Livewire a **Laravel API (headless) + Angular 20 SPA**. Lee primero `CLAUDE.md`, `docs/MIGRATION_PLAN.md` y `docs/API.md` para el contexto completo, el estado y las convenciones.
+Estoy manteniendo Hedman-Garcia Pharmacy, una plataforma con backend Laravel 13 y frontend Angular 22. Lee primero `CLAUDE.md`, `docs/MIGRATION_PLAN.md` y `docs/API.md`.
 
-Resumen: el backend API REST (`pharmacy-app/`, Sanctum, 48 rutas) está **completo**. El frontend (`pharmacy-frontend/`, Angular 20 standalone) ya tiene: login, dashboard, y CRUD de Productos, Clientes, Proveedores, Categorías, Facturación/POS (con PDF y anulación), Caja y Devoluciones. Trabajo en el branch `feature/laravel-api-angular`.
+La API REST en `pharmacy-app/` es la fuente de verdad. La SPA en `pharmacy-frontend/` ya cubre login, dashboard, productos, clientes, proveedores, categorías, facturación, caja, devoluciones, usuarios, Kardex y reportes. Livewire 3 y Volt 1 permanecen únicamente como interfaz de transición.
 
-Quiero continuar con los módulos pendientes, en este orden: **1) Usuarios** (CRUD, solo Administrador), **2) Inventario/Kardex** (solo lectura con filtros), **3) Reportes** (ventas, top productos, inventario; con gráficos). Seguí el patrón replicable ya establecido (model + service + list/ + form/, reusando `shared/` y las clases de `styles.scss`), reemplazando los placeholders `ComingSoon` en `app.routes.ts`.
+Reglas de entorno:
 
-Notas de entorno (críticas):
-- El **puerto 8000 lo ocupa el proyecto petlab** — no lo toques. Para probar, corré el backend en `--port=8001` y apuntá `pharmacy-frontend/src/environments/environment.ts` a `http://localhost:8001/api` temporalmente, **revirtiendo a 8000 antes de commitear**.
-- MySQL `root` / `DaHg10@2000`, DB `pharmacy`. Para E2E creá un usuario demo Administrador temporal y borralo al final.
-- Verificá cada módulo con `ng build` (sin warnings) + smoke test E2E con Playwright (usando `form.requestSubmit()` / `window.ng.getComponent()` en headless), limpiá datos de prueba y commiteá al branch.
+- No tocar el puerto 8000 porque pertenece a PetLab.
+- Para pruebas usa Laravel en 8001 y Angular con la configuración `e2e` en 4200.
+- Configura MySQL y cualquier credencial únicamente mediante archivos `.env` ignorados.
+- El E2E versionado crea y elimina sus propios usuarios y productos temporales.
+- No ejecutes migraciones ni modifiques datos sin autorización explícita.
 
-Empezá por **Usuarios**. Avísame el plan antes de implementar si tenés dudas; si no, procedé.
+Antes de cerrar cambios ejecuta:
+
+```bash
+cd pharmacy-app
+composer audit --locked
+php artisan test
+npm run build
+npm audit
+
+cd ../pharmacy-frontend
+npm run build -- --configuration development
+npm run test:unit
+npm run e2e
+npm audit
+```
+
+Trabaja en español, usa Conventional Commits y presenta un plan antes de cambios estructurales.
 
 ---
