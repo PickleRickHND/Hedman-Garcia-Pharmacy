@@ -14,8 +14,8 @@ La migración en curso: de **Laravel + Livewire** a **Laravel API (headless) + A
 
 ## Stack
 
-- **Backend:** PHP 8.4+, Laravel 13.29, Sanctum 4.3 (token Bearer), spatie/laravel-permission 8.3, Livewire 3.8, Volt 1.11, dompdf 3.1 y MySQL. Lógica de negocio en `app/Services/` (BillingService, InventoryService, CashRegisterService, ReturnService, ReportService, NotificationService).
-- **Frontend:** Node.js 24 LTS, Angular 22.1 standalone, TypeScript 6.0, RxJS 7.8 y SCSS, con routing lazy y guards. Sin librería de componentes; UI propia con tokens en `src/styles.scss`. Gráficos con `BarChart` propio.
+- **Backend:** PHP 8.4.1+, Laravel 13.37, Sanctum 4.3 (token Bearer), spatie/laravel-permission 8.3, Livewire 4.4, Volt 1.11, dompdf 3.1 y MySQL. Lógica de negocio en `app/Services/` (BillingService, InventoryService, CashRegisterService, ReturnService, ReportService, NotificationService).
+- **Frontend:** Node.js 24 LTS, Angular 22.2 standalone, TypeScript 6.0, RxJS 7.8 y SCSS, con routing lazy y guards. Sin librería de componentes; UI propia con tokens en `src/styles.scss`. Gráficos con `BarChart` propio.
 - **Testing:** Pest (backend, incluye tests de la API en `tests/Feature/Api/`), Karma + Jasmine (unit frontend, `HttpTestingController`), Playwright **versionado** (`pharmacy-frontend/e2e/`, configuración `e2e` → :8001) cubriendo login + flujos críticos.
 - **Marca:** monograma **HG** (teal `#12a594 → #0b6557`). Assets en `pharmacy-frontend/public/` (`logo.png`, `favicon.ico`, `apple-touch-icon.png`); login y sidebar usan el logo.
 

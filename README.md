@@ -66,8 +66,8 @@ La dirección vigente es Laravel como API headless y Angular como SPA. Las vista
 
 | Capa                | Tecnología                  |
 | ------------------- | --------------------------- |
-| Runtime             | PHP 8.4 o superior          |
-| Framework           | Laravel 13.29               |
+| Runtime             | PHP 8.4.1 o superior        |
+| Framework           | Laravel 13.37               |
 | API y autenticación | REST + Laravel Sanctum 4.3  |
 | Autorización        | spatie/laravel-permission 8 |
 | Persistencia        | MySQL y Eloquent ORM        |
@@ -79,12 +79,12 @@ La dirección vigente es Laravel como API headless y Angular como SPA. Las vista
 | Capa         | Tecnología                     |
 | ------------ | ------------------------------ |
 | Runtime      | Node.js 24 LTS y npm 11         |
-| Framework    | Angular 22.1 standalone        |
+| Framework    | Angular 22.2 standalone        |
 | Lenguaje     | TypeScript 6.0                 |
 | Reactividad  | Signals y RxJS 7.8             |
 | Estilos      | SCSS con sistema visual propio |
 | Unit testing | Karma 6.4 + Jasmine 6.3        |
-| E2E          | Playwright 1.62                |
+| E2E          | Playwright 1.64                |
 
 ## Arquitectura
 
@@ -178,8 +178,8 @@ La configuración `e2e` apunta al backend local en el puerto 8001 sin modificar 
 
 - Laravel se actualizó de forma incremental, primero a 12 y después a 13.
 - Las sesiones conservan serialización PHP para no desconectar usuarios durante la migración; cambiar a JSON requiere un rollout separado.
-- Livewire 3.8 y Volt 1.11 permanecen como interfaz de transición porque soportan Laravel 13. La interfaz objetivo sigue siendo Angular.
-- El frontend Livewire conserva Tailwind CSS 3.4 para evitar un rediseño incidental, pero utiliza Vite 8.2 y Laravel Vite Plugin 3.2.
+- Livewire 4.4 y Volt 1.11 permanecen como interfaz de transición porque soportan Laravel 13. La interfaz objetivo sigue siendo Angular.
+- El frontend Livewire conserva Tailwind CSS 3.4 para evitar un rediseño incidental, pero utiliza Vite 8.3 y Laravel Vite Plugin 3.2.
 - Angular se actualizó de forma incremental, primero a 21 y después a 22, con los codemods oficiales.
 - No se agregaron migraciones ni se modificaron bases de datos.
 

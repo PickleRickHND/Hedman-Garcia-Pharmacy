@@ -6,7 +6,7 @@ Copiá y pegá este contexto al iniciar una nueva sesión de trabajo en el repos
 
 Estoy manteniendo Hedman-Garcia Pharmacy, una plataforma con backend Laravel 13 y frontend Angular 22. Lee primero `CLAUDE.md`, `docs/MIGRATION_PLAN.md` y `docs/API.md`.
 
-La API REST en `pharmacy-app/` es la fuente de verdad. La SPA en `pharmacy-frontend/` ya cubre login, dashboard, productos, clientes, proveedores, categorías, facturación, caja, devoluciones, usuarios, Kardex y reportes. Livewire 3 y Volt 1 permanecen únicamente como interfaz de transición.
+La API REST en `pharmacy-app/` es la fuente de verdad. La SPA en `pharmacy-frontend/` ya cubre login, dashboard, productos, clientes, proveedores, categorías, facturación, caja, devoluciones, usuarios, Kardex y reportes. Livewire 4 y Volt 1 permanecen únicamente como interfaz de transición.
 
 Reglas de entorno:
 
