@@ -67,7 +67,7 @@ La dirección vigente es Laravel como API headless y Angular como SPA. Las vista
 | Capa                | Tecnología                  |
 | ------------------- | --------------------------- |
 | Runtime             | PHP 8.4.1 o superior        |
-| Framework           | Laravel 13.37               |
+| Framework           | Laravel 13.35               |
 | API y autenticación | REST + Laravel Sanctum 4.3  |
 | Autorización        | spatie/laravel-permission 8 |
 | Persistencia        | MySQL y Eloquent ORM        |

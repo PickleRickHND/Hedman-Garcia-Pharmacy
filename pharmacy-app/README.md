@@ -13,7 +13,7 @@ Backend principal del sistema de farmacia. Laravel concentra autenticación, aut
 | Capa | Tecnología |
 | --- | --- |
 | Runtime | PHP 8.4.1 o superior |
-| Framework | Laravel 13.37 |
+| Framework | Laravel 13.35 |
 | Autenticación | Sanctum 4.3 |
 | Roles | spatie/laravel-permission 8.3 |
 | UI transitoria | Livewire 4.4 y Volt 1.11 |
