@@ -38,5 +38,26 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # Tailwind 4 (pharmacy-app) pasa la configuración a CSS (@theme,
+      # @tailwindcss/postcss), renombra utilidades usadas en las vistas Blade y
+      # exige Safari 16.4+ / Chrome 111+. La UI Livewire es transitoria y ni el
+      # build ni Pest validan el cambio visual. Reevaluar al retirar Livewire.
+      - dependency-name: tailwindcss
+        versions: ['>= 4']
+      # TypeScript 7: Angular 22 declara typescript >=6.0 <6.1 como peer y
+      # typescript-eslint tampoco lo soporta todavía.
+      - dependency-name: typescript
+        versions: ['>= 7']
+      # jasmine-core 7 bloquea el monkey patching y karma-jasmine 5.1.0 (su
+      # última versión) no arranca: "Cannot assign to read only property
+      # 'describe'". Reevaluar al migrar los unit tests de Karma a Vitest.
+      - dependency-name: jasmine-core
+        versions: ['>= 7']
+      - dependency-name: '@types/jasmine'
+        versions: ['>= 7']
+      # Los tipos de Node siguen al runtime fijado en .nvmrc y engines (Node 24).
+      - dependency-name: '@types/node'
+        versions: ['>= 25']
     commit-message:
       prefix: chore(deps)
