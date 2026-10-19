@@ -13,12 +13,12 @@ Frontend principal del sistema de farmacia. La aplicación Angular consume la AP
 | Capa | Tecnología |
 | --- | --- |
 | Runtime | Node.js 24 LTS y npm 11 |
-| Framework | Angular 22.1 standalone |
+| Framework | Angular 22.2 standalone |
 | Lenguaje | TypeScript 6.0 |
 | Reactividad | Signals, RxJS 7.8 y Zone.js 0.16 |
 | Estilos | SCSS y tokens propios |
 | Unit testing | Karma 6.4 y Jasmine 6.3 |
-| E2E | Playwright 1.62 |
+| E2E | Playwright 1.64 |
 
 ## Requisitos
 

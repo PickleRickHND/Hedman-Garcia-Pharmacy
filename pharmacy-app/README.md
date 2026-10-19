@@ -12,13 +12,13 @@ Backend principal del sistema de farmacia. Laravel concentra autenticación, aut
 
 | Capa | Tecnología |
 | --- | --- |
-| Runtime | PHP 8.4 o superior |
-| Framework | Laravel 13.29 |
+| Runtime | PHP 8.4.1 o superior |
+| Framework | Laravel 13.35 |
 | Autenticación | Sanctum 4.3 |
 | Roles | spatie/laravel-permission 8.3 |
-| UI transitoria | Livewire 3.8 y Volt 1.11 |
+| UI transitoria | Livewire 4.4 y Volt 1.11 |
 | PDF | dompdf 3.1 |
-| Assets | Vite 8.2, Laravel Vite Plugin 3.2 y Tailwind CSS 3.4 |
+| Assets | Vite 8.3, Laravel Vite Plugin 3.2 y Tailwind CSS 3.4 |
 | Pruebas | Pest 5 sobre PHPUnit 13 |
 
 ## Desarrollo local
@@ -67,7 +67,7 @@ La referencia completa de endpoints vive en [docs/API.md](../docs/API.md). El es
 
 ## Compatibilidad
 
-- Livewire 3 y Volt 1 se mantienen porque soportan Laravel 13 y representan una interfaz de transición.
+- Livewire 4 y Volt 1 se mantienen porque soportan Laravel 13 y representan una interfaz de transición.
 - La interfaz objetivo es la SPA Angular de `../pharmacy-frontend/`.
 - Tailwind 3 se conserva para evitar un rediseño accidental del frontend Livewire.
 - No se requieren migraciones de base de datos para esta actualización tecnológica.
